@@ -49,7 +49,16 @@
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         
-        /* === CAMBIO COLOR Y FORMA CÍRCULO USUARIO HEADER (Imagen 4 Fix) === */
+        /* === BLINDAJE CÍRCULO USUARIO HEADER (Sin bordes rojos, todo Cyan) === */
+        .user-circle-btn {
+            border: 2px solid #81D0DC !important;
+            background-color: transparent !important;
+            border-radius: 50% !important;
+            padding: 2px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .user-circle-initial { 
             background-color: #81D0DC !important; 
             color: #FFFFFF !important; 
@@ -60,6 +69,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
+            border: none !important;
         }
 
         /* === ESTILOS DEL MENÚ === */
@@ -161,8 +171,7 @@
         .up-info strong { color: #111827; font-weight: 800; font-size: 15px; }
         .btn-limpiar { background: white; color: #6b7280; border: 1px solid #e5e7eb; height: 40px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;}
         .btn-limpiar:hover { background: #f3f4f6; color: #111827; }
-        /* CAMBIO COLOR ELIMINADO ROJO */
-        .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s;}
+        .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s;}
         .btn-adjuntar:hover { opacity: 0.85; }
 
         /* MODAL ALERTA CUSTOM */
@@ -200,7 +209,7 @@
     <div id="login-screen">
         <div id="login-card">
             <div class="flex flex-col items-center mb-4">
-                <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="Logo FRANVE" class="mb-5 object-contain" style="height: 7.2rem; border-radius: 10px;"> 
+                <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="Logo FRANVE" class="mb-5 object-contain" style="max-width: 80%; height: auto; max-height: 90px; border-radius: 10px;"> 
                 <h1 class="text-2xl font-semibold text-text-main tracking-tight" style="margin:0;">Bienvenido</h1>
                 <p class="text-[15px] text-text-sub mt-1" style="margin-top:5px;">Mesa de Servicio Operativo</p>
             </div>
@@ -248,7 +257,9 @@
             </div>
             <div class="header-right">
                 <div class="user-menu">
-                    <button class="user-circle-btn" onclick="document.getElementById('btnCerrarSesionTop').click()"><span class="user-circle-initial" id="user-initial-header">U</span></button>
+                    <button class="user-circle-btn" onclick="document.getElementById('btnCerrarSesionTop').click()">
+                        <span class="user-circle-initial" id="user-initial-header">U</span>
+                    </button>
                     <button id="btnCerrarSesionTop" style="display:none;" onclick="cerrarSesionGlobal()"></button>
                 </div>
             </div>
@@ -305,6 +316,7 @@
                 <div id="vista-mantenimiento" class="modulo-vista activa">
                     <div class="reporte-container" style="max-width: 1200px; margin: 0 auto; position: relative; padding-bottom: 20px;">
                         
+                        <!-- ENCABEZADO Y PESTAÑAS -->
                         <header class="page-header-section" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e5e7eb;">
                             <div style="margin-bottom: 15px;">
                                 <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">Mantenimiento Correctivo</h1>
@@ -330,6 +342,7 @@
                             </div>
                         </header>
 
+                        <!-- TABLA DE ÓRDENES Y FILTROS -->
                         <div id="dashboard-ordenes" style="display: none;">
                             <form class="filters-bar" id="form-filtros-mtto">
                                 <div class="filter-group">
@@ -357,7 +370,8 @@
                             <div class="data-table-container">
                                 <table class="data-table" style="width: 100%; text-align: center; border-collapse: collapse;">
                                     <thead style="background: #f8fafc; border-bottom: 1px solid #e5e7eb;">
-                                        </thead>
+                                        <!-- Se llena dinamicamente -->
+                                    </thead>
                                     <tbody id="tabla-mis-ordenes">
                                         <tr><td colspan="6" style="padding: 30px; color: #6b7280;">Cargando...</td></tr>
                                     </tbody>
@@ -365,6 +379,7 @@
                             </div>
                         </div>
 
+                        <!-- FORMULARIO PRINCIPAL -->
                         <form id="ordenMttoForm" style="display: block;">
                             <div class="form-card" style="border-left: 4px solid #81D0DC;">
                                 <h3 class="section-title" style="color: #81D0DC; margin-bottom: 5px;"><i data-lucide="hash"></i> Folio de Orden</h3>
@@ -533,6 +548,7 @@
                     </div>
                 </div>
 
+                <!-- OTRAS VISTAS (VACÍAS) -->
                 <div id="vista-ordenes-servicio" class="modulo-vista">
                     <div style="max-width: 1000px; margin: 0 auto;">
                         <header class="page-header-section"><h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">Mantenimientos Preventivos</h1></header>
@@ -549,6 +565,7 @@
         </div>
     </div>
 
+    <!-- MODAL LECTURA CP -->
     <div id="modalLecturaCP">
         <div class="modal-card-cp">
             <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; background: #fff;">
@@ -607,6 +624,7 @@
         </div>
     </div>
 
+    <!-- BARRA FLOTANTE PARA BORRAR -->
     <div class="upload-bottom-bar" id="delete-draft-bar">
         <div class="up-info">
             <span>SELECCIÓN ACTUAL</span>
@@ -638,6 +656,7 @@
         <img class="modal-content-img" id="imgFull">
     </div>
 
+    <!-- ALERTA CUSTOM -->
     <div id="custom-alert">
         <div class="modal-card-alert">
             <div id="alert-icon-container"></div>
@@ -647,6 +666,7 @@
         </div>
     </div>
 
+    <!-- CONFIRM CUSTOM -->
     <div id="custom-confirm" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
         <div style="background:white; border-radius:16px; padding:24px; width:100%; max-width:320px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="margin-bottom:16px; color:#81D0DC; display:flex; justify-content:center;"><i data-lucide="alert-circle" style="width:48px; height:48px;"></i></div>
@@ -680,6 +700,7 @@
 
         lucide.createIcons();
 
+        // AQUÍ ESTÁ TU URL ACTUALIZADA
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGWGCHKQZFzMAZvaPjd7MXuW0n9hWLzg1-m7oXRzACeUGEzMl1s2ALDuvhIqcajQ/exec';
         window.appData = null;
 
@@ -719,6 +740,7 @@
 
         function cargarMisOrdenes() {
             if (!window.appData) return;
+            // Usamos nombreProveedor para la consulta en Firebase
             const proveedor = window.appData.nombreProveedor;
 
             db.collection("tickets_mantenimiento")
@@ -746,7 +768,7 @@
                 if (o.estado_confirmacion === 'Borrador') b++;
                 else if (o.estado_confirmacion === 'En proceso') p++;
                 else if (o.evaluacion_nivel === 'No Aceptado') r++;
-                else if (o.estado_confirmacion && o.estado_confirmacion !== 'Borrador') a++; // Cualquier otra aprobada
+                else if (o.estado_confirmacion && o.estado_confirmacion !== 'Borrador') a++; 
             });
 
             document.getElementById('badge-Borrador').innerText = b;
@@ -1353,14 +1375,13 @@
             if (savedSession && savedUser) {
                 window.appData = JSON.parse(savedSession);
                 
-                // HEADER BRANDING (Fix Imagen 4)
+                // HEADER BRANDING
                 const inicial = savedUser.charAt(0).toUpperCase();
                 document.getElementById('user-initial-header').innerText = inicial;
-                document.getElementById('welcome-username-display').innerText = window.appData.nombreProveedor;
+                document.getElementById('welcome-username-display').innerText = window.appData.nombreUsuario || '-';
 
-                // 2. LLENAR DATOS DEL PROVEEDOR (Corrección Imagen 2)
+                // 2. LLENAR DATOS DEL PROVEEDOR
                 document.getElementById('prov-info-nombre').innerText = window.appData.nombreProveedor || '-';
-                // Usamos operador opcional ?. por seguridad
                 document.getElementById('prov-info-rfc').innerText = window.appData.proveedorInfo?.rfc || 'N/A';
                 document.getElementById('prov-info-dir').innerText = window.appData.proveedorInfo?.direccion || 'N/A';
                 document.getElementById('prov-info-cont').innerText = window.appData.proveedorInfo?.contacto || 'N/A';
@@ -1389,13 +1410,13 @@
                     });
                 }
 
-                // 3. LLENAR DATOS DEL TÉCNICO (Corrección Imagen 3)
+                // 3. LLENAR DATOS DEL TÉCNICO (Autocomplete)
                 const listaTec = document.getElementById('tecnicos-list');
                 listaTec.innerHTML = '';
                 if(window.appData.tecnicos) {
                     window.appData.tecnicos.forEach(t => {
                         let opt = document.createElement('option');
-                        opt.value = t; // El valor es el nombre para el autocompletado
+                        opt.value = t; 
                         listaTec.appendChild(opt);
                     });
                 }
@@ -1424,8 +1445,10 @@
             const btn = document.getElementById('submitBtn');
             const alertMsg = document.getElementById('alertMessage');
             
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
+            const userRaw = document.getElementById('username').value;
+            const user = userRaw.trim(); 
+            const passRaw = document.getElementById('password').value;
+            const pass = passRaw.trim();
 
             alertMsg.style.display = 'none';
             btn.innerText = 'Verificando...';
@@ -1459,7 +1482,7 @@
         });
 
         // ==========================================
-        // CASCADA CLIENTE -> SUCURSAL LÓGICA (MODIFICADA PARA FRANVE)
+        // CASCADA CLIENTE -> SUCURSAL LÓGICA
         // ==========================================
         document.getElementById('sucursal-input').addEventListener('input', function(e) {
             const val = e.target.value;
@@ -1473,7 +1496,6 @@
                 document.getElementById('suc-col').innerText = suc.colonia || '';
                 document.getElementById('suc-city').innerText = suc.ciudad || '';
                 document.getElementById('suc-cp').innerText = suc.cp || '';
-                // Imagen 1 Fix: Mostrar Cliente en la interfaz
                 document.getElementById('suc-client').innerText = suc.cliente || ''; 
                 document.getElementById('suc-tel').innerText = suc.telefono || '';
                 document.getElementById('suc-mail').innerText = suc.correo || '';
