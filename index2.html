@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reporte de Recepción de Trabajos - FRANVE</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* Variables y Configuración General */
+        :root { 
+            --tm-primary: #81D0DC; 
+            --tm-primary-dark: #5FAAB5;
+            --tm-bg-dark: #131520;
+            --tm-text: #000000; 
+            --tm-border: #b3b3b3; 
+            --tm-bg-gray: #f0f0f0; 
+        }
+        
+        body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 20px; background-color: #555; color: var(--tm-text); font-size: 11px; line-height: 1.2; display: flex; flex-direction: column; align-items: center; }
+        
+        .btn-descargar { position: fixed; top: 15px; right: 15px; background-color: var(--tm-primary); color: var(--tm-bg-dark); border: none; padding: 10px 18px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 1000; transition: background-color 0.2s; }
+        .btn-descargar:hover { background-color: var(--tm-primary-dark); }
+        
+        .btn-regresar { position: fixed; top: 15px; left: 15px; background-color: var(--tm-bg-dark); color: var(--tm-primary); border: none; padding: 10px 18px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 1000; transition: background-color 0.2s; }
+        .btn-regresar:hover { background-color: #1e2235; }
+
+        .btn-cerrar { background-color: #4b5563 !important; color: white !important; }
+        .btn-cerrar:hover { background-color: #374151 !important; }
+
+        @media (max-width: 767px) {
+            body:not(.pdf-generating) { padding: 60px 0 0 0; } 
+            body:not(.pdf-generating) #contenido-pdf { transform: scale(0.48); transform-origin: top center; margin-top: 10px; width: 210mm; } 
+            body:not(.pdf-generating) .page { box-shadow: none; margin: 0 0 10px 0; padding: 8mm 15mm; border: none; height: auto; } 
+        }
+
+        .page { width: 210mm; height: 297mm; background: white; margin: 0 auto 20px auto; padding: 6mm 15mm; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.5); position: relative; display: flex; flex-direction: column; overflow: hidden; }
+        .content-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+
+        .header-container { display: grid; grid-template-columns: 60% 40%; margin-bottom: 0px; }
+        .title-row { display: flex; align-items: center; font-size: 15px; font-weight: bold; margin-bottom: 10px; color: var(--tm-text); }
+        .primary-square { width: 18px; height: 18px; background-color: var(--tm-primary); margin-right: 10px; }
+        
+        ul.info-list { list-style: none; padding: 0; margin: 0; }
+        ul.info-list li { display: flex; align-items: center; margin-bottom: 3px; font-size: 11px; color: #333; font-weight: normal !important; } 
+        .custom-bullet { display: inline-flex; justify-content: center; align-items: center; width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--tm-primary); margin-right: 8px; flex-shrink: 0; }
+        .custom-bullet::after { content: ''; width: 4px; height: 4px; background-color: var(--tm-primary); border-radius: 50%; }
+
+        .header-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-start; padding-top: 0; }
+        .logo-img { max-width: 180px; max-height: 60px; object-fit: contain; margin-bottom: 5px; margin-right: 15px; margin-top: -5px; }
+        
+        .primary-divider { height: 7px; background-color: var(--tm-primary); width: 100%; margin: 4px 0; }
+        .primary-divider-bottom { height: 7px; background-color: var(--tm-primary); width: 100%; margin: 3px 0; }
+        .primary-divider-bottom-sheet2 { height: 7px; background-color: var(--tm-primary); width: 100%; margin: 2px 0 5px 0; }
+
+        .main-titles-container { text-align: center; position: relative; margin-bottom: 0px; padding-bottom: 2px; }
+        .title-primary-centered { color: var(--tm-bg-dark); font-size: 16px; font-weight: bold; margin-bottom: 2px; }
+        
+        .ticket-left { position: absolute; bottom: 0; left: 0; text-align: left; font-size: 11px; font-weight: normal; } 
+        .ticket-right { position: absolute; bottom: 0; right: 0; text-align: right; font-size: 11px; font-weight: normal; } 
+
+        .area-container { margin-top: 2px; margin-bottom: 2px; padding-left: 0px; }
+        .area-line { display: flex; align-items: center; margin-bottom: 4px; font-size: 11px; font-weight: normal !important; } 
+        .area-container .area-line:last-child { margin-bottom: 2px; }
+
+        .primary-bar-full { background-color: var(--tm-primary); color: var(--tm-bg-dark); display: flex; align-items: center; padding: 4px 10px; font-size: 11px; font-weight: bold; } 
+        .primary-bar-full .left-col { width: 40%; display: flex; align-items: center;}
+        .primary-bar-full .center-col { width: 20%; text-align: center; display: flex; justify-content: center; align-items: center; }
+        .bullet-dark { display: inline-flex; justify-content: center; align-items: center; width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--tm-bg-dark); margin-right: 8px; flex-shrink: 0; }
+        .bullet-dark::after { content: ''; width: 3px; height: 3px; background-color: var(--tm-bg-dark); border-radius: 50%; }
+
+        .photo-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; margin-bottom: 4px; }
+        .photo-box { border: 1px solid var(--tm-border); height: 155px; background-color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .photo-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        .primary-bar-third { background-color: var(--tm-primary); color: var(--tm-bg-dark); display: flex; align-items: center; padding: 3px 10px; font-size: 11px; width: calc(33.33% - 10px); box-sizing: border-box; font-weight: bold; }
+        
+        .text-input-box { border: 1px solid var(--tm-border); padding: 4px 8px; min-height: 40px; margin-top: 2px; margin-bottom: 4px; background-color: white; font-weight: normal; } 
+
+        .eval-container { display: flex; gap: 8px; margin-top: 4px; margin-bottom: 4px; align-items: stretch; height: 155px; }
+        
+        .eval-left-box { width: 33%; border: 1px solid var(--tm-border); background-color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #ccc; font-size: 10px; box-sizing: border-box; }
+        .eval-left-box img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .eval-right-grid { width: 67%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; gap: 6px; height: 100%; }
+        .eval-card { border: 1px solid var(--tm-border); display: flex; flex-direction: column; overflow: hidden; }
+        .empleado-card { grid-column: span 2; }
+        
+        .eval-card-header { background-color: var(--tm-primary); color: var(--tm-bg-dark); padding: 3px 8px; font-size: 10px; display: flex; align-items: center; font-weight: bold; }
+        
+        .eval-card-body { padding: 4px 8px; flex-grow: 1; background-color: white; font-weight: normal; display: flex; flex-direction: column; justify-content: flex-start; overflow: hidden; } 
+        .eval-card-body .area-line { margin-bottom: 2px; font-size: 10px; font-weight: normal !important; } 
+        
+        #pdf-firma { padding: 2px; align-items: center; justify-content: center; width: 100%; height: 100%; box-sizing: border-box; }
+        #pdf-firma img { max-width: 100%; max-height: 100%; object-fit: contain; width: 100%; height: 100%; }
+
+        .proveedor-grid { display: grid; grid-template-columns: 55% 45%; margin-top: 4px; margin-bottom: 4px; padding-left: 0px; }
+        .proveedor-col { display: flex; flex-direction: column; gap: 0px; }
+        .proveedor-col .area-line { margin-bottom: 2px; font-weight: normal !important; } 
+
+        .soporte-fisico-box { background-color: white; border: 1px solid var(--tm-border); flex-grow: 1; margin-top: 3px; margin-bottom: 3px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; font-weight: bold; box-sizing: border-box; overflow: hidden; padding: 10px; }
+        .soporte-fisico-box img { width: auto; height: 100%; object-fit: contain; }
+
+        .footer-divider { border-top: 1px solid #ccc; margin-bottom: 4px; width: 100%; }
+        .primary-footer { background-color: var(--tm-bg-dark); color: var(--tm-primary); text-align: center; padding: 5px 10px; font-size: 8px; width: 100%; box-sizing: border-box; white-space: nowrap; font-weight: normal; }
+
+        @media print {
+            body { background-color: white; padding: 0; margin: 0; }
+            #contenido-pdf { transform: none; width: 210mm; margin: 0; }
+            .page { box-shadow: none; margin: 0; padding: 10mm 15mm; border: none; height: 297mm; overflow: hidden; }
+            .btn-descargar, .btn-regresar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-regresar" id="btn-regresar" onclick="manejarRegreso()">Volver a la App</button>
+    <button class="btn-descargar" id="btn-descargar" onclick="generarPDF()">Descargar PDF</button>
+
+    <div id="contenido-pdf">
+        
+        <div class="page">
+            <div class="content-wrapper">
+                <div class="header-container">
+                    <div>
+                        <div class="title-row">
+                            <div class="primary-square"></div>
+                            <div id="pdf-sucursal" style="font-weight: bold;">-- SUCURSAL --</div>
+                        </div>
+                        <ul class="info-list">
+                            <li><i class="custom-bullet"></i> Dirección: <span id="pdf-dir" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Colonia: <span id="pdf-col" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Ciudad / C.P.: <span id="pdf-city" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Horario de servicio: <span id="pdf-hor" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Teléfono: <span id="pdf-tel" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Correo electrónico: <span id="pdf-mail" style="margin-left: 5px;"></span></li>
+                        </ul>
+                    </div>
+                    <div class="header-right">
+                        <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img">
+                    </div>
+                </div>
+
+                <div class="primary-divider"></div>
+
+                <div class="main-titles-container">
+                    <div class="title-primary-centered">ATENCIÓN CORRECTIVA</div>
+                    <div class="title-primary-centered">REPORTE DE RECEPCIÓN DE TRABAJOS</div>
+                    <div class="title-primary-centered" style="font-weight: normal;">MANTENIMIENTO</div>
+                    
+                    <div class="ticket-left">N° TICKET: <span id="pdf-ticket"></span></div>
+                    
+                    <div class="ticket-right">
+                        FECHA: <span id="pdf-fecha"></span>
+                    </div>
+                </div>
+
+                <div class="primary-divider-bottom"></div>
+
+                <div class="area-container">
+                    <div class="area-line"><i class="custom-bullet"></i> AREA: <span id="pdf-area" style="margin-left: 5px;"></span></div>
+                    <div class="area-line"><i class="custom-bullet"></i> SUB AREA: <span id="pdf-subarea" style="margin-left: 5px;"></span></div>
+                </div>
+
+                <div class="primary-bar-full">
+                    <div class="left-col"><span class="bullet-dark"></span> EVIDENCIA FOTOGRÁFICA</div>
+                    <div class="center-col">FALLA</div>
+                </div>
+                
+                <div class="photo-grid-3">
+                    <div class="photo-box" id="pdf-falla-0"></div>
+                    <div class="photo-box" id="pdf-falla-1"></div>
+                    <div class="photo-box" id="pdf-falla-2"></div>
+                </div>
+
+                <div class="primary-bar-third"><span class="bullet-dark"></span> DESCRIPCIÓN DE FALLA</div>
+                <div class="text-input-box" id="pdf-desc-falla"></div>
+
+                <div class="primary-bar-full">
+                    <div class="left-col"><span class="bullet-dark"></span> EVIDENCIA FOTOGRÁFICA</div>
+                    <div class="center-col">TRABAJO REALIZADOS</div>
+                </div>
+                
+                <div class="photo-grid-3">
+                    <div class="photo-box" id="pdf-sol-0"></div>
+                    <div class="photo-box" id="pdf-sol-1"></div>
+                    <div class="photo-box" id="pdf-sol-2"></div>
+                </div>
+
+                <div class="primary-bar-third"><span class="bullet-dark"></span> DESCRIPCIÓN DEL TRABAJO</div>
+                <div class="text-input-box" id="pdf-desc-sol"></div>
+
+                <div class="primary-bar-full"><span class="bullet-dark"></span> EMPLEADO DEL PROVEDOR / TÉCNICO</div>
+                
+                <div class="eval-container">
+                    <div class="eval-left-box" id="pdf-foto-tecnico"></div>
+                    <div class="eval-right-grid">
+                        <div class="eval-card empleado-card">
+                            <div class="eval-card-header"><span class="bullet-dark"></span> TÉCNICO EN SITIO</div>
+                            <div class="eval-card-body">
+                                <div class="area-line"><i class="custom-bullet"></i> NOMBRE: <span id="pdf-tec-nom" style="margin-left: 5px;"></span></div>
+                                <div class="area-line"><i class="custom-bullet"></i> CELULAR: <span id="pdf-tec-cel" style="margin-left: 5px;"></span></div>
+                                <div class="area-line"><i class="custom-bullet"></i> EMPRESA: <span id="pdf-tec-empresa" style="margin-left: 5px;"></span></div>
+                            </div>
+                        </div>
+                        <div class="eval-card">
+                            <div class="eval-card-header"><span class="bullet-dark"></span> COMENTARIO DE SALIDA</div>
+                            <div class="eval-card-body" id="pdf-comentario" style="font-size: 10px;"></div>
+                        </div>
+                        <div class="eval-card">
+                            <div class="eval-card-header"><span class="bullet-dark"></span> FIRMA</div>
+                            <div class="eval-card-body" id="pdf-firma"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+            <div class="primary-footer">
+                Contáctanos: admin@franve.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Aviso Legal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Política de privacidad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ® &amp; 2026 FRANVE. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TODOS LOS DERECHOS RESERVADOS.
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="content-wrapper">
+                <div class="header-container">
+                    <div>
+                        <div class="title-row">
+                            <div class="primary-square"></div>
+                            <div id="pdf-sucursal-2" style="font-weight: bold;">-- SUCURSAL --</div>
+                        </div>
+                        <ul class="info-list">
+                            <li><i class="custom-bullet"></i> Dirección: <span id="pdf-dir-2" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Colonia: <span id="pdf-col-2" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Ciudad / C.P.: <span id="pdf-city-2" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Horario de servicio: <span id="pdf-hor-2" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Teléfono: <span id="pdf-tel-2" style="margin-left: 5px;"></span></li>
+                            <li><i class="custom-bullet"></i> Correo electrónico: <span id="pdf-mail-2" style="margin-left: 5px;"></span></li>
+                        </ul>
+                    </div>
+                    <div class="header-right">
+                        <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img">
+                    </div>
+                </div>
+
+                <div class="primary-divider"></div>
+
+                <div class="main-titles-container">
+                    <div class="title-primary-centered">ATENCIÓN CORRECTIVA</div>
+                    <div class="title-primary-centered">REPORTE DE RECEPCIÓN DE TRABAJOS</div>
+                    <div class="title-primary-centered" style="font-weight: normal;">MANTENIMIENTO</div>
+                    <div class="ticket-left">N° TICKET: <span id="pdf-ticket-2"></span></div>
+                    <div class="ticket-right">
+                        FECHA: <span id="pdf-fecha-2"></span>
+                    </div>
+                </div>
+
+                <div class="primary-divider-bottom-sheet2"></div>
+
+                <div class="primary-bar-full"><span class="bullet-dark"></span> DATOS DEL PROVEDOR</div>
+                
+                <div class="proveedor-grid">
+                    <div class="proveedor-col">
+                        <div class="area-line"><i class="custom-bullet"></i> PROVEDOR: <span id="pdf-prov-nombre" style="margin-left: 5px;"></span></div>
+                        <div class="area-line"><i class="custom-bullet"></i> RFC: <span id="pdf-prov-rfc" style="margin-left: 5px;"></span></div>
+                        <div class="area-line"><i class="custom-bullet"></i> DIRECCIÓN: <span id="pdf-prov-dir" style="margin-left: 5px;"></span></div>
+                    </div>
+                    <div class="proveedor-col">
+                        <div class="area-line"><i class="custom-bullet"></i> CONTACTO: <span id="pdf-prov-cont" style="margin-left: 5px;"></span></div>
+                        <div class="area-line"><i class="custom-bullet"></i> TELEFONO: <span id="pdf-prov-tel" style="margin-left: 5px;"></span></div>
+                        <div class="area-line"><i class="custom-bullet"></i> CORREO: <span id="pdf-prov-mail" style="margin-left: 5px;"></span></div>
+                    </div>
+                </div>
+
+                <div class="primary-bar-full"><span class="bullet-dark"></span> SOPORTE FÍSICO / ORDEN DE COMPRA FIRMADA</div>
+                
+                <div class="soporte-fisico-box" id="pdf-soporte-fisico"></div>
+            </div>
+
+            <div class="footer-divider"></div>
+            <div class="primary-footer">
+                Contáctanos: admin@franve.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Aviso Legal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Política de privacidad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ® &amp; 2026 FRANVE. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TODOS LOS DERECHOS RESERVADOS.
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function manejarRegreso() {
+            if (window.opener) {
+                window.close(); 
+            } else {
+                window.location.href = 'index.html'; 
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            if (window.opener) {
+                const btnRegresar = document.getElementById('btn-regresar');
+                btnRegresar.innerText = 'Cerrar PDF';
+                btnRegresar.classList.add('btn-cerrar'); 
+            }
+
+            const dataStr = sessionStorage.getItem('DatosOrdenPDF');
+            
+            if(dataStr) {
+                const data = JSON.parse(dataStr);
+                
+                document.getElementById('pdf-sucursal').innerText = data.sucursal;
+                document.getElementById('pdf-dir').innerText = data.suc_dir;
+                document.getElementById('pdf-col').innerText = data.suc_col;
+                
+                const ciudadLimpia = data.suc_city ? data.suc_city.split(" / C.P.")[0] : '';
+                document.getElementById('pdf-city').innerText = ciudadLimpia + " " + data.suc_cp; 
+                
+                document.getElementById('pdf-hor').innerText = data.suc_hor;
+                document.getElementById('pdf-tel').innerText = data.suc_tel;
+                document.getElementById('pdf-mail').innerText = data.suc_mail;
+                document.getElementById('pdf-ticket').innerText = data.ticket;
+                document.getElementById('pdf-fecha').innerText = data.fecha_hora;
+                document.getElementById('pdf-area').innerText = data.area;
+                document.getElementById('pdf-subarea').innerText = data.subarea;
+                document.getElementById('pdf-desc-falla').innerText = data.desc_falla;
+                document.getElementById('pdf-desc-sol').innerText = data.desc_solucion;
+                document.getElementById('pdf-tec-nom').innerText = data.tec_nombre;
+                document.getElementById('pdf-tec-cel').innerText = data.tec_celular;
+                document.getElementById('pdf-tec-empresa').innerText = data.prov_nombre;
+                document.getElementById('pdf-comentario').innerText = data.comentario;
+
+                document.getElementById('pdf-sucursal-2').innerText = data.sucursal;
+                document.getElementById('pdf-dir-2').innerText = data.suc_dir;
+                document.getElementById('pdf-col-2').innerText = data.suc_col;
+                document.getElementById('pdf-city-2').innerText = ciudadLimpia + " " + data.suc_cp; 
+                document.getElementById('pdf-hor-2').innerText = data.suc_hor;
+                document.getElementById('pdf-tel-2').innerText = data.suc_tel;
+                document.getElementById('pdf-mail-2').innerText = data.suc_mail;
+                document.getElementById('pdf-ticket-2').innerText = data.ticket;
+                document.getElementById('pdf-fecha-2').innerText = data.fecha_hora;
+                document.getElementById('pdf-prov-nombre').innerText = data.prov_nombre;
+                document.getElementById('pdf-prov-rfc').innerText = data.prov_rfc;
+                document.getElementById('pdf-prov-dir').innerText = data.prov_dir;
+                document.getElementById('pdf-prov-cont').innerText = data.prov_cont;
+                document.getElementById('pdf-prov-tel').innerText = data.prov_tel;
+                document.getElementById('pdf-prov-mail').innerText = data.prov_mail;
+
+                data.fotos_falla.forEach((fotoBase64, index) => {
+                    if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
+                });
+
+                data.fotos_solucion.forEach((fotoBase64, index) => {
+                    if(fotoBase64) { document.getElementById(`pdf-sol-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
+                });
+
+                if(data.firma) { document.getElementById('pdf-firma').innerHTML = `<img src="${data.firma}">`; }
+                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}">`; }
+                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}">`; }
+
+            } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
+        });
+
+        function generarPDF() {
+            document.body.classList.add('pdf-generating');
+
+            const btn = document.getElementById('btn-descargar');
+            const btnR = document.querySelector('.btn-regresar');
+            btn.style.display = 'none';
+            btnR.style.display = 'none';
+
+            window.scrollTo(0, 0);
+
+            const elemento = document.getElementById('contenido-pdf');
+            const pages = document.querySelectorAll('.page');
+            const originalStyles = [];
+            
+            pages.forEach((p) => {
+                originalStyles.push({ margin: p.style.margin, boxShadow: p.style.boxShadow, height: p.style.height });
+                p.style.margin = '0';
+                p.style.boxShadow = 'none';
+                p.style.height = '296.5mm'; 
+            });
+
+            const sucursalRaw = document.getElementById('pdf-sucursal').innerText;
+            const sucursal = sucursalRaw.replace(/\s+/g, '_'); 
+            const fechaHoraRaw = document.getElementById('pdf-fecha').innerText;
+            const fechaHora = fechaHoraRaw.replace(/[\s\/:,]/g, '_'); 
+            
+            const opciones = {
+                margin:       0,
+                filename:     `MTTO_CORR_${sucursal}_${fechaHora}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opciones).from(elemento).save().then(() => {
+                btn.style.display = 'block';
+                btnR.style.display = 'block';
+                pages.forEach((p, index) => {
+                    p.style.margin = originalStyles[index].margin;
+                    p.style.boxShadow = originalStyles[index].boxShadow;
+                    p.style.height = originalStyles[index].height;
+                });
+                
+                document.body.classList.remove('pdf-generating');
+            });
+        }
+    </script>
+</body>
+</html>
