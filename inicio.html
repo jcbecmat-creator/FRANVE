@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Inicio | FRANVE</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/fonts.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/style.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/components.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/design-system.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css">
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        if (!sessionStorage.getItem('loginSession')) {
+            window.location.href = 'index.html'; 
+        } else {
+            document.documentElement.classList.add('is-logged-in');
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .app-content { overflow-y: auto; height: 100vh; padding-bottom: 120px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
+        html.is-logged-in #app-screen { display: block !important; }
+        
+        /* OVERRIDES DE BRANDING FRANVE */
+        .main-header { background-color: #131520 !important; border-bottom: none !important; }
+        .system-title { color: #FFFFFF !important; }
+        .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
+        .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
+
+        .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
+        .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
+        
+        .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
+        .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
+
+        .dashboard-wrap { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+        /* === BIENVENIDA HOMOLOGADA === */
+        #global-welcome-section { text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white; }
+        #global-welcome-section h1 { margin: 0; font-size: 24px; color: #111827; font-weight: 700; }
+        #welcome-username-display { margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2; }
+
+        /* === CONTROLES DASHBOARD === */
+        .dashboard-header-controls { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; 
+        }
+        .btn-limpiar-filtros { background: #81D0DC; color: #131520; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: none; align-items: center; gap: 8px; transition: opacity 0.2s; box-shadow: 0 4px 6px rgba(129, 208, 220, 0.2); }
+        .btn-limpiar-filtros:hover { opacity: 0.85; }
+        
+        .filtros-activos-text { font-size: 18px; font-weight: 800; color: #111827; }
+
+        /* === MÉTRICAS SUPERIORES === */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .metric-card { 
+            background: white; padding: 20px; border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; 
+            display: flex; align-items: center; gap: 16px; transition: all 0.2s; cursor: pointer; 
+        }
+        .metric-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #d1d5db; }
+        .metric-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .metric-content { display: flex; flex-direction: column; overflow: hidden; }
+        .metric-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; letter-spacing: 0.5px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .metric-value { font-size: 18px; font-weight: 900; color: #111827; line-height: 1.2; letter-spacing: -0.5px; white-space: nowrap; }
+
+        .icon-blue { background: #eff6ff; color: #2563eb; }
+        .icon-yellow { background: #fef3c7; color: #d97706; }
+        .icon-green { background: #f0fdf4; color: #16a34a; }
+        .icon-red { background: #fef2f2; color: #dc2626; }
+        .icon-dark { background: #f3f4f6; color: #1f2937; } 
+        .icon-cyan { background: #e0f2fe; color: #81D0DC; } 
+
+        /* === GRIDS DE GRÁFICAS === */
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .chart-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; flex-direction: column; position: relative; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #f3f4f6; padding-bottom: 16px; }
+        .chart-title { font-size: 16px; font-weight: 800; color: #111827; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .chart-hint { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; }
+        .chart-container { position: relative; height: 300px; width: 100%; cursor: pointer; }
+
+        @media (max-width: 1024px) {
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="has-sidebar">
+
+    <div id="app-screen" style="display: block;">
+        <header class="main-header">
+            <div class="header-left">
+                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle>
+                    <span class="hamburger"></span>
+                </button>
+                <a href="inicio.html">
+                    <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px;">
+                </a>
+                <h1 class="system-title">Ordenes de Servicio</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-menu" data-user-menu>
+                    <button class="user-circle-btn" type="button" data-user-trigger>
+                        <span class="user-circle-initial" id="user-initial-header">U</span>
+                    </button>
+                    <div class="user-dropdown" data-user-dropdown>
+                        <div class="user-card">
+                            <div class="user-circle-avatar user-circle-initial">U</div>
+                            <div class="user-meta">
+                                <div class="user-name">Cargando...</div>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();">
+                                <i data-lucide="log-out"></i> Cerrar sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <aside class="sidebar app-sidebar" data-app-sidebar>
+                <button class="sidebar-close" type="button" data-sidebar-close><span class="close-icon">X</span></button>
+                <div class="sidebar-content">
+                    <nav class="sidebar-nav">
+                        <a class="sidebar-link activa" href="inicio.html"><i data-lucide="home"></i> Inicio</a>
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">Formas</div>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="calendar-check"></i> Mantenimientos Preventivos</a>
+                        </div>
+                        <div class="sidebar-section" id="nav-seccion-admin" style="display: none;">
+                            <div class="sidebar-section-title">Administración</div>
+                            <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
+                            <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
+                            <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
+                            <a class="sidebar-link" href="aprobacion_gerencia.html"><i data-lucide="shield-check"></i> Aprobación gerencia</a>
+                            <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
+                        </div>
+                        <div class="sidebar-section" id="nav-seccion-reportes" style="display: none;">
+                            <div class="sidebar-section-title">Reportes</div>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="bar-chart-3"></i> Reportes</a>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+            <div class="sidebar-backdrop" data-sidebar-backdrop></div>
+
+            <main class="main-content app-content">
+                
+                <div id="global-welcome-section">
+                    <h1>Bienvenido</h1>
+                    <h2 id="welcome-username-display">CARGANDO...</h2>
+                </div>
+
+                <div class="dashboard-wrap">
+                    
+                    <div class="dashboard-header-controls">
+                        <div class="filtros-activos-text" id="filtros-activos-display">Información General</div>
+                        <button class="btn-limpiar-filtros" id="btn-clear-filters" onclick="limpiarFiltrosDashboard()">
+                            <i data-lucide="filter-x" style="width: 16px;"></i> Limpiar Filtros
+                        </button>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card" id="card-total" onclick="setFiltroKpi('total')">
+                            <div class="metric-icon icon-cyan"><i data-lucide="files" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Total de Folios</span>
+                                <span class="metric-value" id="kpi-total">0 - $0.00</span>
+                            </div>
+                        </div>
+                        <div class="metric-card" id="card-rechazados" onclick="setFiltroKpi('rechazados')">
+                            <div class="metric-icon icon-red"><i data-lucide="x-circle" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Gastos Rechazados</span>
+                                <span class="metric-value" id="kpi-rechazados">0 - $0.00</span>
+                            </div>
+                        </div>
+                        <div class="metric-card" id="card-aprobados" onclick="setFiltroKpi('aprobados')">
+                            <div class="metric-icon icon-yellow"><i data-lucide="circle-dollar-sign" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Gasto Aprobado</span>
+                                <span class="metric-value" id="kpi-gasto">0 - $0.00</span>
+                            </div>
+                        </div>
+                        <div class="metric-card" id="card-pagados" onclick="setFiltroKpi('pagados')">
+                            <div class="metric-icon icon-green"><i data-lucide="check-circle" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Total Pagado</span>
+                                <span class="metric-value" id="kpi-pagado">0 - $0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">
+                        <h2 style="font-size: 18px; font-weight: 800; color: #111827; margin: 0;">Finanzas</h2>
+                    </div>
+
+                    <div class="metrics-grid" style="margin-bottom: 35px;">
+                        <div class="metric-card" id="card-fin_pendientes" onclick="setFiltroKpi('fin_pendientes')">
+                            <div class="metric-icon icon-yellow"><i data-lucide="clock" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Folios Pendientes</span>
+                                <span class="metric-value" id="kpi-fin-pendientes">0 - $0.00</span>
+                            </div>
+                        </div>
+                        <div class="metric-card" id="card-fin_porpagar" onclick="setFiltroKpi('fin_porpagar')">
+                            <div class="metric-icon icon-blue"><i data-lucide="file-text" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Folios Por Pagar</span>
+                                <span class="metric-value" id="kpi-fin-porpagar">0 - $0.00</span>
+                            </div>
+                        </div>
+                        <div class="metric-card" id="card-fin_pagados" onclick="setFiltroKpi('fin_pagados')">
+                            <div class="metric-icon icon-green"><i data-lucide="check-circle" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Folios Pagados</span>
+                                <span class="metric-value" id="kpi-fin-pagados">0 - $0.00</span>
+                            </div>
+                        </div>
+                        <div class="metric-card" id="card-fin_total" onclick="setFiltroKpi('fin_total')">
+                            <div class="metric-icon icon-dark"><i data-lucide="calculator" stroke-width="2.5" style="width: 26px; height: 26px;"></i></div>
+                            <div class="metric-content">
+                                <span class="metric-title">Total General</span>
+                                <span class="metric-value" id="kpi-fin-total">0 - $0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i data-lucide="pie-chart" style="color:#81D0DC;"></i> Distribución Operativa</h3>
+                                <span class="chart-hint">Clic para filtrar</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chartEstatus"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i data-lucide="bar-chart-2" style="color:#81D0DC;"></i> Gasto por Cliente / Sucursal</h3>
+                                <span class="chart-hint">Clic para filtrar</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chartSucursales"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i data-lucide="users" style="color:#81D0DC;"></i> Top Proveedores (Órdenes)</h3>
+                                <span class="chart-hint">Clic para filtrar</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chartProveedores"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i data-lucide="briefcase" style="color:#81D0DC;"></i> Calificación CAPEX / OPEX</h3>
+                                <span class="chart-hint">Clic para filtrar</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chartCapex"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i data-lucide="trending-up" style="color:#81D0DC;"></i> Tendencia Mensual (Folios)</h3>
+                                <span class="chart-hint">Clic para filtrar</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chartTendencia"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i data-lucide="tag" style="color:#81D0DC;"></i> Tipificación de Gasto</h3>
+                                <span class="chart-hint">Clic para filtrar</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chartTipificacion"></canvas></div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+<script>
+    // Inicialización de Firebase con los nuevos datos de FRANVE
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUM2w0L-3GNm0unSgKHZCrrW9xKQY0_is",
+        authDomain: "franve-1b62e.firebaseapp.com",
+        projectId: "franve-1b62e",
+        storageBucket: "franve-1b62e.firebasestorage.app",
+        messagingSenderId: "118420640551",
+        appId: "1:118420640551:web:9b79daa79a2d46eefe4f02"
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore();
+
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#6b7280';
+    
+    // Paleta de colores ajustada
+    const thColors = ['#81D0DC', '#f59e0b', '#2563eb', '#10b981', '#8b5cf6', '#111827', '#14b8a6', '#f43f5e'];
+
+    // Variables Globales para Interactividad
+    let allTickets = [];
+    let chartInstances = {};
+    let activeFilters = {
+        estatus: null,
+        sucursal: null,
+        proveedor: null,
+        capex: null,
+        mes: null,
+        tipo: null,
+        kpi: null // Filtro para clics en tarjetas
+    };
+
+    const kpiNames = {
+        'rechazados': 'Gastos Rechazados',
+        'aprobados': 'Gasto Aprobado',
+        'pagados': 'Total Pagado',
+        'fin_pendientes': 'Folios Pendientes',
+        'fin_porpagar': 'Folios Por Pagar',
+        'fin_pagados': 'Folios Pagados',
+        'fin_total': 'Total General'
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        
+        const savedUser = sessionStorage.getItem('loginUser') || 'Usuario';
+        document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if(appDataStr) {
+            window.appData = JSON.parse(appDataStr);
+            document.getElementById('welcome-username-display').innerText = window.appData.nombreProveedor || savedUser;
+            document.querySelector('.user-name').innerText = window.appData.nombreProveedor || savedUser;
+            
+            if(window.appData.privilegio == 2 || window.appData.privilegio == "2") {
+                document.getElementById('nav-seccion-admin').style.display = 'none';
+                document.getElementById('nav-seccion-reportes').style.display = 'none';
+            } else {
+                document.getElementById('nav-seccion-admin').style.display = 'block';
+                document.getElementById('nav-seccion-reportes').style.display = 'block';
+            }
+        }
+
+        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
+        toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar').classList.toggle('open')));
+        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
+
+        cargarDatosDashboard();
+    });
+
+    function formateaMoneda(valor) { return "$" + parseFloat(valor || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+    // Helpers de Extracción de Datos
+    function getGrupoEstatus(t) {
+        const est = t.estado_confirmacion || 'Nuevo';
+        if (['Nuevo', 'Borrador', 'En proceso', 'Pendiente de Aprobación', 'Pendiente Gerencia'].includes(est)) return 'En Proceso';
+        if (['Costos Rechazados'].includes(est) || t.rechazado_gerencia) return 'Rechazados';
+        if (['Costos Aprobados', 'Facturado', 'Pagado'].includes(est)) return 'Aprobados';
+        return est;
+    }
+    function getMes(t) { return t.fecha_creacion ? t.fecha_creacion.substring(0, 7) : 'Sin fecha'; }
+    function getSucursal(t) { return (t.sucursal || 'Sin asignar').toUpperCase(); }
+    function getProveedor(t) { return (t.proveedor || t.prov_nombre || 'Sin asignar').toUpperCase(); }
+    function getCapex(t) { return (t.calificacion_capex_opex || 'Sin asignar'); }
+    function getTipo(t) { return (t.tipificacion_gasto || 'Sin asignar'); }
+
+    async function cargarDatosDashboard() {
+        try {
+            let query = db.collection("tickets_mantenimiento");
+            
+            if (window.appData && (window.appData.privilegio == 2 || window.appData.privilegio == "2")) {
+                query = query.where("proveedor", "==", window.appData.nombreProveedor);
+            }
+
+            const snapshot = await query.get();
+            allTickets = [];
+            snapshot.forEach(doc => allTickets.push(doc.data()));
+            aplicarFiltrosCruzados(); 
+        } catch (error) {
+            console.error("Error cargando dashboard:", error);
+            alert("Error al cargar los datos: " + error.message);
+        }
+    }
+
+    // === LÓGICA DE FILTRADO CRUZADO ===
+    function setFiltro(tipo, valor) {
+        if (activeFilters[tipo] === valor) {
+            activeFilters[tipo] = null;
+        } else {
+            activeFilters[tipo] = valor;
+        }
+        aplicarFiltrosCruzados();
+    }
+
+    // Lógica al dar clic en una tarjeta (KPI)
+    function setFiltroKpi(kpiName) {
+        document.querySelectorAll('.metric-card').forEach(c => {
+            c.style.borderColor = '#e5e7eb';
+            c.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+        });
+        
+        if (activeFilters.kpi === kpiName || kpiName === 'total') {
+            activeFilters.kpi = null;
+        } else {
+            activeFilters.kpi = kpiName;
+            const card = document.getElementById('card-' + kpiName);
+            if(card) {
+                card.style.borderColor = '#81D0DC';
+                card.style.boxShadow = '0 0 0 3px rgba(129,208,220,0.2)';
+            }
+        }
+        aplicarFiltrosCruzados();
+    }
+
+    function limpiarFiltrosDashboard() {
+        activeFilters = { estatus: null, sucursal: null, proveedor: null, capex: null, mes: null, tipo: null, kpi: null };
+        document.querySelectorAll('.metric-card').forEach(c => {
+            c.style.borderColor = '#e5e7eb';
+            c.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+        });
+        aplicarFiltrosCruzados();
+    }
+
+    function aplicarFiltrosCruzados() {
+        let filtrados = allTickets.filter(t => {
+            // Filtros de las gráficas
+            if (activeFilters.estatus && getGrupoEstatus(t) !== activeFilters.estatus) return false;
+            if (activeFilters.sucursal && getSucursal(t) !== activeFilters.sucursal) return false;
+            if (activeFilters.proveedor && getProveedor(t) !== activeFilters.proveedor) return false;
+            if (activeFilters.capex && getCapex(t) !== activeFilters.capex) return false;
+            if (activeFilters.mes && getMes(t) !== activeFilters.mes) return false;
+            if (activeFilters.tipo && getTipo(t) !== activeFilters.tipo) return false;
+            
+            // Filtro si dieron clic en una tarjeta (KPI)
+            if (activeFilters.kpi) {
+                const estGrupo = getGrupoEstatus(t);
+                const estRaw = t.estado_confirmacion;
+                
+                if (activeFilters.kpi === 'rechazados' && estGrupo !== 'Rechazados') return false;
+                if (activeFilters.kpi === 'aprobados' && !(estGrupo === 'Aprobados' || estRaw === 'Pendiente Gerencia')) return false;
+                if (activeFilters.kpi === 'pagados' && !(t.estado_pago === 'Pagado' || estRaw === 'Pagado')) return false;
+                
+                if (activeFilters.kpi === 'fin_pendientes' && !(estRaw === 'Costos Aprobados' && t.estado_pago !== 'Pagado' && t.estado_pago !== 'Por Pagar' && !t.url_factura_xml)) return false;
+                if (activeFilters.kpi === 'fin_porpagar' && !(estRaw === 'Costos Aprobados' && (t.estado_pago === 'Por Pagar' || t.url_factura_xml) && t.estado_pago !== 'Pagado')) return false;
+                if (activeFilters.kpi === 'fin_pagados' && !(estRaw === 'Costos Aprobados' && t.estado_pago === 'Pagado')) return false;
+                if (activeFilters.kpi === 'fin_total' && estRaw !== 'Costos Aprobados') return false;
+            }
+            return true;
+        });
+
+        const activos = [];
+        if(activeFilters.estatus) activos.push(activeFilters.estatus);
+        if(activeFilters.sucursal) activos.push(activeFilters.sucursal);
+        if(activeFilters.proveedor) activos.push(activeFilters.proveedor);
+        if(activeFilters.capex) activos.push(activeFilters.capex);
+        if(activeFilters.mes) activos.push(activeFilters.mes);
+        if(activeFilters.tipo) activos.push(activeFilters.tipo);
+        if(activeFilters.kpi) activos.push(kpiNames[activeFilters.kpi]);
+
+        const btnClear = document.getElementById('btn-clear-filters');
+        const txtDisplay = document.getElementById('filtros-activos-display');
+        
+        if (activos.length > 0) {
+            btnClear.style.display = 'inline-flex';
+            txtDisplay.innerHTML = `Información General <span style="font-size: 14px; font-weight: 600; color: #6b7280; margin-left: 10px;">(Filtrando por: <span style="color:#81D0DC;">${activos.join(', ')}</span>)</span>`;
+        } else {
+            btnClear.style.display = 'none';
+            txtDisplay.innerHTML = 'Información General';
+        }
+
+        actualizarKpis(filtrados);
+        actualizarGraficas(filtrados);
+    }
+
+    function actualizarKpis(tickets) {
+        let top_total = { c: 0, s: 0 };
+        let top_rechazados = { c: 0, s: 0 };
+        let top_aprobado = { c: 0, s: 0 };
+        let top_pagado = { c: 0, s: 0 };
+
+        let fin_pendientes = { c: 0, s: 0 };
+        let fin_porpagar = { c: 0, s: 0 };
+        let fin_pagados = { c: 0, s: 0 };
+        let fin_total = { c: 0, s: 0 };
+
+        tickets.forEach(t => {
+            const costo = parseFloat(t.costo_total_aprobado || t.costo_total || 0);
+            const estGrupo = getGrupoEstatus(t);
+            const estRaw = t.estado_confirmacion;
+
+            // Fila 1
+            top_total.c++; top_total.s += costo;
+
+            if (estGrupo === 'Rechazados') {
+                top_rechazados.c++; top_rechazados.s += costo;
+            }
+            if (estGrupo === 'Aprobados' || estRaw === 'Pendiente Gerencia') {
+                top_aprobado.c++; top_aprobado.s += costo;
+            }
+            if (t.estado_pago === 'Pagado' || estRaw === 'Pagado') {
+                top_pagado.c++; top_pagado.s += costo;
+            }
+
+            // Fila 2
+            if (estRaw === 'Costos Aprobados') {
+                fin_total.c++; fin_total.s += costo;
+
+                if (t.estado_pago === 'Pagado') {
+                    fin_pagados.c++; fin_pagados.s += costo;
+                } else if (t.estado_pago === 'Por Pagar' || t.url_factura_xml) {
+                    fin_porpagar.c++; fin_porpagar.s += costo;
+                } else {
+                    fin_pendientes.c++; fin_pendientes.s += costo;
+                }
+            }
+        });
+
+        document.getElementById('kpi-total').innerText = `${top_total.c} - ${formateaMoneda(top_total.s)}`;
+        document.getElementById('kpi-rechazados').innerText = `${top_rechazados.c} - ${formateaMoneda(top_rechazados.s)}`;
+        document.getElementById('kpi-gasto').innerText = `${top_aprobado.c} - ${formateaMoneda(top_aprobado.s)}`;
+        document.getElementById('kpi-pagado').innerText = `${top_pagado.c} - ${formateaMoneda(top_pagado.s)}`;
+
+        document.getElementById('kpi-fin-pendientes').innerText = `${fin_pendientes.c} - ${formateaMoneda(fin_pendientes.s)}`;
+        document.getElementById('kpi-fin-porpagar').innerText = `${fin_porpagar.c} - ${formateaMoneda(fin_porpagar.s)}`;
+        document.getElementById('kpi-fin-pagados').innerText = `${fin_pagados.c} - ${formateaMoneda(fin_pagados.s)}`;
+        document.getElementById('kpi-fin-total').innerText = `${fin_total.c} - ${formateaMoneda(fin_total.s)}`;
+    }
+
+    function actualizarGraficas(tickets) {
+        let dEstatus = {}; let dSucursales = {}; let dProveedores = {}; let dCapex = {}; let dMeses = {}; let dTipo = {};
+
+        tickets.forEach(t => {
+            const costo = parseFloat(t.costo_total_aprobado || t.costo_total || 0);
+            
+            dEstatus[getGrupoEstatus(t)] = (dEstatus[getGrupoEstatus(t)] || 0) + 1;
+            dMeses[getMes(t)] = (dMeses[getMes(t)] || 0) + 1;
+            dProveedores[getProveedor(t)] = (dProveedores[getProveedor(t)] || 0) + 1;
+            dCapex[getCapex(t)] = (dCapex[getCapex(t)] || 0) + 1;
+            dTipo[getTipo(t)] = (dTipo[getTipo(t)] || 0) + 1;
+            
+            if (costo > 0) dSucursales[getSucursal(t)] = (dSucursales[getSucursal(t)] || 0) + costo;
+        });
+
+        dibujarGrafica('chartEstatus', 'doughnut', dEstatus, 'estatus', thColors);
+        dibujarGrafica('chartSucursales', 'bar', dSucursales, 'sucursal', ['#81D0DC'], true, true); 
+        dibujarGrafica('chartProveedores', 'horizontalBar', dProveedores, 'proveedor', ['#131520'], true); 
+        dibujarGrafica('chartCapex', 'pie', dCapex, 'capex', ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']);
+        dibujarGrafica('chartTendencia', 'line', dMeses, 'mes', ['#81D0DC']);
+        dibujarGrafica('chartTipificacion', 'bar', dTipo, 'tipo', ['#f59e0b']);
+    }
+
+    function dibujarGrafica(canvasId, tipo, dataObj, filtroClave, colores, top5 = false, isMoney = false) {
+        if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); }
+
+        let entries = Object.entries(dataObj);
+        if (tipo === 'line') {
+            entries.sort((a, b) => a[0].localeCompare(b[0])); 
+        } else if (top5) {
+            entries.sort((a, b) => b[1] - a[1]);
+            entries = entries.slice(0, 5); 
+        } else if (tipo !== 'doughnut' && tipo !== 'pie') {
+            entries.sort((a, b) => b[1] - a[1]); 
+        }
+
+        const labels = entries.map(e => e[0]);
+        const values = entries.map(e => e[1]);
+        const ctx = document.getElementById(canvasId).getContext('2d');
+
+        let isHorizontal = false;
+        let chartType = tipo;
+        if (tipo === 'horizontalBar') { chartType = 'bar'; isHorizontal = true; }
+
+        let config = {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colores.length > 1 ? colores : colores[0],
+                    borderColor: tipo === 'line' ? colores[0] : '#ffffff',
+                    borderWidth: tipo === 'line' ? 3 : 1,
+                    borderRadius: (chartType === 'bar') ? 6 : 0,
+                    fill: tipo === 'line' ? true : false,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                indexAxis: isHorizontal ? 'y' : 'x',
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (e, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const labelClicked = labels[index];
+                        setFiltro(filtroClave, labelClicked);
+                    }
+                },
+                plugins: {
+                    legend: { display: ['doughnut', 'pie'].includes(chartType), position: 'right' },
+                    tooltip: { callbacks: { label: (ctx) => isMoney ? formateaMoneda(ctx.raw) : ctx.raw } }
+                },
+                scales: ['doughnut', 'pie'].includes(chartType) ? {} : {
+                    x: { grid: { display: false }, ticks: { font: { weight: isHorizontal ? 'bold' : 'normal' } } },
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4] } }
+                }
+            }
+        };
+
+        if(tipo === 'line') config.data.datasets[0].backgroundColor = 'rgba(129, 208, 220, 0.1)';
+
+        chartInstances[canvasId] = new Chart(ctx, config);
+    }
+</script>
+</body>
+</html>,document_type:HTML,title:Inicio_Franve.html}
