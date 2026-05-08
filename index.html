@@ -49,7 +49,7 @@
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         
-        /* === BLINDAJE CÍRCULO USUARIO HEADER (Sin bordes rojos, todo Cyan) === */
+        /* === BLINDAJE CÍRCULO USUARIO HEADER === */
         .user-circle-btn {
             border: 2px solid #81D0DC !important;
             background-color: transparent !important;
@@ -209,8 +209,8 @@
     <div id="login-screen">
         <div id="login-card">
             <div class="flex flex-col items-center mb-4">
-                <!-- LOGO RESPONSIVO AUMENTADO 5% ADICIONAL -->
-                <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="Logo FRANVE" class="mb-5 object-contain" style="max-width: 95%; height: auto; max-height: 110px; border-radius: 10px;"> 
+                <!-- LOGO AUMENTADO +5% -->
+                <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="Logo FRANVE" class="mb-5 object-contain" style="max-width: 100%; height: auto; max-height: 120px; border-radius: 10px;"> 
                 <h1 class="text-2xl font-semibold text-text-main tracking-tight" style="margin:0;">Bienvenido</h1>
                 <p class="text-[15px] text-text-sub mt-1" style="margin-top:5px;">Mesa de Servicio Operativo</p>
             </div>
@@ -250,12 +250,13 @@
     </div>
 
     <div id="app-screen" style="display: none;">
-        <!-- HEADER ALINEADO Y CENTRADO HORIZONTALMENTE -->
+        <!-- HEADER ALINEADO Y CENTRADO HORIZONTALMENTE (Fix Imagen 2) -->
         <header class="main-header">
             <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
                 <button class="header-hamburger" type="button" data-sidebar-toggle style="margin-right: 0;"><span class="hamburger"></span></button>
                 <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px; margin: 0;">
-                <h1 class="system-title" style="margin: 0; line-height: 1;">Ordenes de Servicio</h1>
+                <!-- translateY(-3px) sube el texto ligeramente para alinear visualmente -->
+                <h1 class="system-title" style="margin: 0; line-height: 1; transform: translateY(-3px);">Ordenes de Servicio</h1>
             </div>
             <div class="header-right">
                 <div class="user-menu">
@@ -566,7 +567,7 @@
         </div>
     </div>
 
-    <!-- MODAL LECTURA CP -->
+    <!-- MODAL LECTURA CP (Confirmación Operativa) -->
     <div id="modalLecturaCP">
         <div class="modal-card-cp">
             <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; background: #fff;">
