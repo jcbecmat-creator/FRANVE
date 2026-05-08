@@ -49,7 +49,7 @@
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         
-        /* CAMBIO COLOR CÍRCULO USUARIO HEADER */
+        /* === CAMBIO COLOR Y FORMA CÍRCULO USUARIO HEADER (Imagen 4 Fix) === */
         .user-circle-initial { 
             background-color: #81D0DC !important; 
             color: #FFFFFF !important; 
@@ -161,8 +161,9 @@
         .up-info strong { color: #111827; font-weight: 800; font-size: 15px; }
         .btn-limpiar { background: white; color: #6b7280; border: 1px solid #e5e7eb; height: 40px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;}
         .btn-limpiar:hover { background: #f3f4f6; color: #111827; }
-        .btn-adjuntar { background: #DC2626; color: white; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s;}
-        .btn-adjuntar:hover { background: #b91c1c; }
+        /* CAMBIO COLOR ELIMINADO ROJO */
+        .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s;}
+        .btn-adjuntar:hover { opacity: 0.85; }
 
         /* MODAL ALERTA CUSTOM */
         #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
@@ -183,7 +184,7 @@
         .eval-input-wrapper { display: flex; flex-direction: column; width: 100%; }
         .eval-input-control { width: 100%; padding: 0 1rem; line-height: 40px; font-size: 14px; color: #111827; background-color: #f3f4f6; border-radius: 0.5rem; border: 1px solid #d1d5db; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); box-sizing: border-box; height: 42px; display: block; }
         textarea.eval-input-control { height: auto; min-height: 80px; padding: 0.75rem 1rem; line-height: 1.5; resize: none; }
-        .eval-input-control[readonly] { background-color: #e5e7eb; color: #4b5563; cursor: not-allowed; border-color: #e5e7eb; box-shadow: none; }
+        .eval-input-control[readonly] { background-color: #e5e5e5; color: #4b5563; cursor: not-allowed; border-color: #d1d5db; box-shadow: none; }
 
         @media (max-width: 900px) {
             .upload-bottom-bar { flex-direction: column; gap: 12px; padding: 16px; bottom: -200px;}
@@ -228,7 +229,7 @@
                     Verifica tu usuario o contraseña
                 </div>
                 
-                <button id="submitBtn" class="w-full flex justify-center items-center py-3.5 px-4 rounded-lg text-sm font-semibold text-white shadow-sm transition-all" style="width:100%; padding:14px; background:#131520; color:#81D0DC; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:20px;" type="submit">Iniciar Sesión</button>
+                <button id="submitBtn" class="w-full flex justify-center items-center py-3.5 px-4 rounded-lg text-sm font-semibold shadow-sm transition-all" style="width:100%; padding:14px; background:#131520; color:#81D0DC; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:20px;" type="submit">Iniciar Sesión</button>
             </form>
         </div>
         <div class="mt-8 text-center" style="margin-top: 2rem;">
@@ -385,7 +386,7 @@
                                         <div class="info-item"><label>Colonia</label><span id="suc-col"></span></div>
                                         <div class="info-item"><label>Ciudad</label><span id="suc-city"></span></div>
                                         <div class="info-item"><label>C.P.</label><span id="suc-cp"></span></div>
-                                        <div class="info-item"><label>Cliente</label><span id="suc-client"></span></div>
+                                        <div class="info-item"><label>Cliente</label><span id="suc-client"></span></div> 
                                         <div class="info-item"><label>Teléfono</label><span id="suc-tel"></span></div>
                                         <div class="info-item"><label>Correo</label><span id="suc-mail"></span></div>
                                     </div>
@@ -464,7 +465,7 @@
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="form-label required" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Nombre del técnico en sitio</label>
                                     <input type="text" class="form-input" id="nombre_tecnico" list="tecnicos-list" placeholder="Escribe para buscar técnico..." autocomplete="off">
-                                    <datalist id="tecnicos-list"></datalist>
+                                    <datalist id="tecnicos-list"></datalist> 
                                 </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="form-label required" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Celular del técnico</label>
@@ -679,7 +680,6 @@
 
         lucide.createIcons();
 
-        // ESTA URL ES LA NUEVA QUE ME COMPARTISTE
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGWGCHKQZFzMAZvaPjd7MXuW0n9hWLzg1-m7oXRzACeUGEzMl1s2ALDuvhIqcajQ/exec';
         window.appData = null;
 
@@ -974,17 +974,21 @@
         function actualizarBarraBorradores() {
             const checkboxes = document.querySelectorAll('.chk-draft:checked');
             const count = checkboxes.length;
-            document.getElementById('lbl-draft-count').innerText = `${count} folio${count !== 1 ? 's' : ''}`;
+            const bar = document.getElementById('delete-draft-bar');
             
+            if (count > 0) {
+                document.getElementById('lbl-draft-count').innerText = `${count} folio${count !== 1 ? 's' : ''}`;
+                bar.classList.add('show');
+            } else {
+                bar.classList.remove('show');
+            }
+            
+            // Actualizar estado del checkbox "seleccionar todos"
             const allDraftsCb = document.getElementById('chk-all-drafts');
             const totalCheckboxes = document.querySelectorAll('.chk-draft').length;
             if (allDraftsCb) {
                 allDraftsCb.checked = (count === totalCheckboxes && totalCheckboxes > 0);
             }
-
-            const bar = document.getElementById('delete-draft-bar');
-            if (count > 0) { bar.classList.add('show'); } 
-            else { bar.classList.remove('show'); }
         }
 
         function limpiarSeleccionBorradores() {
@@ -1030,6 +1034,7 @@
                     nuevoNumero = doc.data().mc_folio + 1;
                 }
                 
+                // Merge para no borrar otros contadores si existen
                 transaction.set(contadorRef, { mc_folio: nuevoNumero }, { merge: true });
                 return `MC-${nuevoNumero.toString().padStart(4, '0')}`;
             });
@@ -1069,6 +1074,7 @@
             document.getElementById('area-input').value = o.area || '';
             document.getElementById('area-input').dispatchEvent(new Event('input'));
             
+            // Subárea con ligero delay para carga
             setTimeout(() => {
                 if(document.getElementById('subarea-select') && o.subarea) {
                     document.getElementById('subarea-select').value = o.subarea;
@@ -1081,16 +1087,19 @@
             document.getElementById('celular_tecnico').value = o.tec_celular || '';
             document.getElementById('comentario_salida').value = o.comentario || '';
 
+            // Cargar fotos guardadas
             fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null];
             fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null];
             fotos.soporte = o.url_soporte ? [o.url_soporte] : [null];
             fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
 
+            // Asegurar longitud correcta
             while(fotos.falla.length < 3) fotos.falla.push(null);
             while(fotos.solucion.length < 3) fotos.solucion.push(null);
 
             renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie');
 
+            // Cargar Firma (Imagen si existe)
             if(o.url_firma) {
                 document.getElementById('firma_tecnico_data').value = o.url_firma;
                 const img = new Image();
@@ -1109,6 +1118,7 @@
             const btnEnviar = document.getElementById('btn-enviar-orden');
             let folioActual = document.getElementById('folio_mc').value;
 
+            // Validación mínima para ENVIAR (En proceso)
             const canvasFirmaReal = document.getElementById('firma_tecnico');
             const firmaVacia = document.createElement('canvas');
             firmaVacia.width = canvasFirmaReal.width; firmaVacia.height = canvasFirmaReal.height;
@@ -1123,12 +1133,14 @@
                     showCustomAlert("Atención", "Para enviar, debes completar Sucursal, Área, Falla y Nombre del técnico.", false); 
                     return;
                 }
+                // Validar firma obligatoria
                 if(canvasFirmaReal.toDataURL() === firmaVacia.toDataURL() && !document.getElementById('firma_tecnico_data').value) {
                     showCustomAlert("Atención", "La firma del técnico es obligatoria para enviar la orden.", false); 
                     return;
                 }
             }
 
+            // Capturar firma si dibujaron algo nuevo
             if (canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL()) {
                 document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL();
             }
@@ -1152,9 +1164,10 @@
                         await ref.put(dataURItoBlob(fileData));
                         return await ref.getDownloadURL();
                     }
-                    return fileData; 
+                    return fileData; // Ya era una URL o null
                 };
 
+                // Subida de fotos (solo si son Base64 nuevas)
                 for(let i=0; i<fotos.falla.length; i++) {
                     if(fotos.falla[i]) {
                         urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`));
@@ -1215,9 +1228,11 @@
                 showCustomAlert("Éxito", estadoFinal === 'Borrador' ? "Borrador guardado exitosamente." : "Orden enviada a Confirmación.", true);
                 
                 if (estadoFinal === 'En proceso') {
+                    // Redirigir al PDF
                     sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(ordenData));
                     setTimeout(() => { window.location.href = 'index2.html'; }, 1500);
                 } else {
+                    // Borrador guardado, ir a tabla
                     document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`;
                     lucide.createIcons();
                     cargarMisOrdenes();
@@ -1338,17 +1353,21 @@
             if (savedSession && savedUser) {
                 window.appData = JSON.parse(savedSession);
                 
+                // HEADER BRANDING (Fix Imagen 4)
                 const inicial = savedUser.charAt(0).toUpperCase();
                 document.getElementById('user-initial-header').innerText = inicial;
                 document.getElementById('welcome-username-display').innerText = window.appData.nombreProveedor;
 
+                // 2. LLENAR DATOS DEL PROVEEDOR (Corrección Imagen 2)
                 document.getElementById('prov-info-nombre').innerText = window.appData.nombreProveedor || '-';
+                // Usamos operador opcional ?. por seguridad
                 document.getElementById('prov-info-rfc').innerText = window.appData.proveedorInfo?.rfc || 'N/A';
                 document.getElementById('prov-info-dir').innerText = window.appData.proveedorInfo?.direccion || 'N/A';
                 document.getElementById('prov-info-cont').innerText = window.appData.proveedorInfo?.contacto || 'N/A';
                 document.getElementById('prov-info-tel').innerText = window.appData.proveedorInfo?.telefono || 'N/A';
                 document.getElementById('prov-info-mail').innerText = window.appData.proveedorInfo?.correo || 'N/A'; 
 
+                // Poblar Sucursales
                 const listaSuc = document.getElementById('sucursales-list');
                 listaSuc.innerHTML = '';
                 if(window.appData.sucursales) {
@@ -1359,6 +1378,7 @@
                     });
                 }
 
+                // Poblar Áreas
                 const listaAreas = document.getElementById('areas-list');
                 listaAreas.innerHTML = '';
                 if(window.appData.areas) {
@@ -1369,22 +1389,24 @@
                     });
                 }
 
+                // 3. LLENAR DATOS DEL TÉCNICO (Corrección Imagen 3)
                 const listaTec = document.getElementById('tecnicos-list');
                 listaTec.innerHTML = '';
                 if(window.appData.tecnicos) {
                     window.appData.tecnicos.forEach(t => {
                         let opt = document.createElement('option');
-                        opt.value = t;
+                        opt.value = t; // El valor es el nombre para el autocompletado
                         listaTec.appendChild(opt);
                     });
                 }
 
+                // Mostrar app
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'block';
                 lucide.createIcons();
 
+                // Privilegios Técnico (Ocultar navs admin/inicio)
                 if(window.appData.privilegio == 2 || window.appData.privilegio == "2") {
-                    document.getElementById('nav-inicio').style.display = 'none';
                     document.getElementById('nav-preventivo').style.display = 'none';
                     document.getElementById('nav-seccion-admin').style.display = 'none';
                     document.getElementById('nav-seccion-reportes').style.display = 'none';
@@ -1402,10 +1424,8 @@
             const btn = document.getElementById('submitBtn');
             const alertMsg = document.getElementById('alertMessage');
             
-            const userRaw = document.getElementById('username').value;
-            const user = userRaw.trim(); 
-            const passRaw = document.getElementById('password').value;
-            const pass = passRaw.trim();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
 
             alertMsg.style.display = 'none';
             btn.innerText = 'Verificando...';
@@ -1421,7 +1441,6 @@
                 if (data.valido) {
                     sessionStorage.setItem('loginSession', JSON.stringify(data));
                     sessionStorage.setItem('loginUser', user);
-                    window.appData = data;
                     window.location.reload(); 
                 } else {
                     alertMsg.innerText = data.error || "Verifica tu usuario o contraseña";
@@ -1454,6 +1473,7 @@
                 document.getElementById('suc-col').innerText = suc.colonia || '';
                 document.getElementById('suc-city').innerText = suc.ciudad || '';
                 document.getElementById('suc-cp').innerText = suc.cp || '';
+                // Imagen 1 Fix: Mostrar Cliente en la interfaz
                 document.getElementById('suc-client').innerText = suc.cliente || ''; 
                 document.getElementById('suc-tel').innerText = suc.telefono || '';
                 document.getElementById('suc-mail').innerText = suc.correo || '';
@@ -1492,13 +1512,7 @@
             document.querySelectorAll('.modulo-vista').forEach(v => v.classList.remove('activa'));
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('activa'));
             document.getElementById(idVista).classList.add('activa');
-            
-            if(event) {
-                event.currentTarget.classList.add('activa');
-            } else {
-                const linkActivo = document.querySelector(`.sidebar-link[onclick*="${idVista}"]`);
-                if(linkActivo) linkActivo.classList.add('activa');
-            }
+            if(event) event.currentTarget.classList.add('activa');
             
             const sidebar = document.getElementById('sidebar');
             if (window.innerWidth <= 1024 && sidebar && sidebar.classList.contains('open')) { sidebar.classList.remove('open'); }
@@ -1527,25 +1541,19 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    let w = img.width; 
-                    let h = img.height;
+                    let w = img.width; let h = img.height;
                     const maxDim = 800; 
                     if(w > maxDim || h > maxDim) {
                         if(w > h) { h = (h/w)*maxDim; w = maxDim; }
                         else { w = (w/h)*maxDim; h = maxDim; }
                     }
-                    canvas.width = w; 
-                    canvas.height = h;
+                    canvas.width = w; canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
-                    
                     const fotoComprimida = canvas.toDataURL('image/jpeg', 0.7);
                     
                     const slotVacio = fotos[activeTarget].findIndex(f => f === null);
-                    if(slotVacio > -1) { 
-                        fotos[activeTarget][slotVacio] = fotoComprimida; 
-                        renderSlots(activeTarget); 
-                    }
+                    if(slotVacio > -1) { fotos[activeTarget][slotVacio] = fotoComprimida; renderSlots(activeTarget); }
                     input.value = ''; 
                 };
                 img.src = e.target.result;
@@ -1642,9 +1650,7 @@
             const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
             const ab = new ArrayBuffer(byteString.length);
             const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
             return new Blob([ab], {type: mimeString});
         }
 
@@ -1665,8 +1671,7 @@
 
         function cerrarSesionGlobal() {
             showConfirm("Cerrar Sesión", "¿Seguro que quieres cerrar sesión?", function() {
-                sessionStorage.clear(); 
-                window.location.reload(); 
+                sessionStorage.clear(); window.location.reload(); 
             });
         }
 
