@@ -48,7 +48,19 @@
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
-        .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
+        
+        /* CAMBIO COLOR CÍRCULO USUARIO HEADER */
+        .user-circle-initial { 
+            background-color: #81D0DC !important; 
+            color: #FFFFFF !important; 
+            font-weight: bold; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
 
         /* === ESTILOS DEL MENÚ === */
         .sidebar-link.activa { 
@@ -373,7 +385,7 @@
                                         <div class="info-item"><label>Colonia</label><span id="suc-col"></span></div>
                                         <div class="info-item"><label>Ciudad</label><span id="suc-city"></span></div>
                                         <div class="info-item"><label>C.P.</label><span id="suc-cp"></span></div>
-                                        <div class="info-item"><label>Horario</label><span id="suc-hor"></span></div>
+                                        <div class="info-item"><label>Cliente</label><span id="suc-client"></span></div>
                                         <div class="info-item"><label>Teléfono</label><span id="suc-tel"></span></div>
                                         <div class="info-item"><label>Correo</label><span id="suc-mail"></span></div>
                                     </div>
@@ -451,7 +463,8 @@
 
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="form-label required" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Nombre del técnico en sitio</label>
-                                    <input type="text" class="form-input" id="nombre_tecnico" placeholder="Nombre completo">
+                                    <input type="text" class="form-input" id="nombre_tecnico" list="tecnicos-list" placeholder="Escribe para buscar técnico..." autocomplete="off">
+                                    <datalist id="tecnicos-list"></datalist>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="form-label required" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Celular del técnico</label>
@@ -666,7 +679,7 @@
 
         lucide.createIcons();
 
-        // ESTA URL DEBE SER REEMPLAZADA POR LA TUYA DESPUÉS DE PUBLICAR EL SCRIPT EN GOOGLE SHEETS
+        // ESTA URL ES LA NUEVA QUE ME COMPARTISTE
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGWGCHKQZFzMAZvaPjd7MXuW0n9hWLzg1-m7oXRzACeUGEzMl1s2ALDuvhIqcajQ/exec';
         window.appData = null;
 
@@ -686,11 +699,11 @@
             if(isSuccess) {
                 alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
                 alertBtn.style.background = '#16a34a';
-                alertBtn.style.color = 'white';
+                alertBtn.style.color = '#FFFFFF';
             } else {
                 alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
                 alertBtn.style.background = '#DC2626';
-                alertBtn.style.color = 'white';
+                alertBtn.style.color = '#FFFFFF';
             }
             alertBox.style.display = 'flex';
             lucide.createIcons();
@@ -1106,22 +1119,10 @@
                 const descF = document.getElementById('desc_falla').value;
                 const tecNom = document.getElementById('nombre_tecnico').value;
                 
-                // LÓGICA DE CASCADA PARA VALIDAR CLIENTE/SUCURSAL DE FRANVE
-                let isValidSucursal = false;
-                if (window.appData && window.appData.sucursales) {
-                    isValidSucursal = window.appData.sucursales.some(s => s.nombre === suc);
-                }
-                
                 if(!suc || !area || !descF || !tecNom) {
                     showCustomAlert("Atención", "Para enviar, debes completar Sucursal, Área, Falla y Nombre del técnico.", false); 
                     return;
                 }
-                
-                if(!isValidSucursal) {
-                    showCustomAlert("Atención", "Por favor, selecciona una sucursal/cliente válida de la lista.", false);
-                    return;
-                }
-                
                 if(canvasFirmaReal.toDataURL() === firmaVacia.toDataURL() && !document.getElementById('firma_tecnico_data').value) {
                     showCustomAlert("Atención", "La firma del técnico es obligatoria para enviar la orden.", false); 
                     return;
@@ -1341,7 +1342,7 @@
                 document.getElementById('user-initial-header').innerText = inicial;
                 document.getElementById('welcome-username-display').innerText = window.appData.nombreProveedor;
 
-                document.getElementById('prov-info-nombre').innerText = window.appData.nombreProveedor;
+                document.getElementById('prov-info-nombre').innerText = window.appData.nombreProveedor || '-';
                 document.getElementById('prov-info-rfc').innerText = window.appData.proveedorInfo?.rfc || 'N/A';
                 document.getElementById('prov-info-dir').innerText = window.appData.proveedorInfo?.direccion || 'N/A';
                 document.getElementById('prov-info-cont').innerText = window.appData.proveedorInfo?.contacto || 'N/A';
@@ -1365,6 +1366,16 @@
                         let opt = document.createElement('option');
                         opt.value = a;
                         listaAreas.appendChild(opt);
+                    });
+                }
+
+                const listaTec = document.getElementById('tecnicos-list');
+                listaTec.innerHTML = '';
+                if(window.appData.tecnicos) {
+                    window.appData.tecnicos.forEach(t => {
+                        let opt = document.createElement('option');
+                        opt.value = t;
+                        listaTec.appendChild(opt);
                     });
                 }
 
@@ -1443,7 +1454,7 @@
                 document.getElementById('suc-col').innerText = suc.colonia || '';
                 document.getElementById('suc-city').innerText = suc.ciudad || '';
                 document.getElementById('suc-cp').innerText = suc.cp || '';
-                document.getElementById('suc-hor').innerText = suc.horario || '';
+                document.getElementById('suc-client').innerText = suc.cliente || ''; 
                 document.getElementById('suc-tel').innerText = suc.telefono || '';
                 document.getElementById('suc-mail').innerText = suc.correo || '';
                 container.style.display = 'grid';
