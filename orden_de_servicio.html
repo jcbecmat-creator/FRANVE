@@ -52,6 +52,14 @@
         .page-header-content h1 { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; color: #111827; line-height: 1; }
         .page-header-content p { color: #6b7280; margin: 0; line-height: 1.5; }
 
+        /* === ESTILOS DE PESTAÑAS (SUB-MENÚS) === */
+        .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn:hover { background: #e5e7eb; }
+        .tab-btn.active { background: white !important; color: #111827 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb !important; }
+        .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
+
         /* === BARRA DE FILTROS AVANZADA === */
         .filters-bar { background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
         .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 160px; flex: 1; }
@@ -69,19 +77,25 @@
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
         .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
         
-        /* Unificación estricta de fuentes al estilo 'observaciones' (Inter Regular) para toda la tabla */
+        /* Unificación de fuentes compartidas */
         .co-table th, .co-table td, .co-table span, .co-table div, .co-table select {
             font-family: 'Inter', sans-serif !important;
             font-weight: 400 !important;
             text-transform: none !important;
         }
         .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700 !important; text-transform: uppercase !important; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
+        
+        /* Regla CSS para forzar todas las celdas de datos a Mayúsculas */
+        .co-table tbody td, .co-table tbody select, .co-table tbody span { 
+            text-transform: uppercase !important; 
+        }
+        
         .co-table td { padding: 16px 20px; text-align: center; font-size: 13px; color: #111827; border-bottom: 1px solid #f3f4f6; max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
         .co-table tr:hover td { background-color: #F8FAFC; }
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
-        /* Forzado exclusivo de negrita únicamente para el ID de Incidencia */
-        .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; }
+        /* Forzado de negrita únicamente para el ID de Incidencia */
+        .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
 
         /* Estilos de la lista desplegable de asignación */
         .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 200px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
@@ -89,9 +103,10 @@
         .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
 
         /* Estilos del Botón de Acción Dinámico Inteligente (Mismo color que Buscar) */
-        .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; }
+        .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
         .btn-action-trigger:hover { opacity: 0.85; }
         .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
+        .btn-action-trigger span { font-weight: 700 !important; text-transform: none !important; }
 
         .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
@@ -202,20 +217,32 @@
                             <h1>Bandeja de Incidencias</h1>
                             <p>Gestión, consulta y asignación de incidencias recibidas desde Gmail</p>
                         </div>
+                        
+                        <div class="tabs-container" style="margin-top: 5px;">
+                            <button class="tab-btn active" onclick="cambiarTab('pendientes')" id="tab-pendientes">
+                                Pendientes <span class="tab-badge" id="badge-pendientes">0</span>
+                            </button>
+                            <button class="tab-btn" onclick="cambiarTab('enviados')" id="tab-enviados">
+                                Enviados <span class="tab-badge" id="badge-enviados">0</span>
+                            </button>
+                            <button class="tab-btn" onclick="cambiarTab('rechazados')" id="tab-rechazados">
+                                Rechazados <span class="tab-badge" id="badge-rechazados">0</span>
+                            </button>
+                        </div>
                     </header>
 
                     <form class="filters-bar" onsubmit="event.preventDefault(); filtrarIncidencias();">
                         <div class="filter-group">
                             <label class="filter-label">Fecha inicio</label>
-                            <input type="date" class="input-control" id="filtro-inicio">
+                            <input type="date" class="input-control" id="filtro-inicio" onchange="filtrarIncidencias()">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Fecha fin</label>
-                            <input type="date" class="input-control" id="filtro-fin">
+                            <input type="date" class="input-control" id="filtro-fin" onchange="filtrarIncidencias()">
                         </div>
                         <div class="filter-group style-search flex-grow">
-                            <label class="filter-label">Buscar por Incidencia o Tienda</label>
-                            <input type="text" class="input-control" id="filtro-buscar" placeholder="Ej. 12323-00225 o CP PUBLIC MARKET...">
+                            <label class="filter-label">Buscar por Incidencia, Tienda o Trabajador</label>
+                            <input type="text" class="input-control" id="filtro-buscar" placeholder="Ej. 12323-00225, CP PUBLIC MARKET o JOSE ALFREDO...">
                         </div>
                         <div class="filter-actions">
                             <button class="btn-search" type="button" onclick="filtrarIncidencias()">
@@ -277,29 +304,22 @@
 
     let listaUsuariosGlobal = [];
     let incidenciasGlobales = [];
+    let tabActual = 'pendientes';
 
-    // Formateador de fechas para corregir la vista raw de Firestore Timestamps u objetos planos
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
-        
-        // Caso 1: Es un objeto nativo de Firestore Timestamp
         if (fechaField && typeof fechaField.toDate === 'function') {
             const d = fechaField.toDate();
             return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
         }
-        
-        // Caso 2: Es un objeto plano con propiedad seconds
         if (fechaField && fechaField.seconds) {
             const d = new Date(fechaField.seconds * 1000);
             return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
         }
-        
-        // Caso 3: Es una cadena de texto larga proveniente del correo de Gmail
         if (typeof fechaField === 'string') {
             if (fechaField.includes("Timestamp")) return "—";
             return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
         }
-        
         return "—";
     }
 
@@ -318,7 +338,7 @@
             const mesStr = partes[2];
             const año = parseInt(partes[4]);
             
-            if (!dia && meses[mesStr] !== undefined && !año) {
+            if (!isNaN(dia) && meses[mesStr] !== undefined && !isNaN(año)) {
                 return new Date(año, meses[mesStr], dia);
             }
         } catch (e) {}
@@ -414,7 +434,8 @@
                     data.id_documento = doc.id;
                     incidenciasGlobales.push(data);
                 });
-                renderizarTabla(incidenciasGlobales);
+                actualizarBadges();
+                filtrarIncidencias();
             })
             .catch((error) => {
                 console.error("Error: ", error);
@@ -423,12 +444,39 @@
             });
     }
 
+    function actualizarBadges() {
+        let p = 0, e = 0, r = 0;
+        incidenciasGlobales.forEach(inc => {
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const estAsignacion = inc.estado_asignacion || "";
+
+            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") {
+                r++;
+            } else if (asignado !== "") {
+                e++;
+            } else {
+                p++;
+            }
+        });
+        document.getElementById('badge-pendientes').innerText = p;
+        document.getElementById('badge-enviados').innerText = e;
+        document.getElementById('badge-rechazados').innerText = r;
+    }
+
+    function cambiarTab(tab) {
+        tabActual = tab;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const btnActivo = document.getElementById('tab-' + tab);
+        if(btnActivo) btnActivo.classList.add('active');
+        filtrarIncidencias();
+    }
+
     function renderizarTabla(listaIncidencias) {
         const tbody = document.getElementById('tabla-incidencias-body');
         tbody.innerHTML = '';
 
         if (listaIncidencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en la base de datos.</span></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
             lucide.createIcons();
             return;
         }
@@ -446,7 +494,6 @@
             const obs = inc.observaciones || "—";
             const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
 
-            // Determinar si ya cuenta con asignación en DB para bloquear el select inicialmente
             const tieneAsignacion = asignadoActual !== "";
             const selectDisabled = tieneAsignacion ? "disabled" : "";
             const btnText = tieneAsignacion ? "Editar" : "Asignar";
@@ -455,8 +502,8 @@
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
             selectHtml += `<option value="">— Seleccionar —</option>`;
             listaUsuariosGlobal.forEach(user => {
-                const isSelected = (user === asignadoActual) ? 'selected' : '';
-                selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
+                const isSelected = (user.toUpperCase() === asignadoActual.toUpperCase()) ? 'selected' : '';
+                selectHtml += `<option value="${user}">${user}</option>`;
             });
             selectHtml += `</select>`;
 
@@ -490,7 +537,6 @@
         lucide.createIcons();
     }
 
-    // Controlador Inteligente del Flujo de Asignación y Edición
     async function manejarAccionFila(idDoc) {
         const btn = document.getElementById(`btn-action-${idDoc}`);
         const select = document.getElementById(`select-${idDoc}`);
@@ -500,14 +546,12 @@
         const modoActual = textSpan.innerText.trim();
 
         if (modoActual === "Editar") {
-            // Cambia a modo de selección habilitando la lista desplegable y alternando el botón
             select.disabled = false;
             textSpan.innerText = "Asignar";
             btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
             lucide.createIcons();
             select.focus();
         } else {
-            // Ejecuta el guardado directo de la asignación en la base de datos
             const usuarioAsignado = select.value;
             await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
         }
@@ -522,21 +566,23 @@
         textSpan.innerText = "Guardando...";
 
         try {
+            const nuevoEstado = usuarioAsignado ? "Asignado" : "Pendiente";
             await db.collection("incidencias").doc(idDocumento).update({
                 usuario_asignado: usuarioAsignado,
                 usuario_assigned: usuarioAsignado,
                 fecha_asignacion: new Date().toISOString(),
-                estado_asignacion: usuarioAsignado ? "Asignado" : "Pendiente"
+                estado_asignacion: nuevoEstado
             });
 
-            // Sincronizar memoria interna
             const index = incidenciasGlobales.findIndex(i => i.id_documento === idDocumento);
             if (index !== -1) {
                 incidenciasGlobales[index].usuario_asignado = usuarioAsignado;
                 incidenciasGlobales[index].usuario_assigned = usuarioAsignado;
+                incidenciasGlobales[index].estado_asignacion = nuevoEstado;
             }
 
-            // Cambiar vista del botón a Editar y congelar select
+            actualizarBadges();
+
             selectElement.disabled = true;
             buttonElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
             lucide.createIcons();
@@ -546,11 +592,13 @@
             } else {
                 showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
             }
+            
+            filtrarIncidencias();
+
         } catch (error) {
             console.error("Error al actualizar:", error);
             showCustomAlert("Error de Asignación", "No se pudo guardar en Firebase. Revisa la conexión.", false);
             
-            // Revertir a modo guardar si falla
             selectElement.disabled = false;
             buttonElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
             lucide.createIcons();
@@ -565,10 +613,22 @@
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
 
         let filtrados = incidenciasGlobales.filter(inc => {
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const estAsignacion = inc.estado_asignacion || "";
+
+            if (tabActual === 'pendientes') {
+                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignado !== "") return false;
+            } else if (tabActual === 'enviados') {
+                if (asignado === "" || estAsignacion === "Rechazado") return false;
+            } else if (tabActual === 'rechazados') {
+                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados") return false;
+            }
+
             if (fBuscar) {
                 const incidenciaCod = (inc.incidencia || "").toLowerCase();
                 const nombreTienda = (inc.usuario || "").toLowerCase();
-                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar)) {
+                const trabajador = asignado.toLowerCase();
+                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
                     return false;
                 }
             }
@@ -596,7 +656,7 @@
         document.getElementById('filtro-inicio').value = '';
         document.getElementById('filtro-fin').value = '';
         document.getElementById('filtro-buscar').value = '';
-        renderizarTabla(incidenciasGlobales);
+        filtrarIncidencias();
     }
 </script>
 </body>
