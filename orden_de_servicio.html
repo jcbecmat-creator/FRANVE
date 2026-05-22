@@ -35,7 +35,7 @@
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
         
-        /* OVERRIDES DE BRANDING FRANVE / FRAVE */
+        /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
@@ -65,29 +65,44 @@
         .btn-reset { height: 42px; background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background 0.2s; }
         .btn-reset:hover { background: #E2E8F0; }
         
-        /* === CONTENEDOR DE TABLA HOMOLOGADO === */
+        /* === CONTENEDOR DE TABLA HOMOLOGADO Y TIPOGRAFÍA BLINDADA === */
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
-        .co-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
+        .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
+        
+        /* Unificación estricta de fuentes al estilo 'observaciones' (Inter Regular) para toda la tabla */
+        .co-table th, .co-table td, .co-table span, .co-table div, .co-table select {
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 400 !important;
+            text-transform: none !important;
+        }
+        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700 !important; text-transform: uppercase !important; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
         .co-table td { padding: 16px 20px; text-align: center; font-size: 13px; color: #111827; border-bottom: 1px solid #f3f4f6; max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
         .co-table tr:hover td { background-color: #F8FAFC; }
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
-        /* Estilos de la lista desplegable de asignación */
-        .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 220px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
-        .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
-        .assign-select:disabled { background-color: #E5E7EB; color: #6B7280; cursor: not-allowed; }
+        /* Forzado exclusivo de negrita únicamente para el ID de Incidencia */
+        .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; }
 
-        .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
-        .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        /* Estilos de la lista desplegable de asignación */
+        .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 200px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
+        .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
+        .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
+
+        /* Estilos del Botón de Acción Dinámico Inteligente (Mismo color que Buscar) */
+        .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; }
+        .btn-action-trigger:hover { opacity: 0.85; }
+        .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
+
+        .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
+        .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
 
         /* Modal Alerta Personalizado */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
-        #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
+        #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700 !important; }
         #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
-        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
+        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600 !important; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
         #alert-btn:hover { opacity: 0.9; }
     </style>
 </head>
@@ -189,7 +204,6 @@
                         </div>
                     </header>
 
-                    <!-- BARRA DE FILTROS CONECTADA A FIREBASE -->
                     <form class="filters-bar" onsubmit="event.preventDefault(); filtrarIncidencias();">
                         <div class="filter-group">
                             <label class="filter-label">Fecha inicio</label>
@@ -213,7 +227,6 @@
                         </div>
                     </form>
 
-                    <!-- TABLA DE INCIDENCIAS DE FIREBASE -->
                     <div class="co-table-container">
                         <table class="co-table">
                             <thead>
@@ -227,10 +240,11 @@
                                     <th>Fallo Reportado</th>
                                     <th>Observaciones</th>
                                     <th style="text-align: center;">Asignar Técnico / Usuario</th>
+                                    <th style="text-align: center;">Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-incidencias-body">
-                                <tr><td colspan="9" class="co-table-empty">Cargando incidencias desde Firebase...</td></tr>
+                                <tr><td colspan="10" class="co-table-empty">Cargando incidencias desde Firebase...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -239,7 +253,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE ALERTA PERSONALIZADO -->
     <div id="custom-alert" class="modal-overlay">
         <div class="modal-card-alert">
             <div id="alert-icon-container"></div>
@@ -250,7 +263,6 @@
     </div>
 
 <script>
-    // Configuración exacta extraída de las credenciales de Firebase del cliente
     const firebaseConfig = {
         apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
         authDomain: "frave-4fbbf.firebaseapp.com",
@@ -266,32 +278,56 @@
     let listaUsuariosGlobal = [];
     let incidenciasGlobales = [];
 
-    // Helper para parsear la fecha en formato string largo de Firebase ("21 de mayo de 2026...")
-    function parsearFechaFirebase(fechaStr) {
-        if (!fechaStr) return new Date(0);
+    // Formateador de fechas para corregir la vista raw de Firestore Timestamps u objetos planos
+    function formatearFecha(fechaField) {
+        if (!fechaField) return "—";
+        
+        // Caso 1: Es un objeto nativo de Firestore Timestamp
+        if (fechaField && typeof fechaField.toDate === 'function') {
+            const d = fechaField.toDate();
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Caso 2: Es un objeto plano con propiedad seconds
+        if (fechaField && fechaField.seconds) {
+            const d = new Date(fechaField.seconds * 1000);
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Caso 3: Es una cadena de texto larga proveniente del correo de Gmail
+        if (typeof fechaField === 'string') {
+            if (fechaField.includes("Timestamp")) return "—";
+            return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
+        }
+        
+        return "—";
+    }
+
+    function parsearFechaFirebase(fechaField) {
+        if (!fechaField) return new Date(0);
+        if (typeof fechaField.toDate === 'function') return fechaField.toDate();
+        if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
+        
         try {
             const meses = {
                 "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4, "junio": 5,
                 "julio": 6, "agosto": 7, "septiembre": 8, "octubre": 9, "noviembre": 10, "diciembre": 11
             };
-            const partes = fechaStr.toLowerCase().split(' ');
+            const partes = fechaField.toLowerCase().split(' ');
             const dia = parseInt(partes[0]);
             const mesStr = partes[2];
             const año = parseInt(partes[4]);
             
-            if (!isNaN(dia) && meses[mesStr] !== undefined && !isNaN(año)) {
+            if (!dia && meses[mesStr] !== undefined && !año) {
                 return new Date(año, meses[mesStr], dia);
             }
-        } catch (e) {
-            console.error("Error al parsear la fecha de la incidencia:", e);
-        }
-        return new Date(fechaStr); // Fallback directo si viene formateada estándar
+        } catch (e) {}
+        return new Date(fechaField);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) { lucide.createIcons(); }
         
-        // Carga de sesión de usuario de FRANVE
         const savedUser = sessionStorage.getItem('loginUser');
         if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
 
@@ -303,12 +339,10 @@
             if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
         }
 
-        // Sidebar responsive logic
         const toggles = document.querySelectorAll('[data-sidebar-toggle]');
         toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar').classList.toggle('open')));
         document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
 
-        // Inicializar carga de datos cruzados
         cargarListaUsuarios().then(() => {
             cargarIncidenciasFirebase();
         });
@@ -340,7 +374,6 @@
         document.getElementById('custom-alert').style.display = 'none';
     }
 
-    // Obtener la lista de usuarios/técnicos asignables desde la sesión o catálogo global de Firebase
     async function cargarListaUsuarios() {
         try {
             const appDataStr = sessionStorage.getItem('loginSession');
@@ -352,7 +385,6 @@
                 }
             }
             
-            // Fallback de catálogo en caso de que no existan cargados en la sesión actual
             const usuariosSnapshot = await db.collection("usuarios").get();
             listaUsuariosGlobal = [];
             usuariosSnapshot.forEach(doc => {
@@ -361,18 +393,17 @@
             });
 
             if (listaUsuariosGlobal.length === 0) {
-                listaUsuariosGlobal = ["Juan Pérez (Mobiliario)", "Carlos Mendoza (Electromecánico)", "Soporte Técnico Especializado", "Proveedor FRANVE Zona Norte"];
+                listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS", "SOPORTE TÉCNICO"];
             }
         } catch (error) {
-            console.error("Error cargando catálogo de técnicos:", error);
-            listaUsuariosGlobal = ["Juan Pérez (Mobiliario)", "Carlos Mendoza (Electromecánico)", "Soporte Técnico Especializado"];
+            console.error("Error catálogo:", error);
+            listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS"];
         }
     }
 
-    // Consulta inicial a la colección 'incidencias' tal como se muestra en la consola de Firestore
     function cargarIncidenciasFirebase() {
         const tbody = document.getElementById('tabla-incidencias-body');
-        tbody.innerHTML = '<tr><td colspan="9" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
 
         db.collection("incidencias")
             .get()
@@ -380,14 +411,14 @@
                 incidenciasGlobales = [];
                 querySnapshot.forEach((doc) => {
                     let data = doc.data();
-                    data.id_documento = doc.id; // Guardamos el ID del documento para la actualización del select
+                    data.id_documento = doc.id;
                     incidenciasGlobales.push(data);
                 });
                 renderizarTabla(incidenciasGlobales);
             })
             .catch((error) => {
-                console.error("Error consultando base de datos: ", error);
-                tbody.innerHTML = '<tr><td colspan="9" class="co-table-empty" style="color: #ef4444;"><i data-lucide="alert-circle" class="inline mr-2"></i> Error al conectar con Firebase. Revisa los permisos de seguridad.</td></tr>';
+                console.error("Error: ", error);
+                tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty" style="color: #ef4444;"><i data-lucide="alert-circle" class="inline mr-2"></i> Error al conectar con Firebase.</td></tr>';
                 lucide.createIcons();
             });
     }
@@ -397,7 +428,7 @@
         tbody.innerHTML = '';
 
         if (listaIncidencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en la base de datos.</span></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en la base de datos.</span></div></td></tr>`;
             lucide.createIcons();
             return;
         }
@@ -405,7 +436,7 @@
         listaIncidencias.forEach(inc => {
             const idDoc = inc.id_documento;
             const codigoIncidencia = inc.incidencia || "—";
-            const fechaRec = inc.fechaRecepcion || "—";
+            const fechaRec = formatearFecha(inc.fechaRecepcion);
             const tienda = inc.usuario || "—";
             const codigoEq = inc.codigoEquipo || "—";
             const instalacion = inc.instalacion || "—";
@@ -413,47 +444,127 @@
             const tipo = inc.tipo || "Anomalía";
             const fallos = inc.fallos || "—";
             const obs = inc.observaciones || "—";
-            const asignadoActual = inc.usuario_asignado || "";
+            const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
 
-            // Crear lista desplegable dinâmica
-            let selectHtml = `<select class="assign-select" onchange="asignarOrdenServicio('${idDoc}', this.value, this)">`;
-            selectHtml += `<option value="">— Seleccionar Usuario —</option>`;
+            // Determinar si ya cuenta con asignación en DB para bloquear el select inicialmente
+            const tieneAsignacion = asignadoActual !== "";
+            const selectDisabled = tieneAsignacion ? "disabled" : "";
+            const btnText = tieneAsignacion ? "Editar" : "Asignar";
+            const btnIcon = tieneAsignacion ? "edit-3" : "user-plus";
+
+            let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
+            selectHtml += `<option value="">— Seleccionar —</option>`;
             listaUsuariosGlobal.forEach(user => {
                 const isSelected = (user === asignadoActual) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
             selectHtml += `</select>`;
 
+            let btnHtml = `
+                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
+                    <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
+                    <span class="lbl-text">${btnText}</span>
+                </button>
+            `;
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong style="color: #1e293b;">${codigoIncidencia}</strong></td>
-                <td style="font-size: 12px; color: #475569;">${fechaRec}</td>
-                <td style="font-weight: 600; text-align: left;">${tienda}</td>
+                <td><span class="incidencia-bold">${codigoIncidencia}</span></td>
+                <td>${fechaRec}</td>
+                <td style="text-align: left;">${tienda}</td>
                 <td><span class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">${codigoEq}</span></td>
-                <td><span style="font-weight: 500;">${instalacion}</span></td>
+                <td>${instalacion}</td>
                 <td>
                     <div class="flex flex-col gap-1 items-center">
                         <span class="badge-origin">${origen}</span>
                         <span class="badge-type">${tipo}</span>
                     </div>
                 </td>
-                <td style="text-align: left; max-width: 250px;" title="${fallos}">${fallos}</td>
+                <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>${selectHtml}</td>
+                <td>${btnHtml}</td>
             `;
             tbody.appendChild(tr);
         });
         lucide.createIcons();
     }
 
-    // Función para filtrar los registros por Rango de Fechas e Incidencia/Tienda
+    // Controlador Inteligente del Flujo de Asignación y Edición
+    async function manejarAccionFila(idDoc) {
+        const btn = document.getElementById(`btn-action-${idDoc}`);
+        const select = document.getElementById(`select-${idDoc}`);
+        if (!btn || !select) return;
+
+        const textSpan = btn.querySelector('.lbl-text');
+        const modoActual = textSpan.innerText.trim();
+
+        if (modoActual === "Editar") {
+            // Cambia a modo de selección habilitando la lista desplegable y alternando el botón
+            select.disabled = false;
+            textSpan.innerText = "Asignar";
+            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            lucide.createIcons();
+            select.focus();
+        } else {
+            // Ejecuta el guardado directo de la asignación en la base de datos
+            const usuarioAsignado = select.value;
+            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
+        }
+    }
+
+    async function guardarAsignacionFirebase(idDocumento, usuarioAsignado, selectElement, buttonElement) {
+        if (!idDocumento) return;
+
+        selectElement.disabled = true;
+        buttonElement.disabled = true;
+        const textSpan = buttonElement.querySelector('.lbl-text');
+        textSpan.innerText = "Guardando...";
+
+        try {
+            await db.collection("incidencias").doc(idDocumento).update({
+                usuario_asignado: usuarioAsignado,
+                usuario_assigned: usuarioAsignado,
+                fecha_asignacion: new Date().toISOString(),
+                estado_asignacion: usuarioAsignado ? "Asignado" : "Pendiente"
+            });
+
+            // Sincronizar memoria interna
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDocumento);
+            if (index !== -1) {
+                incidenciasGlobales[index].usuario_asignado = usuarioAsignado;
+                incidenciasGlobales[index].usuario_assigned = usuarioAsignado;
+            }
+
+            // Cambiar vista del botón a Editar y congelar select
+            selectElement.disabled = true;
+            buttonElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
+            lucide.createIcons();
+
+            if (usuarioAsignado) {
+                showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada correctamente a: ${usuarioAsignado}.`, true);
+            } else {
+                showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
+            }
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            showCustomAlert("Error de Asignación", "No se pudo guardar en Firebase. Revisa la conexión.", false);
+            
+            // Revertir a modo guardar si falla
+            selectElement.disabled = false;
+            buttonElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            lucide.createIcons();
+        } finally {
+            buttonElement.disabled = false;
+        }
+    }
+
     function filtrarIncidencias() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
 
         let filtrados = incidenciasGlobales.filter(inc => {
-            // Filtro por Buscador (Código de incidencia o Nombre de la tienda)
             if (fBuscar) {
                 const incidenciaCod = (inc.incidencia || "").toLowerCase();
                 const nombreTienda = (inc.usuario || "").toLowerCase();
@@ -462,7 +573,6 @@
                 }
             }
 
-            // Filtro por Rango de Fechas usando el normalizador de string
             if (fInicio || fFin) {
                 const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
                 
@@ -487,39 +597,6 @@
         document.getElementById('filtro-fin').value = '';
         document.getElementById('filtro-buscar').value = '';
         renderizarTabla(incidenciasGlobales);
-    }
-
-    // Actualiza en tiempo real el documento dentro de Firestore al cambiar la lista desplegable de asignación
-    async function asignarOrdenServicio(idDocumento, usuarioAsignado, selectElement) {
-        if (!idDocumento) return;
-
-        selectElement.disabled = true;
-        
-        try {
-            await db.collection("incidencias").doc(idDocumento).update({
-                usuario_asignado: usuarioAsignado,
-                fecha_asignacion: new Date().toISOString(),
-                estado_asignacion: usuarioAsignado ? "Asignado" : "Pendiente"
-            });
-
-            // Actualizar la lista local en memoria para mantener consistencia en búsquedas posteriores
-            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDocumento);
-            if (index !== -1) {
-                incidenciasGlobales[index].usuario_asignado = usuarioAsignado;
-            }
-
-            if (usuarioAsignado) {
-                showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada correctamente a: ${usuarioAsignado}.`, true);
-            } else {
-                showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
-            }
-        } catch (error) {
-            console.error("Error al actualizar la asignación en Firestore:", error);
-            showCustomAlert("Error de Asignación", "No se pudo actualizar el registro en Firebase. Verifica las reglas de seguridad de Firestore.", false);
-            cargarIncidenciasFirebase(); // Recargar para revertir cambio visual incorrecto
-        } finally {
-            selectElement.disabled = false;
-        }
     }
 </script>
 </body>
