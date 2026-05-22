@@ -38,7 +38,7 @@
         /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
-        .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
+        .header-hamburger Motion.hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
 
         /* ESTILO DEL MENÚ ACTIVO TIPO PASTILLA CON CURVA */
@@ -77,7 +77,7 @@
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
         .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
         
-        /* Unificación de fuentes compartidas */
+        /* Unificación de fuentes compartidas basadas en el estilo observaciones */
         .co-table th, .co-table td, .co-table span, .co-table div, .co-table select {
             font-family: 'Inter', sans-serif !important;
             font-weight: 400 !important;
@@ -102,11 +102,11 @@
         .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
         .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
 
-        /* Estilos del Botón de Acción Dinámico Inteligente (Mismo color que Buscar) */
-        .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
+        /* CORRECCIÓN DE ESTILO: Letras normales sin negritas para los botones de acción */
+        .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 400 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
         .btn-action-trigger:hover { opacity: 0.85; }
         .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
-        .btn-action-trigger span { font-weight: 700 !important; text-transform: none !important; }
+        .btn-action-trigger span { font-weight: 400 !important; text-transform: none !important; }
 
         .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
@@ -494,6 +494,7 @@
             const obs = inc.observaciones || "—";
             const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
 
+            // Determinar si ya cuenta con asignación en DB para bloquear el select inicialmente
             const tieneAsignacion = asignadoActual !== "";
             const selectDisabled = tieneAsignacion ? "disabled" : "";
             const btnText = tieneAsignacion ? "Editar" : "Asignar";
@@ -502,11 +503,13 @@
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
             selectHtml += `<option value="">— Seleccionar —</option>`;
             listaUsuariosGlobal.forEach(user => {
-                const isSelected = (user.toUpperCase() === asignadoActual.toUpperCase()) ? 'selected' : '';
-                selectHtml += `<option value="${user}">${user}</option>`;
+                // SOLUCIÓN AL BUG 1: Inyección explícita del atributo 'selected' evaluando cadenas
+                const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
+                selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
             selectHtml += `</select>`;
 
+            // SOLUCIÓN AL BUG 2: Se removieron los pesos pesados (font-weight: 700) de los botones para un look regular
             let btnHtml = `
                 <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
