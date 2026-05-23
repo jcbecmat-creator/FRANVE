@@ -480,90 +480,75 @@
         filtrarIncidencias();
     }
 
-function renderizarTabla(listaIncidencias) {
-    const tbody = document.getElementById('tabla-incidencias-body');
-    tbody.innerHTML = '';
+    function renderizarTabla(listaIncidencias) {
+        const tbody = document.getElementById('tabla-incidencias-body');
+        tbody.innerHTML = '';
 
-    // ===== DELEGACIÓN DE EVENTOS (se configura una sola vez) =====
-    if (!tbody._delegacionActiva) {
-        tbody.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn-accion-asignar');
-            if (btn) {
-                const idDoc = btn.getAttribute('data-doc-id');
-                if (idDoc) {
-                    manejarAccionFila(idDoc);
-                }
-            }
+        if (listaIncidencias.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
+            return;
+        }
+
+        listaIncidencias.forEach(inc => {
+            const idDoc = inc.id_documento;
+            const codigoIncidencia = inc.incidencia || "—";
+            const fechaRec = formatearFecha(inc.fechaRecepcion);
+            const tienda = inc.usuario || "—";
+            const codigoEq = inc.codigoEquipo || "—";
+            const instalacion = inc.instalacion || "—";
+            const origen = inc.origen || "Correctiva";
+            const tipo = inc.tipo || "Anomalía";
+            const fallos = inc.fallos || "—";
+            const obs = inc.observaciones || "—";
+            const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
+
+            const tieneAsignacion = asignadoActual !== "";
+            const selectDisabled = tieneAsignacion ? "disabled" : "";
+            const btnText = tieneAsignacion ? "Editar" : "Asignar";
+            const btnIcon = tieneAsignacion ? "edit-3" : "user-plus";
+
+            let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
+            selectHtml += `<option value="">— Seleccionar —</option>`;
+            listaUsuariosGlobal.forEach(user => {
+                const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
+                selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
+            });
+            selectHtml += `</select>`;
+
+            let btnHtml = `
+                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
+                    <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
+                    <span class="lbl-text">${btnText}</span>
+                </button>
+            `;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="incidencia-bold">${codigoIncidencia}</span></td>
+                <td>${fechaRec}</td>
+                <td style="text-align: left;">${tienda}</td>
+                <td><span class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">${codigoEq}</span></td>
+                <td>${instalacion}</td>
+                <td>
+                    <div class="flex flex-col gap-1 items-center">
+                        <span class="badge-origin">${origen}</span>
+                        <span class="badge-type">${tipo}</span>
+                    </div>
+                </td>
+                <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
+                <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
+                <td>
+                    ${selectHtml}
+                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px; font-weight:600;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                </td>
+                <td>${btnHtml}</td>
+            `;
+            tbody.appendChild(tr);
         });
-        tbody._delegacionActiva = true;
-    }
-
-    if (listaIncidencias.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
+        
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
-        return;
     }
-
-    listaIncidencias.forEach(inc => {
-        const idDoc = inc.id_documento;
-        const codigoIncidencia = inc.incidencia || "—";
-        const fechaRec = formatearFecha(inc.fechaRecepcion);
-        const tienda = inc.usuario || "—";
-        const codigoEq = inc.codigoEquipo || "—";
-        const instalacion = inc.instalacion || "—";
-        const origen = inc.origen || "Correctiva";
-        const tipo = inc.tipo || "Anomalía";
-        const fallos = inc.fallos || "—";
-        const obs = inc.observaciones || "—";
-        const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
-
-        const tieneAsignacion = asignadoActual !== "";
-        const selectDisabled = tieneAsignacion ? "disabled" : "";
-        const btnText = tieneAsignacion ? "Editar" : "Asignar";
-        const btnIcon = tieneAsignacion ? "edit-3" : "user-plus";
-
-        let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
-        selectHtml += `<option value="">— Seleccionar —</option>`;
-        listaUsuariosGlobal.forEach(user => {
-            const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
-            selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
-        });
-        selectHtml += `</select>`;
-
-        // ===== BOTÓN CON data-doc-id Y CLASE btn-accion-asignar (sin onclick inline) =====
-        let btnHtml = `
-            <button id="btn-action-${idDoc}" data-doc-id="${idDoc}" class="btn-action-trigger btn-accion-asignar" type="button">
-                <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
-                <span class="lbl-text">${btnText}</span>
-            </button>
-        `;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><span class="incidencia-bold">${codigoIncidencia}</span></td>
-            <td>${fechaRec}</td>
-            <td style="text-align: left;">${tienda}</td>
-            <td><span class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">${codigoEq}</span></td>
-            <td>${instalacion}</td>
-            <td>
-                <div class="flex flex-col gap-1 items-center">
-                    <span class="badge-origin">${origen}</span>
-                    <span class="badge-type">${tipo}</span>
-                </div>
-            </td>
-            <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
-            <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
-            <td>
-                ${selectHtml}
-                ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px; font-weight:600;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
-            </td>
-            <td>${btnHtml}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
-    try { if(window.lucide) lucide.createIcons(); } catch(e){}
-}
 
     async function manejarAccionFila(idDoc) {
         const btn = document.getElementById(`btn-action-${idDoc}`);
