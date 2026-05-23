@@ -288,18 +288,35 @@
     let tabActual = 'pendientes';
     let historialCompletoCargado = false; 
 
+    // FUNCIÓN ACTUALIZADA PARA CORREGIR LA HORA Y QUITAR MILISEGUNDOS
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
+        
+        // Si es un Timestamp de Firestore nativo
         if (fechaField && typeof fechaField.toDate === 'function') {
             const d = fechaField.toDate();
             return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
         }
+        
+        // Si viene como un objeto de segundos (Timestamp serializado)
         if (fechaField && fechaField.seconds) {
             const d = new Date(fechaField.seconds * 1000);
             return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
         }
+        
+        // Si es un string (como el nuevo formato ISO que guardamos: "2026-05-23T16:57:30.799Z")
         if (typeof fechaField === 'string') {
             if (fechaField.includes("Timestamp")) return "—";
+            
+            // Intentar convertir el string a objeto Date
+            const dateObj = new Date(fechaField);
+            if (!isNaN(dateObj.getTime())) {
+                // Al usar toLocaleTimeString se convierte automáticamente de hora UTC (Z) a hora local de México
+                // Y con hour/minute eliminamos los segundos y milisegundos
+                return dateObj.toLocaleDateString('es-MX') + ' ' + dateObj.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+            }
+            
+            // Fallback por si no se puede parsear
             return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
         }
         return "—";
@@ -327,7 +344,6 @@
         return new Date(fechaField);
     }
 
-    // Escudo de seguridad para el DOM y la ejecución de la tabla
     document.addEventListener('DOMContentLoaded', () => {
         try {
             if (window.lucide) { lucide.createIcons(); }
@@ -343,7 +359,6 @@
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
                 if(document.getElementById('welcome-username-display')) {
-                    // Texto homologado con las demás pantallas
                     document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
                 const dropdownName = document.querySelector('.user-name');
@@ -516,8 +531,9 @@
             });
             selectHtml += `</select>`;
 
+            // Se agregó 'this' en el onclick para enviar el botón directamente
             let btnHtml = `
-                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
+                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}', this)">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
                     <span class="lbl-text">${btnText}</span>
                 </button>
@@ -550,23 +566,27 @@
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
-    async function manejarAccionFila(idDoc) {
-        const btn = document.getElementById(`btn-action-${idDoc}`);
-        const select = document.getElementById(`select-${idDoc}`);
-        if (!btn || !select) return;
+    // FUNCIÓN ACTUALIZADA: Usa 'this' para buscar el select de manera segura
+    async function manejarAccionFila(idDoc, btnElement) {
+        if (!btnElement) return;
 
-        const textSpan = btn.querySelector('.lbl-text');
-        const modoActual = textSpan.innerText.trim();
+        // Buscar el select en la misma fila (tr)
+        const fila = btnElement.closest('tr');
+        const select = fila ? fila.querySelector('.assign-select') : null;
+        
+        if (!select) return;
+
+        const textSpan = btnElement.querySelector('.lbl-text');
+        const modoActual = textSpan ? textSpan.innerText.trim() : "";
 
         if (modoActual === "Editar") {
             select.disabled = false;
-            textSpan.innerText = "Asignar";
-            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            btnElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
             select.focus();
         } else {
             const usuarioAsignado = select.value;
-            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
+            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btnElement);
         }
     }
 
