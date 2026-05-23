@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Órdenes | FRANVE</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/fonts.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/style.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/components.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/design-system.css">
+    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css">
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        if (!sessionStorage.getItem('loginSession')) {
+            window.location.href = 'index.html';
+        } else {
+            document.documentElement.classList.add('is-logged-in');
+        }
+    </script>
+
+    <script>
+        tailwind.config = { darkMode: "class", corePlugins: { preflight: false }, theme: { extend: { colors: { primary: "#81D0DC", "primary-dark": "#5FAAB5", "surface": "#FFFFFF", "background": "#F8FAFC", "text-main": "#1E293B", "text-sub": "#64748B", }, fontFamily: { sans: ["Inter", "sans-serif"] } } } };
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; line-height: 1.25; }
+        .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
+        html.is-logged-in #app-screen { display: block !important; }
+        
+        /* OVERRIDES DE BRANDING FRANVE */
+        .main-header { background-color: #131520 !important; border-bottom: none !important; }
+        .system-title { color: #FFFFFF !important; }
+        .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
+        .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
+
+        /* MENÚ LATERAL */
+        .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
+        .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
+        .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
+        .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
+
+        .mis-ordenes-wrap { max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-16); }
+        .page-header-content h1 { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; color: #111827; line-height: 1; }
+        .page-header-content p { color: #6b7280; margin: 0; line-height: 1.5; }
+
+        /* PESTAÑAS */
+        .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn:hover { background: #e5e7eb; }
+        .tab-btn.active { background: white !important; color: #111827 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb !important; }
+        .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
+
+        /* FILTROS Y TABLA (Homologados) */
+        .co-filters { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
+        .co-filters-grid { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+        .co-filter-group { flex: 1; min-width: 160px; }
+        .co-filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; display: block; }
+        .co-filter-input { height: 42px; width: 100%; padding: 0 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #111827; box-sizing: border-box; }
+        .btn-secondary { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; }
+
+        .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
+        .co-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
+        .co-table td { padding: 16px 20px; text-align: center; font-size: 14px; color: #111827; border-bottom: 1px solid #f3f4f6; }
+        .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
+        
+        .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
+        .status-badge { height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0 14px; border-radius: 14px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .bg-yellow { background: #fef3c7; color: #92400e; }
+        .bg-green { background: #dcfce7; color: #166534; }
+        .bg-red { background: #fee2e2; color: #991b1b; }
+
+        /* BOTONES DE ACCIÓN APILADOS */
+        .action-buttons-stack { display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; }
+        .btn-aprobar-row { height: 34px; width: 120px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; }
+        .btn-aprobar-row:hover { background: #15803d; }
+        .btn-rechazar-row { height: 34px; width: 120px; background: #DC2626; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; }
+        .btn-rechazar-row:hover { background: #b91c1c; }
+
+        /* MODAL DE RECHAZO */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-overlay.active { display: flex; }
+        .modal-rechazo-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        .modal-rechazo-header { margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
+        .modal-rechazo-header h2 { margin: 0; font-size: 20px; color: #111827; font-weight: 800; }
+        .modal-rechazo-header p { margin: 4px 0 0 0; font-size: 13px; color: #6b7280; }
+        .motivo-rechazo-textarea { width: 100%; height: 120px; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; resize: none; box-sizing: border-box; margin-bottom: 20px; transition: border-color 0.2s; }
+        .motivo-rechazo-textarea:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
+        .modal-rechazo-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        .btn-cancelar-rechazo { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-confirmar-rechazo { background: #DC2626; color: white; border: none; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; }
+        .btn-confirmar-rechazo:hover { background: #b91c1c; }
+
+        /* ALERTAS */
+        #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
+        #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
+        #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
+        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
+    </style>
+</head>
+<body class="has-sidebar">
+
+    <div id="app-screen" style="display: block;">
+        <header class="main-header">
+            <div class="header-left">
+                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle>
+                    <span class="hamburger"></span>
+                </button>
+                <a href="inicio.html">
+                    <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px;">
+                </a>
+                <h1 class="system-title">Ordenes de Servicio</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-menu" data-user-menu>
+                    <button class="user-circle-btn" type="button" data-user-trigger>
+                        <span class="user-circle-initial" id="user-initial-header">U</span>
+                    </button>
+                    <div class="user-dropdown" data-user-dropdown>
+                        <div class="user-card">
+                            <div class="user-circle-avatar user-circle-initial">U</div>
+                            <div class="user-meta">
+                                <div class="user-name">Cargando...</div>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();">
+                                <i data-lucide="log-out"></i> Cerrar sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <aside class="sidebar app-sidebar" id="sidebar" data-app-sidebar>
+                <button class="sidebar-close" type="button" data-sidebar-close><span class="close-icon">X</span></button>
+                <div class="sidebar-content">
+                    <nav class="sidebar-nav">
+                        <a class="sidebar-link" href="inicio.html"><i data-lucide="home"></i> Inicio</a>
+                        <div class="sidebar-section">
+                            <div class="sidebar-section-title">Formas</div>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
+                            <a class="sidebar-link" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Órdenes de servicio</a>
+                            <a class="sidebar-link activa" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
+                        </div>
+                        <div class="sidebar-section" id="nav-seccion-admin">
+                            <div class="sidebar-section-title">Administración</div>
+                            <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
+                            <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
+                            <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
+                            <a class="sidebar-link" href="aprobacion_gerencia.html"><i data-lucide="shield-check"></i> Aprobación gerencia</a>
+                            <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
+                        </div>
+                        <div class="sidebar-section" id="nav-seccion-reportes">
+                            <div class="sidebar-section-title">Reportes</div>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="bar-chart-3"></i> Reportes</a>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+            <div class="sidebar-backdrop" id="sidebar-backdrop" data-sidebar-backdrop></div>
+
+            <main class="main-content app-content">
+                <div id="global-welcome-section" style="text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white;">
+                    <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: 700;">Bienvenido</h1>
+                    <h2 id="welcome-username-display" style="margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2;">CARGANDO...</h2>
+                </div>
+
+                <div class="mis-ordenes-wrap">
+                    <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px;">
+                        <div class="page-header-content">
+                            <h1>Mis Órdenes Asignadas</h1>
+                            <p>Revisa y acepta o rechaza las incidencias asignadas a ti</p>
+                        </div>
+                        <div class="tabs-container" style="margin-bottom: 0; padding-bottom: 0;">
+                            <button class="tab-btn active" onclick="cambiarTab('pendientes')" id="tab-pendientes">
+                                Pendientes <span class="tab-badge" id="badge-pendientes">0</span>
+                            </button>
+                            <button class="tab-btn" onclick="cambiarTab('aprobados')" id="tab-aprobados">
+                                Aprobados <span class="tab-badge" id="badge-aprobados">0</span>
+                            </button>
+                            <button class="tab-btn" onclick="cambiarTab('rechazados')" id="tab-rechazados">
+                                Rechazados <span class="tab-badge" id="badge-rechazados">0</span>
+                            </button>
+                        </div>
+                    </header>
+
+                    <form class="co-filters">
+                        <div class="co-filters-grid">
+                            <div class="co-filter-group">
+                                <label class="co-filter-label">Buscar Incidencia</label>
+                                <input type="text" class="co-filter-input" id="filtro-buscar" placeholder="Ej. 12323-00225...">
+                            </div>
+                            <div class="flex gap-2 flex-shrink-0" style="align-self: flex-end;">
+                                <button class="btn-secondary" type="button" onclick="renderTabla()">
+                                    <i data-lucide="search" style="width: 18px; height: 18px;"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="co-table-container">
+                        <table class="co-table">
+                            <thead>
+                                <tr>
+                                    <th>Incidencia</th>
+                                    <th>Fecha Recepción</th>
+                                    <th>Tienda / Usuario</th>
+                                    <th>Código Equipo</th>
+                                    <th>Fallo Reportado</th>
+                                    <th>Estado</th>
+                                    <th style="text-align: center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-mis-ordenes-body">
+                                <tr><td colspan="7" class="co-table-empty">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL DE RECHAZO -->
+    <div id="modalRechazo" class="modal-overlay">
+        <div class="modal-rechazo-card">
+            <div class="modal-rechazo-header">
+                <h2>Rechazar Incidencia</h2>
+                <p>Por favor, indica el motivo por el cual rechazas esta orden</p>
+            </div>
+            <input type="hidden" id="rechazo-id-doc">
+            <textarea id="rechazo-motivo" class="motivo-rechazo-textarea" placeholder="Escribe el motivo del rechazo..."></textarea>
+            <div class="modal-rechazo-actions">
+                <button class="btn-cancelar-rechazo" onclick="cerrarModalRechazo()">Cancelar</button>
+                <button class="btn-confirmar-rechazo" onclick="confirmarRechazo()">
+                    <i data-lucide="x-circle" style="width: 16px;"></i> Confirmar Rechazo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERTA CUSTOM -->
+    <div id="custom-alert" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-card-alert" style="background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div id="alert-icon-container" style="margin-bottom: 16px; display: flex; justify-content: center;"></div>
+            <h3 id="alert-title" style="margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700;"></h3>
+            <p id="alert-msg" style="margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5;"></p>
+            <button id="alert-btn" onclick="closeCustomAlert()" style="width: 100%; padding: 12px; border-radius: 8px; border: none; background: #81D0DC; color: #131520; font-weight: 700; font-size: 14px; cursor: pointer;">Aceptar</button>
+        </div>
+    </div>
+
+<script>
+    // Firebase Config (Mismo proyecto de incidencias)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
+        authDomain: "frave-4fbbf.firebaseapp.com",
+        projectId: "frave-4fbbf",
+        storageBucket: "frave-4fbbf.firebasestorage.app",
+        messagingSenderId: "687825589857",
+        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore();
+
+    let incidenciasGlobales = [];
+    let tabActual = 'pendientes';
+    let nombreUsuarioLogueado = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) { lucide.createIcons(); }
+        
+        const savedUser = sessionStorage.getItem('loginUser');
+        if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if(appDataStr) {
+            const appData = JSON.parse(appDataStr);
+            nombreUsuarioLogueado = appData.nombreProveedor || appData.nombreUsuario || savedUser;
+            
+            const welcomeTitle = document.getElementById('welcome-username-display');
+            if(welcomeTitle) welcomeTitle.innerText = nombreUsuarioLogueado;
+            const dropdownName = document.querySelector('.user-name');
+            if(dropdownName) dropdownName.innerText = nombreUsuarioLogueado;
+        }
+
+        const userMenu = document.querySelector('[data-user-menu]');
+        if (userMenu) {
+            const trigger = userMenu.querySelector('[data-user-trigger]');
+            const dropdown = userMenu.querySelector('[data-user-dropdown]');
+            const closeMenus = (event) => { if (!userMenu.contains(event.target)) dropdown.classList.remove('show'); };
+            trigger.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('show'); });
+            document.addEventListener('click', closeMenus);
+        }
+
+        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
+        toggles.forEach(t => t.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open')));
+        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
+
+        cargarMisIncidencias();
+    });
+
+    function showCustomAlert(title, message, isSuccess = true) {
+        const alertBox = document.getElementById('custom-alert');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMsg = document.getElementById('alert-msg');
+        const alertIcon = document.getElementById('alert-icon-container');
+        const alertBtn = document.getElementById('alert-btn');
+
+        alertTitle.innerText = title;
+        alertMsg.innerText = message;
+
+        if(isSuccess) {
+            alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
+            alertBtn.style.background = '#16a34a'; alertBtn.style.color = '#FFFFFF';
+        } else {
+            alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
+            alertBtn.style.background = '#DC2626'; alertBtn.style.color = '#FFFFFF';
+        }
+        alertBox.style.display = 'flex';
+        lucide.createIcons();
+    }
+
+    function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+
+    function formatearFecha(fechaField) {
+        if (!fechaField) return "—";
+        if (fechaField && typeof fechaField.toDate === 'function') {
+            const d = fechaField.toDate();
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (fechaField && fechaField.seconds) {
+            const d = new Date(fechaField.seconds * 1000);
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (typeof fechaField === 'string') {
+            if (fechaField.includes("Timestamp")) return "—";
+            return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
+        }
+        return "—";
+    }
+
+    // === CARGA DE DATOS ===
+    function cargarMisIncidencias() {
+        db.collection("incidencias")
+          .where("usuario_assigned", "==", nombreUsuarioLogueado)
+          .get()
+          .then((querySnapshot) => {
+              incidenciasGlobales = [];
+              querySnapshot.forEach((doc) => {
+                  let data = doc.data();
+                  data.id_documento = doc.id;
+                  incidenciasGlobales.push(data);
+              });
+              actualizarBadges();
+              renderTabla();
+          })
+          .catch((error) => {
+              console.error("Error: ", error);
+              document.getElementById('tabla-mis-ordenes-body').innerHTML = '<tr><td colspan="7" class="co-table-empty" style="color: red;">Error al cargar tus incidencias.</td></tr>';
+          });
+    }
+
+    function actualizarBadges() {
+        const pend = incidenciasGlobales.filter(i => i.estado_asignacion === "Asignado" || !i.estado_asignacion).length;
+        const apr = incidenciasGlobales.filter(i => i.estado_asignacion === "Aprobado Trabajador").length;
+        const rech = incidenciasGlobales.filter(i => i.estado_asignacion === "Rechazado Trabajador").length;
+        
+        document.getElementById('badge-pendientes').innerText = pend;
+        document.getElementById('badge-aprobados').innerText = apr;
+        document.getElementById('badge-rechazados').innerText = rech;
+    }
+
+    function cambiarTab(tab) {
+        tabActual = tab;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        renderTabla();
+    }
+
+    // === RENDERIZADO DE TABLA ===
+    function renderTabla() {
+        const tbody = document.getElementById('tabla-mis-ordenes-body');
+        tbody.innerHTML = '';
+        
+        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
+
+        let filtrados = incidenciasGlobales.filter(inc => {
+            if(tabActual === 'pendientes' && (inc.estado_asignacion && inc.estado_asignacion !== "Asignado")) return false;
+            if(tabActual === 'aprobados' && inc.estado_asignacion !== "Aprobado Trabajador") return false;
+            if(tabActual === 'rechazados' && inc.estado_asignacion !== "Rechazado Trabajador") return false;
+
+            if(fBuscar) {
+                const cod = (inc.incidencia || "").toLowerCase();
+                const tienda = (inc.usuario || "").toLowerCase();
+                if(!cod.includes(fBuscar) && !tienda.includes(fBuscar)) return false;
+            }
+            return true;
+        });
+
+        if(filtrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay incidencias en esta sección.</span></div></td></tr>`;
+            lucide.createIcons();
+            return;
+        }
+
+        filtrados.forEach(inc => {
+            const idDoc = inc.id_documento;
+            const codigoIncidencia = inc.incidencia || "—";
+            const fechaRec = formatearFecha(inc.fechaRecepcion);
+            const tienda = inc.usuario || "—";
+            const codigoEq = inc.codigoEquipo || "—";
+            const fallos = inc.fallos || "—";
+
+            let estadoHtml = "";
+            let accionHtml = "";
+
+            if (tabActual === 'pendientes') {
+                estadoHtml = `<span class="status-badge bg-yellow">Pendiente</span>`;
+                accionHtml = `
+                    <div class="action-buttons-stack">
+                        <button class="btn-aprobar-row" onclick="aprobarIncidencia('${idDoc}')">
+                            <i data-lucide="check-circle" style="width:14px;"></i> Aprobado
+                        </button>
+                        <button class="btn-rechazar-row" onclick="abrirModalRechazo('${idDoc}')">
+                            <i data-lucide="x-circle" style="width:14px;"></i> Rechazado
+                        </button>
+                    </div>
+                `;
+            } else if (tabActual === 'aprobados') {
+                estadoHtml = `<span class="status-badge bg-green">Aprobado</span>`;
+                accionHtml = `<span style="color:#16a34a; font-weight:600; font-size:12px;">Aceptada por ti</span>`;
+            } else if (tabActual === 'rechazados') {
+                estadoHtml = `<span class="status-badge bg-red">Rechazado</span>`;
+                const motivo = inc.motivo_rechazo_trabajador ? `<br><span style="font-size:11px; color:#6b7280;">${inc.motivo_rechazo_trabajador}</span>` : '';
+                accionHtml = `<span style="color:#DC2626; font-weight:600; font-size:12px;">Rechazada${motivo}</span>`;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="incidencia-bold">${codigoIncidencia}</span></td>
+                <td>${fechaRec}</td>
+                <td style="text-align: left;">${tienda}</td>
+                <td>${codigoEq}</td>
+                <td style="text-align: left; max-width: 230px;">${fallos}</td>
+                <td>${estadoHtml}</td>
+                <td>${accionHtml}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        lucide.createIcons();
+    }
+
+    // === ACCIONES ===
+    async function aprobarIncidencia(idDoc) {
+        try {
+            await db.collection("incidencias").doc(idDoc).update({
+                estado_asignacion: "Aprobado Trabajador",
+                fecha_aprobacion_trabajador: new Date().toISOString(),
+                motivo_rechazo_trabajador: firebase.firestore.FieldValue.delete()
+            });
+
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
+            if (index !== -1) {
+                incidenciasGlobales[index].estado_asignacion = "Aprobado Trabajador";
+                incidenciasGlobales[index].fecha_aprobacion_trabajador = new Date().toISOString();
+            }
+
+            showCustomAlert("¡Aprobada!", "Has aprobado la incidencia exitosamente.", true);
+            actualizarBadges();
+            renderTabla();
+        } catch (error) {
+            console.error("Error al aprobar:", error);
+            showCustomAlert("Error", "No se pudo aprobar la incidencia.", false);
+        }
+    }
+
+    function abrirModalRechazo(idDoc) {
+        document.getElementById('rechazo-id-doc').value = idDoc;
+        document.getElementById('rechazo-motivo').value = '';
+        document.getElementById('modalRechazo').classList.add('active');
+    }
+
+    function cerrarModalRechazo() {
+        document.getElementById('modalRechazo').classList.remove('active');
+    }
+
+    async function confirmarRechazo() {
+        const idDoc = document.getElementById('rechazo-id-doc').value;
+        const motivo = document.getElementById('rechazo-motivo').value.trim();
+
+        if (!motivo) {
+            showCustomAlert("Atención", "Debes escribir un motivo para rechazar la incidencia.", false);
+            return;
+        }
+
+        try {
+            await db.collection("incidencias").doc(idDoc).update({
+                estado_asignacion: "Rechazado Trabajador",
+                motivo_rechazo_trabajador: motivo,
+                fecha_rechazo_trabajador: new Date().toISOString()
+            });
+
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
+            if (index !== -1) {
+                incidenciasGlobales[index].estado_asignacion = "Rechazado Trabajador";
+                incidenciasGlobales[index].motivo_rechazo_trabajador = motivo;
+            }
+
+            cerrarModalRechazo();
+            showCustomAlert("Rechazada", "La incidencia ha sido rechazada.", true);
+            actualizarBadges();
+            renderTabla();
+        } catch (error) {
+            console.error("Error al rechazar:", error);
+            showCustomAlert("Error", "No se pudo rechazar la incidencia.", false);
+        }
+    }
+</script>
+</body>
+</html>
