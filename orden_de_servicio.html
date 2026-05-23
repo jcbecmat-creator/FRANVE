@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Órdenes de Servicio | FRANVE</title>
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="[https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js](https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js](https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js)"></script>
 
-    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/fonts.css">
-    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/style.css">
-    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/components.css">
-    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/design-system.css">
-    <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css">
+    <link rel="stylesheet" href="[https://tims-orden-de-servicio.onrender.com/static/css/fonts.css](https://tims-orden-de-servicio.onrender.com/static/css/fonts.css)">
+    <link rel="stylesheet" href="[https://tims-orden-de-servicio.onrender.com/static/css/style.css](https://tims-orden-de-servicio.onrender.com/static/css/style.css)">
+    <link rel="stylesheet" href="[https://tims-orden-de-servicio.onrender.com/static/css/components.css](https://tims-orden-de-servicio.onrender.com/static/css/components.css)">
+    <link rel="stylesheet" href="[https://tims-orden-de-servicio.onrender.com/static/css/design-system.css](https://tims-orden-de-servicio.onrender.com/static/css/design-system.css)">
+    <link rel="stylesheet" href="[https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css](https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css)">
 
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="[https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js](https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js)"></script>
+    <script src="[https://cdn.tailwindcss.com?plugins=forms,typography](https://cdn.tailwindcss.com?plugins=forms,typography)"></script>
+    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap)" rel="stylesheet">
     
     <script>
         if (!sessionStorage.getItem('loginSession')) {
@@ -67,7 +67,6 @@
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
         .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
         
-        /* Unificación de fuentes compartidas basadas en el estilo observaciones */
         .co-table th, .co-table td, .co-table span, .co-table div, .co-table select {
             font-family: 'Inter', sans-serif !important;
             font-weight: 400 !important;
@@ -75,24 +74,17 @@
         }
         .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700 !important; text-transform: uppercase !important; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
         
-        /* Regla CSS para forzar todas las celdas de datos a Mayúsculas */
-        .co-table tbody td, .co-table tbody select, .co-table tbody span { 
-            text-transform: uppercase !important; 
-        }
-        
+        .co-table tbody td, .co-table tbody select, .co-table tbody span { text-transform: uppercase !important; }
         .co-table td { padding: 16px 20px; text-align: center; font-size: 13px; color: #111827; border-bottom: 1px solid #f3f4f6; max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
         .co-table tr:hover td { background-color: #F8FAFC; }
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
-        /* Forzado de negrita únicamente para el ID de Incidencia */
         .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
 
-        /* Estilos de la lista desplegable de asignación */
-        .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 200px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
+        .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 200px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
         .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
         .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
 
-        /* Letras normales sin negritas para los botones de acción */
         .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 400 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
         .btn-action-trigger:hover { opacity: 0.85; }
         .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
@@ -101,7 +93,6 @@
         .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
 
-        /* Modal Alerta Personalizado */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
@@ -120,7 +111,7 @@
                     <span class="hamburger"></span>
                 </button>
                 <a href="inicio.html">
-                    <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px; margin: 0;">
+                    <img src="[https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png](https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png)" alt="FRANVE Logo" class="header-logo" style="max-height: 40px; margin: 0;">
                 </a>
                 <h1 class="system-title" style="margin: 0; line-height: 1; transform: translateY(-3px);">Órdenes de Servicio</h1>
             </div>
@@ -295,7 +286,7 @@
     let listaUsuariosGlobal = [];
     let incidenciasGlobales = [];
     let tabActual = 'pendientes';
-    let historialCompletoCargado = false; // Bandera para rastrear si ya bajamos todo el historial
+    let historialCompletoCargado = false; 
 
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
@@ -337,25 +328,42 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.lucide) { lucide.createIcons(); }
+        try {
+            if (window.lucide) { lucide.createIcons(); }
+        } catch (e) { console.warn("Lucide no cargó inicialmente"); }
         
-        const savedUser = sessionStorage.getItem('loginUser');
-        if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+        try {
+            const savedUser = sessionStorage.getItem('loginUser');
+            if(savedUser && document.getElementById('user-initial-header')) {
+                document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+            }
 
-        const appDataStr = sessionStorage.getItem('loginSession');
-        if(appDataStr) {
-            const appData = JSON.parse(appDataStr);
-            document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser;
-            const dropdownName = document.querySelector('.user-name');
-            if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
-        }
+            const appDataStr = sessionStorage.getItem('loginSession');
+            if(appDataStr) {
+                const appData = JSON.parse(appDataStr);
+                if(document.getElementById('welcome-username-display')) {
+                    document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
+                }
+                const dropdownName = document.querySelector('.user-name');
+                if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
+            } else {
+                if(document.getElementById('welcome-username-display')) {
+                    document.getElementById('welcome-username-display').innerText = savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
+                }
+            }
+        } catch (e) { console.error("Error validando sesión:", e); }
 
-        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
-        toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar').classList.toggle('open')));
-        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
+        try {
+            const toggles = document.querySelectorAll('[data-sidebar-toggle]');
+            toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.toggle('open')));
+            document.querySelector('[data-sidebar-close]')?.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.remove('open'));
+        } catch (e) { console.warn("Error en eventos de menú"); }
 
         cargarListaUsuarios().then(() => {
-            cargarIncidenciasFirebase(false); // Carga inicial eficiente (Solo 100)
+            cargarIncidenciasFirebase(false); 
+        }).catch(err => {
+            console.error(err);
+            cargarIncidenciasFirebase(false);
         });
     });
 
@@ -378,7 +386,7 @@
         }
 
         alertBox.style.display = 'flex';
-        lucide.createIcons();
+        try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
     function closeCustomAlert() {
@@ -412,7 +420,6 @@
         }
     }
 
-    // LÓGICA HÍBRIDA INTELIGENTE: Controla de forma nativa si se lee toda la DB o solo un pool de 100 docs
     function cargarIncidenciasFirebase(traerTodoElHistorial = false) {
         const tbody = document.getElementById('tabla-incidencias-body');
         tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
@@ -420,7 +427,7 @@
         let query = db.collection("incidencias");
         
         if (!traerTodoElHistorial) {
-            query = query.limit(100); // Límite estricto de control por rendimiento
+            query = query.limit(100); 
             historialCompletoCargado = false;
         } else {
             historialCompletoCargado = true;
@@ -440,7 +447,7 @@
             .catch((error) => {
                 console.error("Error: ", error);
                 tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty" style="color: #ef4444;"><i data-lucide="alert-circle" class="inline mr-2"></i> Error al conectar con Firebase.</td></tr>';
-                lucide.createIcons();
+                try { if(window.lucide) lucide.createIcons(); } catch(e){}
             });
     }
 
@@ -477,7 +484,7 @@
 
         if (listaIncidencias.length === 0) {
             tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
-            lucide.createIcons();
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
             return;
         }
 
@@ -531,13 +538,14 @@
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
                     ${selectHtml}
-                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px; font-weight:600;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
                 </td>
                 <td>${btnHtml}</td>
             `;
             tbody.appendChild(tr);
         });
-        lucide.createIcons();
+        
+        try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
     async function manejarAccionFila(idDoc) {
@@ -548,11 +556,11 @@
         const textSpan = btn.querySelector('.lbl-text');
         const modoActual = textSpan.innerText.trim();
 
-        if (modoActual === "Editar") {
+        if (modoActual.toLowerCase() === "editar") {
             select.disabled = false;
             textSpan.innerText = "Asignar";
             btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
-            lucide.createIcons();
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
             select.focus();
         } else {
             const usuarioAsignado = select.value;
@@ -589,7 +597,7 @@
 
             selectElement.disabled = true;
             buttonElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
-            lucide.createIcons();
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
 
             if (usuarioAsignado) {
                 showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada correctamente a: ${usuarioAsignado}.`, true);
@@ -605,27 +613,24 @@
             
             selectElement.disabled = false;
             buttonElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
-            lucide.createIcons();
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
         } finally {
             buttonElement.disabled = false;
         }
     }
 
-    // Interceptor dinámico de búsqueda: Evalúa si es necesario romper el candado de los 100 docs
     function filtrarIncidencias() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
 
-        // Si el usuario activa filtros de rango de fechas y aún no hemos bajado toda la DB, rompemos el limitador
         if ((fInicio || fFin) && !historialCompletoCargado) {
-            cargarIncidenciasFirebase(true); // Descarga expandida total
+            cargarIncidenciasFirebase(true); 
             return;
         }
 
         ejecutarFiltradoLogico();
     }
 
-    // Núcleo centralizado de renderizado cruzado
     function ejecutarFiltradoLogico() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
@@ -675,7 +680,7 @@
         document.getElementById('filtro-inicio').value = '';
         document.getElementById('filtro-fin').value = '';
         document.getElementById('filtro-buscar').value = '';
-        cargarIncidenciasFirebase(false); // Retorna automáticamente al modo eficiente de 100 documentos
+        cargarIncidenciasFirebase(false); 
     }
 </script>
 </body>
