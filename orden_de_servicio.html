@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/design-system.css">
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css">
 
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -26,33 +26,25 @@
         }
     </script>
 
-    <script>
-        tailwind.config = { darkMode: "class", corePlugins: { preflight: false }, theme: { extend: { colors: { primary: "#81D0DC", "primary-dark": "#5FAAB5", "surface": "#FFFFFF", "background": "#F8FAFC", "text-main": "#1E293B", "text-sub": "#64748B", }, fontFamily: { sans: ["Inter", "sans-serif"] } } } };
-    </script>
-
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; line-height: 1.25; }
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
         
-        /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
 
-        /* ESTILO DEL MENÚ ACTIVO TIPO PASTILLA CON CURVA */
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
 
-        /* Estilos principales del contenedor */
         .ordenes-wrap { max-width: 100%; margin: 0 auto; padding: 24px; }
         .page-header-content h1 { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; color: #111827; line-height: 1; }
         .page-header-content p { color: #6b7280; margin: 0; line-height: 1.5; }
 
-        /* === ESTILOS DE PESTAÑAS (SUB-MENÚS) === */
         .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { background: #e5e7eb; }
@@ -60,7 +52,6 @@
         .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
         .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
 
-        /* === BARRA DE FILTROS AVANZADA === */
         .filters-bar { background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
         .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 160px; flex: 1; }
         .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: 0.5px; }
@@ -68,13 +59,11 @@
         .input-control:focus { outline: none; background-color: #FFFFFF; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
         .filter-actions { display: flex; gap: 8px; }
         
-        /* CORRECCIÓN DE ESTILO: Sin letras en negrita para el botón Buscar y Limpiar */
         .btn-search { height: 42px; background: #81D0DC; color: #131520; border: none; padding: 0 24px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.2); }
         .btn-search:hover { opacity: 0.9; }
         .btn-reset { height: 42px; background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; padding: 0 16px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background 0.2s; }
         .btn-reset:hover { background: #E2E8F0; }
         
-        /* === CONTENEDOR DE TABLA HOMOLOGADO Y TIPOGRAFÍA BLINDADA === */
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
         .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
         
@@ -96,7 +85,6 @@
         .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
         .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
 
-        /* CORRECCIÓN DE ESTILO: Letras normales sin negritas para los botones de acción de las filas */
         .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 400 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
         .btn-action-trigger:hover { opacity: 0.85; }
         .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
@@ -106,7 +94,7 @@
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700 !important; }
         #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
@@ -354,14 +342,13 @@
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
                 if(document.getElementById('welcome-username-display')) {
-                    // CORRECCIÓN: Se inyecta el nombre real del usuario firmado, no de la aplicación
-                    document.getElementById('welcome-username-display').innerText = appData.nombreUsuario || savedUser;
+                    document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
                 const dropdownName = document.querySelector('.user-name');
                 if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
             } else {
                 if(document.getElementById('welcome-username-display')) {
-                    document.getElementById('welcome-username-display').innerText = savedUser;
+                    document.getElementById('welcome-username-display').innerText = savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
             }
         } catch (e) { console.error("Error validando sesión:", e); }
@@ -470,7 +457,7 @@
             const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
             const estAsignacion = inc.estado_asignacion || "";
 
-            if (estAsignacion === "Rechazado" || estAsignacion === "Costos">Rechazados") {
+            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") {
                 r++;
             } else if (asignado !== "") {
                 e++;
@@ -520,7 +507,7 @@
             const btnIcon = tieneAsignacion ? "edit-3" : "user-plus";
 
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
-            selectHtml += `<option value="">— Seleccionar —</option>`;
+            selectHtml += `<option value="">— SELECCIONAR —</option>`;
             listaUsuariosGlobal.forEach(user => {
                 const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
@@ -551,7 +538,7 @@
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
                     ${selectHtml}
-                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px; font-weight:600;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
                 </td>
                 <td>${btnHtml}</td>
             `;
@@ -561,16 +548,15 @@
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
-    // CORRECCIÓN AL BOTÓN EDITAR EN ENVIADOS: Se evalúa de forma insensible a mayúsculas/minúsculas de la tabla
     async function manejarAccionFila(idDoc) {
         const btn = document.getElementById(`btn-action-${idDoc}`);
         const select = document.getElementById(`select-${idDoc}`);
         if (!btn || !select) return;
 
         const textSpan = btn.querySelector('.lbl-text');
-        const modoActual = textSpan.innerText.trim().toUpperCase();
+        const modoActual = textSpan.innerText.trim();
 
-        if (modoActual === "EDITAR") {
+        if (modoActual.toLowerCase() === "editar") {
             select.disabled = false;
             textSpan.innerText = "Asignar";
             btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
