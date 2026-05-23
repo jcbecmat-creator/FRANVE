@@ -288,44 +288,22 @@
     let tabActual = 'pendientes';
     let historialCompletoCargado = false; 
 
-function formatearFecha(fechaField) {
-    if (!fechaField) return "—";
-
-    let d;
-    // Si es un Timestamp nativo de Firebase
-    if (fechaField && typeof fechaField.toDate === 'function') {
-        d = fechaField.toDate();
-    } 
-    // Si es un objeto con segundos (otra variante de Firestore)
-    else if (fechaField && fechaField.seconds) {
-        d = new Date(fechaField.seconds * 1000);
-    } 
-    // Si es un String (como el formato ISO "2026-05-23T17:30...")
-    else if (typeof fechaField === 'string') {
-        if (fechaField.includes("Timestamp")) return "—";
-        
-        d = new Date(fechaField);
-        // Validar que el string se pudo convertir a una fecha válida
-        if (isNaN(d.getTime())) {
-            // Fallback en caso de formatos extraños
+    function formatearFecha(fechaField) {
+        if (!fechaField) return "—";
+        if (fechaField && typeof fechaField.toDate === 'function') {
+            const d = fechaField.toDate();
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (fechaField && fechaField.seconds) {
+            const d = new Date(fechaField.seconds * 1000);
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (typeof fechaField === 'string') {
+            if (fechaField.includes("Timestamp")) return "—";
             return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
         }
+        return "—";
     }
-
-    if (d) {
-        // Retorna: DD/MM/YYYY HH:mm
-        return d.toLocaleDateString('es-MX', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        }) + ' ' + d.toLocaleTimeString('es-MX', {
-            hour: '2-digit', 
-            minute: '2-digit'
-        });
-    }
-
-    return "—";
-}
 
     function parsearFechaFirebase(fechaField) {
         if (!fechaField) return new Date(0);
@@ -349,7 +327,6 @@ function formatearFecha(fechaField) {
         return new Date(fechaField);
     }
 
-    // Escudo de seguridad para el DOM y la ejecución de la tabla
     document.addEventListener('DOMContentLoaded', () => {
         try {
             if (window.lucide) { lucide.createIcons(); }
@@ -365,7 +342,6 @@ function formatearFecha(fechaField) {
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
                 if(document.getElementById('welcome-username-display')) {
-                    // Texto homologado con las demás pantallas
                     document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
                 const dropdownName = document.querySelector('.user-name');
@@ -531,7 +507,7 @@ function formatearFecha(fechaField) {
             const btnIcon = tieneAsignacion ? "edit-3" : "user-plus";
 
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
-            selectHtml += `<option value="">— Seleccionar —</option>`;
+            selectHtml += `<option value="">— SELECCIONAR —</option>`;
             listaUsuariosGlobal.forEach(user => {
                 const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
@@ -562,7 +538,7 @@ function formatearFecha(fechaField) {
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
                     ${selectHtml}
-                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px; font-weight:600;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
                 </td>
                 <td>${btnHtml}</td>
             `;
@@ -572,35 +548,25 @@ function formatearFecha(fechaField) {
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
-async function manejarAccionFila(idDoc) {
-    const btn = document.getElementById(`btn-action-${idDoc}`);
-    const select = document.getElementById(`select-${idDoc}`);
-    if (!btn || !select) return;
+    async function manejarAccionFila(idDoc) {
+        const btn = document.getElementById(`btn-action-${idDoc}`);
+        const select = document.getElementById(`select-${idDoc}`);
+        if (!btn || !select) return;
 
-    const textSpan = btn.querySelector('.lbl-text');
-    // Forzamos a mayúsculas para asegurar la comparación sin importar el CSS
-    const modoActual = textSpan.innerText.trim().toUpperCase();
+        const textSpan = btn.querySelector('.lbl-text');
+        const modoActual = textSpan.innerText.trim();
 
-    // Si el botón dice "EDITAR"
-    if (modoActual === "EDITAR") {
-        // Habilitamos la lista desplegable
-        select.disabled = false;
-        
-        // Cambiamos visualmente el botón a modo Guardar
-        btn.innerHTML = `<i data-lucide="save" style="width:14px; height:14px;"></i> <span class="lbl-text">Guardar</span>`;
-        btn.style.backgroundColor = '#10B981'; // Verde para indicar acción de guardar
-        btn.style.color = '#FFFFFF';
-        
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
-        
-        // Colocamos el foco directamente en la lista para que sea rápido de elegir
-        select.focus();
-    } else {
-        // Si el botón dice "GUARDAR" o "ASIGNAR", ejecutamos la subida a Firebase
-        const usuarioAsignado = select.value;
-        await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
+        if (modoActual.toLowerCase() === "editar") {
+            select.disabled = false;
+            textSpan.innerText = "Asignar";
+            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
+            select.focus();
+        } else {
+            const usuarioAsignado = select.value;
+            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
+        }
     }
-}
 
     async function guardarAsignacionFirebase(idDocumento, usuarioAsignado, selectElement, buttonElement) {
         if (!idDocumento) return;
