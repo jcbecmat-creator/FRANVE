@@ -327,15 +327,6 @@
         return new Date(fechaField);
     }
 
-    // Función auxiliar para limpiar y normalizar texto (Quita acentos y espacios raros)
-    function limpiarTextoComparar(txt) {
-        if (!txt) return "";
-        return txt.toString().trim()
-                  .toUpperCase()
-                  .normalize("NFD")
-                  .replace(/[\u0300-\u036f]/g, ""); // Remueve marcas de acentos (É -> E)
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
         try {
             if (window.lucide) { lucide.createIcons(); }
@@ -351,8 +342,7 @@
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
                 if(document.getElementById('welcome-username-display')) {
-                    // Muestra de manera correcta y dinámica el técnico firmado (ej. JOSÉ MANUEL TULUM)
-                    document.getElementById('welcome-username-display').innerText = appData.nombreUsuario || appData.nombreProveedor || savedUser;
+                    document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
                 const dropdownName = document.querySelector('.user-name');
                 if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
@@ -461,22 +451,18 @@
             });
     }
 
-    // CORRECCIÓN SÓLIDA DE CONTEO: El contador evalúa usando el normalizador de texto insensible a acentos
     function actualizarBadges() {
-        const session = JSON.parse(sessionStorage.getItem('loginSession') || '{}');
-        const userFirmadoLimpio = limpiarTextoComparar(session.nombreUsuario || sessionStorage.getItem('loginUser') || "");
-
         let p = 0, e = 0, r = 0;
         incidenciasGlobales.forEach(inc => {
-            const asignadoLimpio = limpiarTextoComparar(inc.usuario_assigned || inc.usuario_asignado || "");
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
             const estAsignacion = inc.estado_asignacion || "";
 
             if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") {
-                if (asignadoLimpio === userFirmadoLimpio) r++;
-            } else if (asignadoLimpio !== "") {
-                if (asignadoLimpio === userFirmadoLimpio) e++;
+                r++;
+            } else if (asignado !== "") {
+                e++;
             } else {
-                p++; // Las pendientes quedan visibles globales para todos los técnicos
+                p++;
             }
         });
         document.getElementById('badge-pendientes').innerText = p;
@@ -523,7 +509,7 @@
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
             selectHtml += `<option value="">— SELECCIONAR —</option>`;
             listaUsuariosGlobal.forEach(user => {
-                const isSelected = (limpiarTextoComparar(user) === limpiarTextoComparar(asignadoActual)) ? 'selected' : '';
+                const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
             selectHtml += `</select>`;
@@ -552,7 +538,7 @@
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
                     ${selectHtml}
-                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px; font-weight:600;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
                 </td>
                 <td>${btnHtml}</td>
             `;
@@ -645,34 +631,27 @@
         ejecutarFiltradoLogico();
     }
 
-    // CORRECCIÓN DE FILTRADO DINÁMICO: Utiliza el normalizador de texto blindado para acentos y mayúsculas
     function ejecutarFiltradoLogico() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
 
-        const session = JSON.parse(sessionStorage.getItem('loginSession') || '{}');
-        const userFirmadoLimpio = limpiarTextoComparar(session.nombreUsuario || sessionStorage.getItem('loginUser') || "");
-
         let filtrados = incidenciasGlobales.filter(inc => {
-            const asignadoLimpio = limpiarTextoComparar(inc.usuario_assigned || inc.usuario_asignado || "");
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
             const estAsignacion = inc.estado_asignacion || "";
 
             if (tabActual === 'pendientes') {
-                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignadoLimpio !== "") return false;
+                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignado !== "") return false;
             } else if (tabActual === 'enviados') {
-                if (asignadoLimpio === "" || estAsignacion === "Rechazado") return false;
-                // Blindaje de Sandboxing: Compara las cadenas limpiadas sin acentos
-                if (asignadoLimpio !== userFirmadoLimpio) return false;
+                if (asignado === "" || estAsignacion === "Rechazado") return false;
             } else if (tabActual === 'rechazados') {
                 if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados") return false;
-                if (asignadoLimpio !== userFirmadoLimpio) return false;
             }
 
             if (fBuscar) {
                 const incidenciaCod = (inc.incidencia || "").toLowerCase();
                 const nombreTienda = (inc.usuario || "").toLowerCase();
-                const trabajador = asignadoLimpio.toLowerCase();
+                const trabajador = asignado.toLowerCase();
                 if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
                     return false;
                 }
