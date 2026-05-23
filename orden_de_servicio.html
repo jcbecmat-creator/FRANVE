@@ -327,6 +327,15 @@
         return new Date(fechaField);
     }
 
+    // Función auxiliar para limpiar y normalizar texto (Quita acentos y espacios raros)
+    function limpiarTextoComparar(txt) {
+        if (!txt) return "";
+        return txt.toString().trim()
+                  .toUpperCase()
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, ""); // Remueve marcas de acentos (É -> E)
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         try {
             if (window.lucide) { lucide.createIcons(); }
@@ -342,7 +351,7 @@
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
                 if(document.getElementById('welcome-username-display')) {
-                    // Muestra de manera dinámica el técnico que inició la sesión
+                    // Muestra de manera correcta y dinámica el técnico firmado (ej. JOSÉ MANUEL TULUM)
                     document.getElementById('welcome-username-display').innerText = appData.nombreUsuario || appData.nombreProveedor || savedUser;
                 }
                 const dropdownName = document.querySelector('.user-name');
@@ -452,19 +461,22 @@
             });
     }
 
-    // CORRECCIÓN: El conteo de Badges vuelve a ser corporativo (Suma todo el universo real de datos)
+    // CORRECCIÓN SÓLIDA DE CONTEO: El contador evalúa usando el normalizador de texto insensible a acentos
     function actualizarBadges() {
+        const session = JSON.parse(sessionStorage.getItem('loginSession') || '{}');
+        const userFirmadoLimpio = limpiarTextoComparar(session.nombreUsuario || sessionStorage.getItem('loginUser') || "");
+
         let p = 0, e = 0, r = 0;
         incidenciasGlobales.forEach(inc => {
-            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const asignadoLimpio = limpiarTextoComparar(inc.usuario_assigned || inc.usuario_asignado || "");
             const estAsignacion = inc.estado_asignacion || "";
 
             if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") {
-                r++;
-            } else if (asignado !== "") {
-                e++;
+                if (asignadoLimpio === userFirmadoLimpio) r++;
+            } else if (asignadoLimpio !== "") {
+                if (asignadoLimpio === userFirmadoLimpio) e++;
             } else {
-                p++;
+                p++; // Las pendientes quedan visibles globales para todos los técnicos
             }
         });
         document.getElementById('badge-pendientes').innerText = p;
@@ -511,7 +523,7 @@
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
             selectHtml += `<option value="">— SELECCIONAR —</option>`;
             listaUsuariosGlobal.forEach(user => {
-                const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
+                const isSelected = (limpiarTextoComparar(user) === limpiarTextoComparar(asignadoActual)) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
             selectHtml += `</select>`;
@@ -633,28 +645,34 @@
         ejecutarFiltradoLogico();
     }
 
-    // CORRECCIÓN CENTRAL: Se elimina el candado de censura por técnico conectado. Muestra los 9 registros de la empresa completos.
+    // CORRECCIÓN DE FILTRADO DINÁMICO: Utiliza el normalizador de texto blindado para acentos y mayúsculas
     function ejecutarFiltradoLogico() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
 
+        const session = JSON.parse(sessionStorage.getItem('loginSession') || '{}');
+        const userFirmadoLimpio = limpiarTextoComparar(session.nombreUsuario || sessionStorage.getItem('loginUser') || "");
+
         let filtrados = incidenciasGlobales.filter(inc => {
-            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const asignadoLimpio = limpiarTextoComparar(inc.usuario_assigned || inc.usuario_asignado || "");
             const estAsignacion = inc.estado_asignacion || "";
 
             if (tabActual === 'pendientes') {
-                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignado !== "") return false;
+                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignadoLimpio !== "") return false;
             } else if (tabActual === 'enviados') {
-                if (asignado === "" || estAsignacion === "Rechazado") return false;
+                if (asignadoLimpio === "" || estAsignacion === "Rechazado") return false;
+                // Blindaje de Sandboxing: Compara las cadenas limpiadas sin acentos
+                if (asignadoLimpio !== userFirmadoLimpio) return false;
             } else if (tabActual === 'rechazados') {
                 if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados") return false;
+                if (asignadoLimpio !== userFirmadoLimpio) return false;
             }
 
             if (fBuscar) {
                 const incidenciaCod = (inc.incidencia || "").toLowerCase();
                 const nombreTienda = (inc.usuario || "").toLowerCase();
-                const trabajador = asignado.toLowerCase();
+                const trabajador = asignadoLimpio.toLowerCase();
                 if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
                     return false;
                 }
