@@ -38,7 +38,7 @@
         /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
-        .header-hamburger Motion.hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
+        .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
 
         /* ESTILO DEL MENÚ ACTIVO TIPO PASTILLA CON CURVA */
@@ -102,7 +102,7 @@
         .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
         .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
 
-        /* CORRECCIÓN DE ESTILO: Letras normales sin negritas para los botones de acción */
+        /* Letras normales sin negritas para los botones de acción */
         .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 400 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
         .btn-action-trigger:hover { opacity: 0.85; }
         .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
@@ -208,7 +208,7 @@
             <main class="main-content app-content">
                 <div id="global-welcome-section" style="text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white;">
                     <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: 700;">Bienvenido</h1>
-                    <h2 id="welcome-username-display" style="margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2;">CARGANDO...</h2>
+                    <h2 id="welcome-username-display">CARGANDO...</h2>
                 </div>
 
                 <div class="ordenes-wrap">
@@ -305,6 +305,7 @@
     let listaUsuariosGlobal = [];
     let incidenciasGlobales = [];
     let tabActual = 'pendientes';
+    let historialCompletoCargado = false; // Bandera para rastrear si ya bajamos todo el historial
 
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
@@ -364,7 +365,7 @@
         document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
 
         cargarListaUsuarios().then(() => {
-            cargarIncidenciasFirebase();
+            cargarIncidenciasFirebase(false); // Carga inicial eficiente (Solo 100)
         });
     });
 
@@ -421,12 +422,21 @@
         }
     }
 
-    function cargarIncidenciasFirebase() {
+    // LÓGICA HÍBRIDA INTELIGENTE: Controla de forma nativa si se lee toda la DB o solo un pool de 100 docs
+    function cargarIncidenciasFirebase(traerTodoElHistorial = false) {
         const tbody = document.getElementById('tabla-incidencias-body');
         tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
 
-        db.collection("incidencias")
-            .get()
+        let query = db.collection("incidencias");
+        
+        if (!traerTodoElHistorial) {
+            query = query.limit(100); // Límite estricto de control por rendimiento
+            historialCompletoCargado = false;
+        } else {
+            historialCompletoCargado = true;
+        }
+
+        query.get()
             .then((querySnapshot) => {
                 incidenciasGlobales = [];
                 querySnapshot.forEach((doc) => {
@@ -435,7 +445,7 @@
                     incidenciasGlobales.push(data);
                 });
                 actualizarBadges();
-                filtrarIncidencias();
+                ejecutarFiltradoLogico();
             })
             .catch((error) => {
                 console.error("Error: ", error);
@@ -494,7 +504,6 @@
             const obs = inc.observaciones || "—";
             const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
 
-            // Determinar si ya cuenta con asignación en DB para bloquear el select inicialmente
             const tieneAsignacion = asignadoActual !== "";
             const selectDisabled = tieneAsignacion ? "disabled" : "";
             const btnText = tieneAsignacion ? "Editar" : "Asignar";
@@ -503,13 +512,11 @@
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
             selectHtml += `<option value="">— Seleccionar —</option>`;
             listaUsuariosGlobal.forEach(user => {
-                // SOLUCIÓN AL BUG 1: Inyección explícita del atributo 'selected' evaluando cadenas
                 const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
             selectHtml += `</select>`;
 
-            // SOLUCIÓN AL BUG 2: Se removieron los pesos pesados (font-weight: 700) de los botones para un look regular
             let btnHtml = `
                 <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
@@ -596,7 +603,7 @@
                 showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
             }
             
-            filtrarIncidencias();
+            ejecutarFiltradoLogico();
 
         } catch (error) {
             console.error("Error al actualizar:", error);
@@ -610,7 +617,22 @@
         }
     }
 
+    // Interceptor dinámico de búsqueda: Evalúa si es necesario romper el candado de los 100 docs
     function filtrarIncidencias() {
+        const fInicio = document.getElementById('filtro-inicio').value;
+        const fFin = document.getElementById('filtro-fin').value;
+
+        // Si el usuario activa filtros de rango de fechas y aún no hemos bajado toda la DB, rompemos el limitador
+        if ((fInicio || fFin) && !historialCompletoCargado) {
+            cargarIncidenciasFirebase(true); // Descarga expandida total
+            return;
+        }
+
+        ejecutarFiltradoLogico();
+    }
+
+    // Núcleo centralizado de renderizado cruzado
+    function ejecutarFiltradoLogico() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
@@ -659,7 +681,7 @@
         document.getElementById('filtro-inicio').value = '';
         document.getElementById('filtro-fin').value = '';
         document.getElementById('filtro-buscar').value = '';
-        filtrarIncidencias();
+        cargarIncidenciasFirebase(false); // Retorna automáticamente al modo eficiente de 100 documentos
     }
 </script>
 </body>
