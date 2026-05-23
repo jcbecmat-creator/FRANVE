@@ -358,7 +358,7 @@
                 if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
             } else {
                 if(document.getElementById('welcome-username-display')) {
-                    document.getElementById('welcome-username-display').innerText = savedUser;
+                    document.getElementById('welcome-username-display').innerText = savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
             }
         } catch (e) { console.error("Error validando sesión:", e); }
