@@ -327,6 +327,7 @@
         return new Date(fechaField);
     }
 
+    // Escudo de seguridad para el DOM y la ejecución de la tabla
     document.addEventListener('DOMContentLoaded', () => {
         try {
             if (window.lucide) { lucide.createIcons(); }
@@ -342,6 +343,7 @@
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
                 if(document.getElementById('welcome-username-display')) {
+                    // Texto homologado con las demás pantallas
                     document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
                 }
                 const dropdownName = document.querySelector('.user-name');
@@ -515,7 +517,7 @@
             selectHtml += `</select>`;
 
             let btnHtml = `
-                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}', this)">
+                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
                     <span class="lbl-text">${btnText}</span>
                 </button>
@@ -548,26 +550,23 @@
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
-    async function manejarAccionFila(idDoc, btnElement) {
-        if (!btnElement) return;
+    async function manejarAccionFila(idDoc) {
+        const btn = document.getElementById(`btn-action-${idDoc}`);
+        const select = document.getElementById(`select-${idDoc}`);
+        if (!btn || !select) return;
 
-        // Buscar el select en la misma fila (tr) en lugar de usar document.getElementById
-        const fila = btnElement.closest('tr');
-        const select = fila ? fila.querySelector('.assign-select') : null;
-        
-        if (!select) return;
-
-        const textSpan = btnElement.querySelector('.lbl-text');
-        const modoActual = textSpan ? textSpan.innerText.trim() : "";
+        const textSpan = btn.querySelector('.lbl-text');
+        const modoActual = textSpan.innerText.trim();
 
         if (modoActual === "Editar") {
             select.disabled = false;
-            btnElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            textSpan.innerText = "Asignar";
+            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
             select.focus();
         } else {
             const usuarioAsignado = select.value;
-            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btnElement);
+            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
         }
     }
 
