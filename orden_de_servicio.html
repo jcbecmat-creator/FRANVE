@@ -300,10 +300,6 @@
         }
         if (typeof fechaField === 'string') {
             if (fechaField.includes("Timestamp")) return "—";
-            const dateObj = new Date(fechaField);
-            if (!isNaN(dateObj.getTime())) {
-                return dateObj.toLocaleDateString('es-MX') + ' ' + dateObj.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
-            }
             return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
         }
         return "—";
@@ -313,68 +309,113 @@
         if (!fechaField) return new Date(0);
         if (typeof fechaField.toDate === 'function') return fechaField.toDate();
         if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
+        
         try {
-            const meses = { "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4, "junio": 5, "julio": 6, "agosto": 7, "septiembre": 8, "octubre": 9, "noviembre": 10, "diciembre": 11 };
+            const meses = {
+                "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4, "junio": 5,
+                "julio": 6, "agosto": 7, "septiembre": 8, "octubre": 9, "noviembre": 10, "diciembre": 11
+            };
             const partes = fechaField.toLowerCase().split(' ');
             const dia = parseInt(partes[0]);
             const mesStr = partes[2];
             const año = parseInt(partes[4]);
-            if (!isNaN(dia) && meses[mesStr] !== undefined && !isNaN(año)) { return new Date(año, meses[mesStr], dia); }
+            
+            if (!isNaN(dia) && meses[mesStr] !== undefined && !isNaN(año)) {
+                return new Date(año, meses[mesStr], dia);
+            }
         } catch (e) {}
         return new Date(fechaField);
     }
 
+    // Escudo de seguridad para el DOM y la ejecución de la tabla
     document.addEventListener('DOMContentLoaded', () => {
-        try { if (window.lucide) { lucide.createIcons(); } } catch (e) { console.warn("Lucide no cargó inicialmente"); }
+        try {
+            if (window.lucide) { lucide.createIcons(); }
+        } catch (e) { console.warn("Lucide no cargó inicialmente"); }
+        
         try {
             const savedUser = sessionStorage.getItem('loginUser');
-            if(savedUser && document.getElementById('user-initial-header')) { document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase(); }
+            if(savedUser && document.getElementById('user-initial-header')) {
+                document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+            }
+
             const appDataStr = sessionStorage.getItem('loginSession');
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
-                if(document.getElementById('welcome-username-display')) { document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION"; }
+                if(document.getElementById('welcome-username-display')) {
+                    // Texto homologado con las demás pantallas
+                    document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
+                }
                 const dropdownName = document.querySelector('.user-name');
                 if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
             } else {
-                if(document.getElementById('welcome-username-display')) { document.getElementById('welcome-username-display').innerText = savedUser || "FRANVE MANTENIMIENTO Y REMODELACION"; }
+                if(document.getElementById('welcome-username-display')) {
+                    document.getElementById('welcome-username-display').innerText = savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
+                }
             }
         } catch (e) { console.error("Error validando sesión:", e); }
+
         try {
             const toggles = document.querySelectorAll('[data-sidebar-toggle]');
             toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.toggle('open')));
             document.querySelector('[data-sidebar-close]')?.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.remove('open'));
         } catch (e) { console.warn("Error en eventos de menú"); }
-        cargarListaUsuarios().then(() => { cargarIncidenciasFirebase(false); }).catch(err => { console.error(err); cargarIncidenciasFirebase(false); });
+
+        cargarListaUsuarios().then(() => {
+            cargarIncidenciasFirebase(false); 
+        }).catch(err => {
+            console.error(err);
+            cargarIncidenciasFirebase(false);
+        });
     });
 
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
-        document.getElementById('alert-title').innerText = title;
-        document.getElementById('alert-msg').innerText = message;
+        const alertTitle = document.getElementById('alert-title');
+        const alertMsg = document.getElementById('alert-msg');
+        const alertIcon = document.getElementById('alert-icon-container');
+        const alertBtn = document.getElementById('alert-btn');
+
+        alertTitle.innerText = title;
+        alertMsg.innerText = message;
+
         if(isSuccess) {
-            document.getElementById('alert-icon-container').innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
-            document.getElementById('alert-btn').style.background = '#16a34a';
+            alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
+            alertBtn.style.background = '#16a34a';
         } else {
-            document.getElementById('alert-icon-container').innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
-            document.getElementById('alert-btn').style.background = '#DC2626';
+            alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
+            alertBtn.style.background = '#DC2626';
         }
+
         alertBox.style.display = 'flex';
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
-    function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+    function closeCustomAlert() {
+        document.getElementById('custom-alert').style.display = 'none';
+    }
 
     async function cargarListaUsuarios() {
         try {
             const appDataStr = sessionStorage.getItem('loginSession');
             if (appDataStr) {
                 const appData = JSON.parse(appDataStr);
-                if (appData.tecnicos && appData.tecnicos.length > 0) { listaUsuariosGlobal = appData.tecnicos; return; }
+                if (appData.tecnicos && appData.tecnicos.length > 0) {
+                    listaUsuariosGlobal = appData.tecnicos;
+                    return;
+                }
             }
+            
             const usuariosSnapshot = await db.collection("usuarios").get();
             listaUsuariosGlobal = [];
-            usuariosSnapshot.forEach(doc => { const u = doc.data(); if (u.nombre) listaUsuariosGlobal.push(u.nombre); });
-            if (listaUsuariosGlobal.length === 0) { listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS", "SOPORTE TÉCNICO"]; }
+            usuariosSnapshot.forEach(doc => {
+                const u = doc.data();
+                if (u.nombre) listaUsuariosGlobal.push(u.nombre);
+            });
+
+            if (listaUsuariosGlobal.length === 0) {
+                listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS", "SOPORTE TÉCNICO"];
+            }
         } catch (error) {
             console.error("Error catálogo:", error);
             listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS"];
@@ -384,13 +425,26 @@
     function cargarIncidenciasFirebase(traerTodoElHistorial = false) {
         const tbody = document.getElementById('tabla-incidencias-body');
         tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
+
         let query = db.collection("incidencias");
-        if (!traerTodoElHistorial) { query = query.limit(100); historialCompletoCargado = false; } else { historialCompletoCargado = true; }
+        
+        if (!traerTodoElHistorial) {
+            query = query.limit(100); 
+            historialCompletoCargado = false;
+        } else {
+            historialCompletoCargado = true;
+        }
+
         query.get()
             .then((querySnapshot) => {
                 incidenciasGlobales = [];
-                querySnapshot.forEach((doc) => { let data = doc.data(); data.id_documento = doc.id; incidenciasGlobales.push(data); });
-                actualizarBadges(); ejecutarFiltradoLogico();
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    data.id_documento = doc.id;
+                    incidenciasGlobales.push(data);
+                });
+                actualizarBadges();
+                ejecutarFiltradoLogico();
             })
             .catch((error) => {
                 console.error("Error: ", error);
@@ -404,7 +458,14 @@
         incidenciasGlobales.forEach(inc => {
             const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
             const estAsignacion = inc.estado_asignacion || "";
-            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") { r++; } else if (asignado !== "") { e++; } else { p++; }
+
+            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") {
+                r++;
+            } else if (asignado !== "") {
+                e++;
+            } else {
+                p++;
+            }
         });
         document.getElementById('badge-pendientes').innerText = p;
         document.getElementById('badge-enviados').innerText = e;
@@ -449,22 +510,14 @@
 
             let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
             selectHtml += `<option value="">— Seleccionar —</option>`;
-            
-            // LÓGICA MEJORADA: Asegurarnos que el nombre asignado siempre aparezca en el dropdown
-            let matchFound = false;
             listaUsuariosGlobal.forEach(user => {
-                if (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) { matchFound = true; }
                 const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
-            // Si el nombre guardado no estaba en la lista, lo agregamos para que no se borre al editar
-            if (!matchFound && asignadoActual !== "") {
-                selectHtml += `<option value="${asignadoActual}" selected>${asignadoActual}</option>`;
-            }
             selectHtml += `</select>`;
 
             let btnHtml = `
-                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}', this)">
+                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
                     <span class="lbl-text">${btnText}</span>
                 </button>
@@ -497,38 +550,23 @@
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
 
-    async function manejarAccionFila(idDoc, btnElement) {
-        if (!btnElement) return;
+    async function manejarAccionFila(idDoc) {
+        const btn = document.getElementById(`btn-action-${idDoc}`);
+        const select = document.getElementById(`select-${idDoc}`);
+        if (!btn || !select) return;
 
-        const fila = btnElement.closest('tr');
-        const select = fila ? fila.querySelector('.assign-select') : null;
-        if (!select) return;
-
-        const textSpan = btnElement.querySelector('.lbl-text');
-        const modoActual = textSpan ? textSpan.innerText.trim() : "";
+        const textSpan = btn.querySelector('.lbl-text');
+        const modoActual = textSpan.innerText.trim();
 
         if (modoActual === "Editar") {
-            // Habilitar la lista desplegable
             select.disabled = false;
-            btnElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            textSpan.innerText = "Asignar";
+            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
             select.focus();
-            
-        } else if (modoActual === "Asignar") {
-            const usuarioSeleccionado = select.value;
-            const inc = incidenciasGlobales.find(i => i.id_documento === idDoc);
-            const asignadoActual = inc ? (inc.usuario_assigned || inc.usuario_asignado || "") : "";
-
-            // LÓGICA DE SEGURIDAD: Si no se cambió el nombre, solo bloqueamos el selector de nuevo
-            if (usuarioSeleccionado.trim() !== "" && usuarioSeleccionado.trim().toUpperCase() === asignadoActual.trim().toUpperCase()) {
-                select.disabled = true;
-                btnElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
-                try { if(window.lucide) lucide.createIcons(); } catch(e){}
-                showCustomAlert("Sin cambios", "Seleccionaste el mismo técnico. No se realizaron cambios.", true);
-            } else {
-                // Sí cambió el nombre o se seleccionó uno nuevo: Guardar en Firebase
-                await guardarAsignacionFirebase(idDoc, usuarioSeleccionado, select, btnElement);
-            }
+        } else {
+            const usuarioAsignado = select.value;
+            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
         }
     }
 
@@ -566,7 +604,7 @@
             if (usuarioAsignado) {
                 showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada correctamente a: ${usuarioAsignado}.`, true);
             } else {
-                showCustomAlert("Actualizado", "Se ha removido la asignación y la orden pasó a Pendientes.", true);
+                showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
             }
             
             ejecutarFiltradoLogico();
@@ -586,7 +624,12 @@
     function filtrarIncidencias() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
-        if ((fInicio || fFin) && !historialCompletoCargado) { cargarIncidenciasFirebase(true); return; }
+
+        if ((fInicio || fFin) && !historialCompletoCargado) {
+            cargarIncidenciasFirebase(true); 
+            return;
+        }
+
         ejecutarFiltradoLogico();
     }
 
@@ -611,16 +654,27 @@
                 const incidenciaCod = (inc.incidencia || "").toLowerCase();
                 const nombreTienda = (inc.usuario || "").toLowerCase();
                 const trabajador = asignado.toLowerCase();
-                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) { return false; }
+                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
+                    return false;
+                }
             }
 
             if (fInicio || fFin) {
                 const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
-                if (fInicio) { const dateInicioObj = new Date(fInicio + "T00:00:00"); if (fechaDocObj < dateInicioObj) return false; }
-                if (fFin) { const dateFinObj = new Date(fFin + "T23:59:59"); if (fechaDocObj > dateFinObj) return false; }
+                
+                if (fInicio) {
+                    const dateInicioObj = new Date(fInicio + "T00:00:00");
+                    if (fechaDocObj < dateInicioObj) return false;
+                }
+                if (fFin) {
+                    const dateFinObj = new Date(fFin + "T23:59:59");
+                    if (fechaDocObj > dateFinObj) return false;
+                }
             }
+
             return true;
         });
+
         renderizarTabla(filtrados);
     }
 
