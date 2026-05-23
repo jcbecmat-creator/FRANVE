@@ -524,4 +524,159 @@
                 <td>
                     <div class="flex flex-col gap-1 items-center">
                         <span class="badge-origin">${origen}</span>
-                        <span class="badge-type">${tipo
+                        <span class="badge-type">${tipo}</span>
+                    </div>
+                </td>
+                <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
+                <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
+                <td>
+                    ${selectHtml}
+                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                </td>
+                <td>${btnHtml}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        lucide.createIcons();
+    }
+
+    async function manejarAccionFila(idDoc) {
+        const btn = document.getElementById(`btn-action-${idDoc}`);
+        const select = document.getElementById(`select-${idDoc}`);
+        if (!btn || !select) return;
+
+        const textSpan = btn.querySelector('.lbl-text');
+        const modoActual = textSpan.innerText.trim();
+
+        if (modoActual === "Editar") {
+            select.disabled = false;
+            textSpan.innerText = "Asignar";
+            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            lucide.createIcons();
+            select.focus();
+        } else {
+            const usuarioAsignado = select.value;
+            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
+        }
+    }
+
+    async function guardarAsignacionFirebase(idDocumento, usuarioAsignado, selectElement, buttonElement) {
+        if (!idDocumento) return;
+
+        selectElement.disabled = true;
+        buttonElement.disabled = true;
+        const textSpan = buttonElement.querySelector('.lbl-text');
+        textSpan.innerText = "Guardando...";
+
+        try {
+            const nuevoEstado = usuarioAsignado ? "Asignado" : "Pendiente";
+            await db.collection("incidencias").doc(idDocumento).update({
+                usuario_asignado: usuarioAsignado,
+                usuario_assigned: usuarioAsignado,
+                fecha_asignacion: new Date().toISOString(),
+                estado_asignacion: nuevoEstado
+            });
+
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDocumento);
+            if (index !== -1) {
+                incidenciasGlobales[index].usuario_asignado = usuarioAsignado;
+                incidenciasGlobales[index].usuario_assigned = usuarioAsignado;
+                incidenciasGlobales[index].estado_asignacion = nuevoEstado;
+                incidenciasGlobales[index].fecha_asignacion = new Date().toISOString();
+            }
+
+            actualizarBadges();
+
+            selectElement.disabled = true;
+            buttonElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
+            lucide.createIcons();
+
+            if (usuarioAsignado) {
+                showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada correctamente a: ${usuarioAsignado}.`, true);
+            } else {
+                showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
+            }
+            
+            ejecutarFiltradoLogico();
+
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            showCustomAlert("Error de Asignación", "No se pudo guardar en Firebase. Revisa la conexión.", false);
+            
+            selectElement.disabled = false;
+            buttonElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
+            lucide.createIcons();
+        } finally {
+            buttonElement.disabled = false;
+        }
+    }
+
+    // Interceptor dinámico de búsqueda: Evalúa si es necesario romper el candado de los 100 docs
+    function filtrarIncidencias() {
+        const fInicio = document.getElementById('filtro-inicio').value;
+        const fFin = document.getElementById('filtro-fin').value;
+
+        // Si el usuario activa filtros de rango de fechas y aún no hemos bajado toda la DB, rompemos el limitador
+        if ((fInicio || fFin) && !historialCompletoCargado) {
+            cargarIncidenciasFirebase(true); // Descarga expandida total
+            return;
+        }
+
+        ejecutarFiltradoLogico();
+    }
+
+    // Núcleo centralizado de renderizado cruzado
+    function ejecutarFiltradoLogico() {
+        const fInicio = document.getElementById('filtro-inicio').value;
+        const fFin = document.getElementById('filtro-fin').value;
+        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
+
+        let filtrados = incidenciasGlobales.filter(inc => {
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const estAsignacion = inc.estado_asignacion || "";
+
+            if (tabActual === 'pendientes') {
+                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignado !== "") return false;
+            } else if (tabActual === 'enviados') {
+                if (asignado === "" || estAsignacion === "Rechazado") return false;
+            } else if (tabActual === 'rechazados') {
+                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados") return false;
+            }
+
+            if (fBuscar) {
+                const incidenciaCod = (inc.incidencia || "").toLowerCase();
+                const nombreTienda = (inc.usuario || "").toLowerCase();
+                const trabajador = asignado.toLowerCase();
+                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
+                    return false;
+                }
+            }
+
+            if (fInicio || fFin) {
+                const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
+                
+                if (fInicio) {
+                    const dateInicioObj = new Date(fInicio + "T00:00:00");
+                    if (fechaDocObj < dateInicioObj) return false;
+                }
+                if (fFin) {
+                    const dateFinObj = new Date(fFin + "T23:59:59");
+                    if (fechaDocObj > dateFinObj) return false;
+                }
+            }
+
+            return true;
+        });
+
+        renderizarTabla(filtrados);
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('filtro-inicio').value = '';
+        document.getElementById('filtro-fin').value = '';
+        document.getElementById('filtro-buscar').value = '';
+        cargarIncidenciasFirebase(false); // Retorna automáticamente al modo eficiente de 100 documentos
+    }
+</script>
+</body>
+</html>
