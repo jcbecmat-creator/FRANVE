@@ -92,6 +92,9 @@
 
         .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
+        
+        /* ESTILOS PARA MOTIVO DE RECHAZO */
+        .rechazo-motivo-badge { display: block; margin-top: 4px; font-size: 10px; color: #DC2626; font-weight: 600; text-transform: none !important; background: #FEE2E2; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -150,9 +153,15 @@
                         </a>
                         <div class="sidebar-section">
                             <div class="sidebar-section-title">Formas</div>
-                              <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
-                              <a class="sidebar-link" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Ordenes de servicio</a>
-                                <a class="sidebar-link" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
+                            <a class="sidebar-link" href="index.html">
+                                <i data-lucide="wrench"></i> Mantenimiento correctivo
+                            </a>
+                            <a class="sidebar-link activa" href="orden_de_servicio.html">
+                                <i data-lucide="calendar-check"></i> Órdenes de servicio
+                            </a>
+                            <a class="sidebar-link" href="misordenes.html">
+                                <i data-lucide="clipboard-check"></i> Mis Órdenes
+                            </a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-admin">
                             <div class="sidebar-section-title">Administración</div>
@@ -454,7 +463,7 @@
             const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
             const estAsignacion = inc.estado_asignacion || "";
 
-            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados") {
+            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") {
                 r++;
             } else if (asignado !== "") {
                 e++;
@@ -497,6 +506,7 @@
             const fallos = inc.fallos || "—";
             const obs = inc.observaciones || "—";
             const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
+            const motivoRechazo = inc.motivo_rechazo_trabajador || "";
 
             const tieneAsignacion = asignadoActual !== "";
             const selectDisabled = tieneAsignacion ? "disabled" : "";
@@ -510,6 +520,11 @@
                 selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
             });
             selectHtml += `</select>`;
+            
+            // Mostrar motivo si está en rechazados
+            if (tabActual === 'rechazados' && motivoRechazo) {
+                selectHtml += `<span class="rechazo-motivo-badge" title="${motivoRechazo}">Motivo: ${motivoRechazo}</span>`;
+            }
 
             let btnHtml = `
                 <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
@@ -575,12 +590,23 @@
 
         try {
             const nuevoEstado = usuarioAsignado ? "Asignado" : "Pendiente";
-            await db.collection("incidencias").doc(idDocumento).update({
+            
+            // Objeto base de actualización
+            const updateData = {
                 usuario_asignado: usuarioAsignado,
                 usuario_assigned: usuarioAsignado,
                 fecha_asignacion: new Date().toISOString(),
                 estado_asignacion: nuevoEstado
-            });
+            };
+
+            // Si estamos reasignando una incidencia rechazada, limpiamos los campos de rechazo
+            const estAsignacion = incidenciasGlobales.find(i => i.id_documento === idDocumento)?.estado_asignacion || "";
+            if (estAsignacion === "Rechazado Trabajador") {
+                updateData.motivo_rechazo_trabajador = firebase.firestore.FieldValue.delete();
+                updateData.fecha_rechazo_trabajador = firebase.firestore.FieldValue.delete();
+            }
+
+            await db.collection("incidencias").doc(idDocumento).update(updateData);
 
             const index = incidenciasGlobales.findIndex(i => i.id_documento === idDocumento);
             if (index !== -1) {
@@ -588,6 +614,10 @@
                 incidenciasGlobales[index].usuario_assigned = usuarioAsignado;
                 incidenciasGlobales[index].estado_asignacion = nuevoEstado;
                 incidenciasGlobales[index].fecha_asignacion = new Date().toISOString();
+                if (estAsignacion === "Rechazado Trabajador") {
+                    incidenciasGlobales[index].motivo_rechazo_trabajador = "";
+                    incidenciasGlobales[index].fecha_rechazo_trabajador = "";
+                }
             }
 
             actualizarBadges();
@@ -638,11 +668,11 @@
             const estAsignacion = inc.estado_asignacion || "";
 
             if (tabActual === 'pendientes') {
-                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || asignado !== "") return false;
+                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador" || asignado !== "") return false;
             } else if (tabActual === 'enviados') {
-                if (asignado === "" || estAsignacion === "Rechazado") return false;
+                if (asignado === "" || estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") return false;
             } else if (tabActual === 'rechazados') {
-                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados") return false;
+                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados" && estAsignacion !== "Rechazado Trabajador") return false;
             }
 
             if (fBuscar) {
