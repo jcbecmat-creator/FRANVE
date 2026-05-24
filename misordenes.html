@@ -288,7 +288,8 @@
         const appDataStr = sessionStorage.getItem('loginSession');
         if(appDataStr) {
             const appData = JSON.parse(appDataStr);
-            nombreUsuarioLogueado = appData.nombreProveedor || appData.nombreUsuario || savedUser;
+            // CORRECCIÓN: Priorizar el nombre del usuario, no el nombre del proveedor (empresa)
+            nombreUsuarioLogueado = appData.nombreUsuario || savedUser; 
             
             const welcomeTitle = document.getElementById('welcome-username-display');
             if(welcomeTitle) welcomeTitle.innerText = nombreUsuarioLogueado;
@@ -354,6 +355,8 @@
 
     // === CARGA DE DATOS ===
     function cargarMisIncidencias() {
+        if(!nombreUsuarioLogueado) return;
+        
         db.collection("incidencias")
           .where("usuario_assigned", "==", nombreUsuarioLogueado)
           .get()
