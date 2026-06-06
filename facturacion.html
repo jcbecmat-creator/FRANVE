@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Órdenes de Servicio | FRANVE</title>
+    <title>Facturación | FRANVE</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/fonts.css">
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/style.css">
@@ -14,7 +18,7 @@
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/design-system.css">
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/app-shell.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -26,144 +30,196 @@
         }
     </script>
 
+    <script>
+        tailwind.config = { darkMode: "class", corePlugins: { preflight: false }, theme: { extend: { colors: { primary: "#81D0DC", "primary-dark": "#5FAAB5", "surface": "#FFFFFF", "background": "#F8FAFC", "text-main": "#1E293B", "text-sub": "#64748B", }, fontFamily: { sans: ["Inter", "sans-serif"] } } } };
+    </script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; line-height: 1.25; }
-        .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .app-content { overflow-y: auto; height: 100vh; padding-bottom: 120px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
         
+        /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
-
+        
+        /* === CORRECCIÓN DEL MENÚ ACTIVO === */
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
+        
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
 
-        .ordenes-wrap { max-width: 100%; margin: 0 auto; padding: 24px; }
-        .page-header-content h1 { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; color: #111827; line-height: 1; }
-        .page-header-content p { color: #6b7280; margin: 0; line-height: 1.5; }
+        .facturacion-wrap { max-width: 100%; margin: 0 auto; padding: 24px; }
 
-        .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
-        .tab-btn:hover { background: #e5e7eb; }
-        .tab-btn.active { background: white !important; color: #111827 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb !important; }
-        .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
-        .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
+        /* === MÉTRICAS SUPERIORES === */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: center; }
+        .metric-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px;}
+        .metric-value { font-size: 18px; font-weight: 800; color: #111827; }
 
-        .filters-bar { background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
-        .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 160px; flex: 1; }
-        .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: 0.5px; }
-        .input-control { padding: 0 16px; height: 42px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 14px; color: #1E293B; width: 100%; box-sizing: border-box; background-color: #F8FAFC; transition: all 0.2s ease; }
-        .input-control:focus { outline: none; background-color: #FFFFFF; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
-        .filter-actions { display: flex; gap: 8px; }
+        /* === FILTROS === */
+        .filters-bar { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 140px; flex: 1; }
+        .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; }
+        .input { padding: 0 16px; height: 42px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #111827; width: 100%; box-sizing: border-box; background: #f9fafb; transition: all 0.2s;}
+        .input:focus { background: white; outline: none; border-color: #81D0DC; }
+        .filter-actions { display: flex; gap: 12px; }
+        .btn-secondary { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         
-        .btn-search { height: 42px; background: #81D0DC; color: #131520; border: none; padding: 0 24px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.2); }
-        .btn-search:hover { opacity: 0.9; }
-        .btn-reset { height: 42px; background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; padding: 0 16px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background 0.2s; }
-        .btn-reset:hover { background: #E2E8F0; }
-        .btn-add { height: 42px; background: #16a34a; color: white; border: none; padding: 0 16px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; }
-        .btn-add:hover { opacity: 0.9; }
+        /* === TABLA === */
+        .data-table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 2500px; }
+        .data-table thead th { background: #f8fafc; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; padding: 16px 12px; text-align: center; border-bottom: 1px solid #E5E7EB; white-space: nowrap;}
+        .data-table tbody td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; font-size: 12px; color: #111827; vertical-align: middle; text-align: center; background: white; }
+        .data-table tbody tr:hover td { background: #f1f5f9; } 
         
-        .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
-        .co-table { width: 100%; border-collapse: collapse; min-width: 850px; } 
-        
-        .co-table th, .co-table td, .co-table span, .co-table div, .co-table select {
-            font-family: 'Inter', sans-serif !important;
-            font-weight: 400 !important;
-            text-transform: none !important;
-        }
-        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700 !important; text-transform: uppercase !important; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
-        
-        .co-table tbody td, .co-table tbody select, .co-table tbody span { text-transform: uppercase !important; }
-        .co-table td { padding: 16px 20px; text-align: center; font-size: 13px; color: #111827; border-bottom: 1px solid #f3f4f6; max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
-        .co-table tr:hover td { background-color: #F8FAFC; }
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
-        .co-table tr.row-selected td { background-color: #e0f2fe !important; } 
+        /* === CONGELAMIENTO DE LAS PRIMERAS 7 COLUMNAS === */
+        @media (min-width: 1024px) {
+            .data-table th:nth-child(1), .data-table td:nth-child(1) { position: sticky; left: 0px;   min-width: 40px; max-width: 40px; z-index: 5; }
+            .data-table th:nth-child(2), .data-table td:nth-child(2) { position: sticky; left: 40px;  min-width: 120px; max-width: 120px; z-index: 5; }
+            .data-table th:nth-child(3), .data-table td:nth-child(3) { position: sticky; left: 160px; min-width: 150px; max-width: 150px; z-index: 5; }
+            .data-table th:nth-child(4), .data-table td:nth-child(4) { position: sticky; left: 310px; min-width: 110px; max-width: 110px; z-index: 5; }
+            .data-table th:nth-child(5), .data-table td:nth-child(5) { position: sticky; left: 420px; min-width: 110px; max-width: 110px; z-index: 5; }
+            .data-table th:nth-child(6), .data-table td:nth-child(6) { position: sticky; left: 530px; min-width: 100px; max-width: 100px; z-index: 5; }
+            .data-table th:nth-child(7), .data-table td:nth-child(7) { position: sticky; left: 630px; min-width: 120px; max-width: 120px; z-index: 5; border-right: 2px solid #cbd5e1; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.05); }
+            
+            .data-table th:nth-child(-n+7) { z-index: 10 !important; background: #f8fafc; }
+            .data-table td:nth-child(-n+7) { background: white; }
+            .data-table tbody tr:hover td:nth-child(-n+7) { background: #f1f5f9; }
+        }
 
-        .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
-
-        .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 200px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
-        .assign-select:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
-        .assign-select:disabled { background-color: #E2E8F0; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
-
-        .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 400 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
-        .btn-action-trigger:hover { opacity: 0.85; }
-        .btn-action-trigger span { font-weight: 400 !important; text-transform: none !important; }
-
-        .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
-        .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
+        /* Componentes de la tabla */
+        .chk-custom { width: 18px; height: 18px; cursor: pointer; accent-color: #81D0DC; }
         
-        /* NUEVOS BADGES DE ESTATUS */
-        .badge-estatus { background-color: #DCFCE7; color: #166534; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; font-weight: 600 !important; }
-        .badge-estatus-pendiente { background-color: #FEF9C3; color: #854D0E; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; font-weight: 600 !important; }
-        .badge-estatus-rechazado { background-color: #FEE2E2; color: #991B1B; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; font-weight: 600 !important; }
-        
-        .rechazo-motivo-badge { display: block; margin-top: 4px; font-size: 10px; color: #DC2626; font-weight: 600; text-transform: none !important; background: #FEE2E2; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-download-primary { height: 28px; background: #81D0DC; color: #131520; border: none; padding: 0 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: opacity 0.2s; }
+        .btn-download-primary:hover { opacity: 0.85; }
+        .btn-download-disabled { height: 28px; background: #e5e7eb; color: #9ca3af; border: none; padding: 0 12px; border-radius: 6px; font-weight: 600; font-size: 11px; cursor: not-allowed; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .btn-delete-red { height: 28px; background: #DC2626; color: white; border: none; padding: 0 12px; border-radius: 6px; font-weight: 600; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; white-space: nowrap; }
+        .btn-delete-red:hover { background: #b91c1c; }
+
+        .status-badge { height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0 12px; border-radius: 14px; font-size: 11px; font-weight: 700; white-space: nowrap; text-transform: none !important; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        
+        .bg-yellow { background: #fef3c7; color: #92400e; } .dot-yellow { background-color: #f59e0b; }
+        .bg-blue { background: #dbeafe; color: #1e40af; } .dot-blue { background-color: #2563eb; }
+        .bg-green { background: #dcfce7; color: #166534; } .dot-green { background-color: #16a34a; }
+
+        .table-input-auto { 
+            width: 80px; text-align: center; height: 30px; font-size: 12px; 
+            border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb;
+            transition: all 0.2s;
+        }
+        .table-input-auto:focus { background: white; outline: none; border-color: #81D0DC; box-shadow: 0 0 0 1px #81D0DC; }
+        .table-input-auto:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .table-select {
+            height: 30px; font-size: 12px; padding: 0 8px;
+            border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb;
+            width: 100%; min-width: 150px;
+        }
+        .table-select:focus { background: white; outline: none; border-color: #81D0DC; }
+
+        /* === BARRA FLOTANTE DE SUBIDA === */
+        .upload-bottom-bar { 
+            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); 
+            background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 0 1px #e5e7eb; 
+            padding: 16px 24px; display: flex; align-items: center; gap: 24px; z-index: 50; 
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 90%; max-width: 1000px; 
+        }
+        .upload-bottom-bar.show { bottom: 24px; }
+        .up-info { flex-grow: 1; font-size: 14px; color: #6b7280; display: flex; align-items: center; gap: 12px; }
+        .up-info strong { color: #111827; font-weight: 800; font-size: 15px; }
+        
+        .btn-limpiar { background: white; color: #6b7280; border: 1px solid #e5e7eb; height: 40px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;}
+        .btn-limpiar:hover { background: #f3f4f6; color: #111827; }
+        .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s;}
+        .btn-adjuntar:hover { opacity: 0.85; }
+
+        /* === BOTÓN FLOTANTE DESCARGA === */
+        .fab-download {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #81D0DC;
+            color: #131520;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        .fab-download:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
+
+        /* === MODALES === */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
         
-        .modal-card-form { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 600px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-        .modal-form-header { margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-form-header h2 { margin: 0; font-size: 20px; color: #111827; font-weight: 800 !important; }
-        .modal-form-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #6b7280; }
+        .modal-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-header-card { margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
+        .modal-header-card h2 { margin: 0; font-size: 20px; color: #111827; font-weight: 800; }
+        .modal-header-card p { margin: 4px 0 0 0; font-size: 13px; color: #6b7280; }
         
-        .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .modal-form-full { grid-column: span 2; }
-        .form-input-modal { width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.2s; }
-        textarea.form-input-modal { resize: vertical; min-height: 80px; }
-        .form-input-modal:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
-        .form-label-modal { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 6px; text-transform: uppercase; }
-        
-        .modal-form-actions { display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 20px; }
-        .btn-cancel-modal { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600 !important; cursor: pointer; }
-        .btn-save-modal { background: #81D0DC; color: #131520; border: none; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600 !important; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
-        .btn-save-modal:hover { opacity: 0.85; }
-        .btn-save-modal:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .fab-edit { position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700 !important; cursor: pointer; box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: none; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s; }
-        .fab-edit:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
-
-        #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
-        #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700 !important; }
+        #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
         #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
-        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600 !important; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
-        #alert-btn:hover { opacity: 0.9; }
+        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #81D0DC; color: #131520; font-weight: 700; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
+        #alert-btn:hover { opacity: 0.85; }
+
+        @media (max-width: 900px) {
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .upload-bottom-bar { flex-direction: column; gap: 12px; padding: 16px; bottom: -200px;}
+            .up-info { flex-direction: column; text-align: center; gap: 4px; }
+            .btn-adjuntar, .btn-limpiar { width: 100%; justify-content: center; }
+            .fab-download { padding: 12px; border-radius: 50%; right: 15px; bottom: 15px; }
+            .fab-download span { display: none; }
+        }
+        @media (max-width: 600px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body class="has-sidebar">
 
     <div id="app-screen" style="display: block;">
         <header class="main-header">
-            <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
-                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle style="margin-right: 0;">
+            <div class="header-left">
+                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle>
                     <span class="hamburger"></span>
                 </button>
                 <a href="inicio.html">
-                    <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px; margin: 0;">
+                    <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px;">
                 </a>
-                <h1 class="system-title" style="margin: 0; line-height: 1; transform: translateY(-3px);">Órdenes de Servicio</h1>
+                <h1 class="system-title">Ordenes de Servicio</h1>
             </div>
             <div class="header-right">
                 <div class="user-menu" data-user-menu>
-                    <button class="user-circle-btn" type="button" aria-label="Abrir menú de usuario" data-user-trigger>
+                    <button class="user-circle-btn" type="button" data-user-trigger>
                         <span class="user-circle-initial" id="user-initial-header">U</span>
                     </button>
                     <div class="user-dropdown" data-user-dropdown>
                         <div class="user-card">
                             <div class="user-circle-avatar user-circle-initial">U</div>
                             <div class="user-meta">
-                                <div class="user-name">Administrador</div>
+                                <div class="user-name">Cargando...</div>
                             </div>
                         </div>
                         <div class="user-actions">
                             <a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();">
-                                <i data-lucide="log-out"></i>
-                                Cerrar sesión
+                                <i data-lucide="log-out"></i> Cerrar sesión
                             </a>
                         </div>
                     </div>
@@ -172,17 +228,15 @@
         </header>
 
         <div class="main-layout">
-            <aside class="sidebar app-sidebar" id="sidebar" data-app-sidebar>
-                <button class="sidebar-close" type="button" aria-label="Cerrar navegación" data-sidebar-close>
-                    <span class="close-icon">X</span>
-                </button>
+            <aside class="sidebar app-sidebar" data-app-sidebar>
+                <button class="sidebar-close" type="button" data-sidebar-close><span class="close-icon">X</span></button>
                 <div class="sidebar-content">
                     <nav class="sidebar-nav">
                         <a class="sidebar-link" href="inicio.html"><i data-lucide="home"></i> Inicio</a>
                         <div class="sidebar-section">
                             <div class="sidebar-section-title">Formas</div>
                             <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
-                            <a class="sidebar-link activa" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Órdenes de servicio</a>
+                            <a class="sidebar-link" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Ordenes de servicio</a>
                             <a class="sidebar-link" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-admin">
@@ -191,7 +245,8 @@
                             <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
                             <a class="sidebar-link" href="aprobacion_gerencia.html"><i data-lucide="shield-check"></i> Aprobación gerencia</a>
-                            <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
+                            
+                            <a class="sidebar-link activa" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
                             <div class="sidebar-section-title">Reportes</div>
@@ -200,75 +255,104 @@
                     </nav>
                 </div>
             </aside>
-            <div class="sidebar-backdrop" id="sidebar-backdrop" data-sidebar-backdrop></div>
+            <div class="sidebar-backdrop" data-sidebar-backdrop></div>
 
             <main class="main-content app-content">
+                
                 <div id="global-welcome-section" style="text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white;">
                     <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: 700;">Bienvenido</h1>
                     <h2 id="welcome-username-display" style="margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2;">CARGANDO...</h2>
                 </div>
 
-                <div class="ordenes-wrap">
-                    <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px;">
-                        <div class="page-header-content">
-                            <h1>Bandeja de Incidencias</h1>
-                            <p>Gestión, consulta y asignación de incidencias recibidas desde Gmail</p>
-                        </div>
-                        
-                        <div class="tabs-container" style="margin-top: 5px;">
-                            <button class="tab-btn active" onclick="cambiarTab('pendientes')" id="tab-pendientes">
-                                Pendientes <span class="tab-badge" id="badge-pendientes">0</span>
-                            </button>
-                            <button class="tab-btn" onclick="cambiarTab('enviados')" id="tab-enviados">
-                                Enviados <span class="tab-badge" id="badge-enviados">0</span>
-                            </button>
-                            <button class="tab-btn" onclick="cambiarTab('rechazados')" id="tab-rechazados">
-                                Rechazados <span class="tab-badge" id="badge-rechazados">0</span>
-                            </button>
-                        </div>
+                <div class="facturacion-wrap">
+                    
+                    <header style="border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px;">
+                        <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px; color: #111827;">Facturación y Pagos</h1>
+                        <p style="color: #6b7280; margin: 0;">Carga de comprobantes fiscales y seguimiento de pagos de órdenes aprobadas</p>
                     </header>
 
-                    <form class="filters-bar" onsubmit="event.preventDefault(); filtrarIncidencias();">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-title">FOLIOS PENDIENTES</div>
+                            <div class="metric-value" id="met-pendientes">0 - $0.00</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">FOLIOS POR PAGAR</div>
+                            <div class="metric-value" id="met-facturados" style="color: #2563eb;">0 - $0.00</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">FOLIOS PAGADOS</div>
+                            <div class="metric-value" id="met-pagados" style="color: #16a34a;">0 - $0.00</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-title">TOTAL GENERAL</div>
+                            <div class="metric-value" id="met-total">0 - $0.00</div>
+                        </div>
+                    </div>
+
+                    <form class="filters-bar">
                         <div class="filter-group">
                             <label class="filter-label">Fecha inicio</label>
-                            <input type="date" class="input-control" id="filtro-inicio" onchange="filtrarIncidencias()">
+                            <input type="date" class="input" id="filtro-inicio">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Fecha fin</label>
-                            <input type="date" class="input-control" id="filtro-fin" onchange="filtrarIncidencias()">
+                            <input type="date" class="input" id="filtro-fin">
                         </div>
-                        <div class="filter-group style-search flex-grow">
-                            <label class="filter-label">Buscar por Incidencia, Tienda o Trabajador</label>
-                            <input type="text" class="input-control" id="filtro-buscar" placeholder="Ej. 12323-00225, CP PUBLIC MARKET o JOSE ALFREDO...">
+                        <div class="filter-group">
+                            <label class="filter-label">Estado</label>
+                            <select class="input" id="filtro-estado">
+                                <option value="todos">Todos</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Por pagar">Por pagar</option>
+                                <option value="Pagado">Pagado</option>
+                            </select>
+                        </div>
+                        <div class="filter-group flex-grow" style="flex: 2;">
+                            <label class="filter-label">Buscar</label>
+                            <input type="text" class="input" id="filtro-buscar" placeholder="Folio o sucursal...">
                         </div>
                         <div class="filter-actions">
-                            <button class="btn-search" type="button" onclick="filtrarIncidencias()">
+                            <button class="btn-secondary" type="button" onclick="renderTablaActual()">
                                 <i data-lucide="search" style="width: 16px;"></i> Buscar
-                            </button>
-                            <button class="btn-reset" type="button" onclick="limpiarFiltros()">
-                                <i data-lucide="refresh-cw" style="width: 14px;"></i> Limpiar
-                            </button>
-                            <button class="btn-add" type="button" onclick="abrirModalAgregar()">
-                                <i data-lucide="plus" style="width: 14px;"></i> Agregar
                             </button>
                         </div>
                     </form>
 
-                    <div class="co-table-container">
-                        <table class="co-table">
+                    <div class="data-table-container">
+                        <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Incidencia</th>
-                                    <th>Fecha Recepción</th>
-                                    <th>Tienda</th>
-                                    <th>Fallo Reportado</th>
-                                    <th>Estatus</th>
-                                    <th style="text-align: center;">Asignar Técnico / Usuario</th>
-                                    <th style="text-align: center;">Acción</th>
+                                    <th title="Seleccionar para adjuntar facturas">SEL.</th>
+                                    <th>FOLIO (ORDEN)</th>
+                                    <th>SUCURSAL</th>
+                                    <th>FECHA ORDEN</th>
+                                    <th>FECHA DE ENVÍO</th>
+                                    <th style="text-align: right;">TOTAL ORDEN</th>
+                                    <th>ORDEN</th> 
+                                    <th>PDF</th>
+                                    <th>XML</th>
+                                    <th>NO. FACTURA</th>
+                                    <th>FECHA FACTURA</th>
+                                    <th>SEM. FAC.</th>
+                                    <th style="text-align: right;">IMPORTE FACTURA</th>
+                                    
+                                    <th>ESTATUS</th> 
+                                    <th>ACCIÓN</th>
+                                    <th>PAGO TENTATIVO</th>
+                                    
+                                    <th>CÓDIGO SAAS</th>
+                                    <th>FECHA SAAS</th>
+                                    <th>SEM. SAAS</th>
+                                    <th title="Marcar como pagado">PAGADO (CHK)</th>
+                                    <th>FECHA PAGO</th>
+                                    <th>INDICATIVO DE GASTO</th> 
+                                    <th>CALIFICACIÓN CAPEX / OPEX</th> 
+                                    <th>TIPIFICACIÓN DE GASTO</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-incidencias-body">
-                                <tr><td colspan="7" class="co-table-empty">Cargando incidencias desde Firebase...</td></tr>
+                            <tbody id="tabla-facturas-body">
+                                <tr><td colspan="24" class="co-table-empty">Cargando datos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -277,114 +361,65 @@
         </div>
     </div>
 
-    <!-- MODAL AGREGAR INCIDENCIA (Se mantienen todos los campos) -->
-    <div id="modalAgregar" class="modal-overlay">
-        <div class="modal-card-form">
-            <div class="modal-form-header">
-                <h2>Agregar Incidencia</h2>
-                <button onclick="cerrarModalAgregar()">&times;</button>
-            </div>
-            <div class="modal-form-grid">
-                <div>
-                    <label class="form-label-modal">Incidencia</label>
-                    <input type="text" id="add-incidencia" class="form-input-modal" placeholder="Ej. 13036-00001">
-                </div>
-                <div>
-                    <label class="form-label-modal">Fecha Recepción</label>
-                    <input type="datetime-local" id="add-fecha" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Tienda</label>
-                    <input type="text" id="add-tienda" class="form-input-modal" placeholder="Nombre del restaurante">
-                </div>
-                <div>
-                    <label class="form-label-modal">Código Equipo</label>
-                    <input type="text" id="add-codigo" class="form-input-modal" placeholder="Ej. AC-001">
-                </div>
-                <div>
-                    <label class="form-label-modal">Instalación</label>
-                    <input type="text" id="add-instalacion" class="form-input-modal" placeholder="Ej. Cocina">
-                </div>
-                <div>
-                    <label class="form-label-modal">Tipo</label>
-                    <input type="text" id="add-tipo" class="form-input-modal" placeholder="Ej. Anomalía">
-                </div>
-                <div class="modal-form-full">
-                    <label class="form-label-modal">Fallo Reportado</label>
-                    <textarea id="add-fallo" class="form-input-modal" placeholder="Descripción del fallo..."></textarea>
-                </div>
-                <div class="modal-form-full">
-                    <label class="form-label-modal">Observaciones</label>
-                    <textarea id="add-obs" class="form-input-modal" placeholder="Observaciones adicionales..."></textarea>
-                </div>
-            </div>
-            <div class="modal-form-actions">
-                <button class="btn-cancel-modal" type="button" onclick="cerrarModalAgregar()">Cancelar</button>
-                <button class="btn-save-modal" id="btn-guardar-add" type="button" onclick="guardarNuevaIncidencia()">
-                    <i data-lucide="save" style="width:16px;"></i> Guardar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL EDITAR INCIDENCIA (Se mantienen todos los campos) -->
-    <div id="modalEditar" class="modal-overlay">
-        <div class="modal-card-form">
-            <div class="modal-form-header">
-                <h2>Editar Incidencia</h2>
-                <button onclick="cerrarModalEdicion()">&times;</button>
-            </div>
-            <input type="hidden" id="edit-id-doc">
-            <div class="modal-form-grid">
-                <div>
-                    <label class="form-label-modal">Incidencia</label>
-                    <input type="text" id="edit-incidencia" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Fecha Recepción</label>
-                    <input type="datetime-local" id="edit-fecha" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Tienda</label>
-                    <input type="text" id="edit-tienda" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Código Equipo</label>
-                    <input type="text" id="edit-codigo" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Instalación</label>
-                    <input type="text" id="edit-instalacion" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Tipo</label>
-                    <input type="text" id="edit-tipo" class="form-input-modal">
-                </div>
-                <div class="modal-form-full">
-                    <label class="form-label-modal">Fallo Reportado</label>
-                    <textarea id="edit-fallo" class="form-input-modal"></textarea>
-                </div>
-                <div class="modal-form-full">
-                    <label class="form-label-modal">Observaciones</label>
-                    <textarea id="edit-obs" class="form-input-modal"></textarea>
-                </div>
-            </div>
-            <div class="modal-form-actions">
-                <button class="btn-cancel-modal" type="button" onclick="cerrarModalEdicion()">Cancelar</button>
-                <button class="btn-save-modal" id="btn-guardar-edit" type="button" onclick="guardarEdicionIncidencia()">
-                    <i data-lucide="save" style="width:16px;"></i> Actualizar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTÓN FLOTANTE EDICIÓN -->
-    <button id="btn-editar-flotante" class="fab-edit" onclick="abrirModalEdicion()">
-        <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i> 
-        Editar Incidencia
+    <button class="fab-download" onclick="abrirModalDescarga()">
+        <i data-lucide="folder-down" style="width: 20px; height: 20px;"></i>
+        <span>Descargar Facturas</span>
     </button>
 
-    <div id="custom-alert" class="modal-overlay">
+    <div class="upload-bottom-bar" id="upload-bar">
+        <div class="up-info">
+            <span>SELECCIÓN ACTUAL</span>
+            <span style="display: flex; align-items: center; gap: 8px;">
+                <strong id="lbl-sel-count">0 folios</strong> 
+                <strong id="lbl-sel-sum" style="color: #16a34a;">$0.00</strong> aprobados
+            </span>
+        </div>
+        <button class="btn-limpiar" onclick="limpiarSeleccion()">
+            <i data-lucide="x-circle" style="width: 16px;"></i> Limpiar
+        </button>
+        <button class="btn-adjuntar" onclick="triggerUpload('pdf')">
+            <i data-lucide="file-plus" style="width: 16px;"></i> Adjuntar PDF
+        </button>
+        <button class="btn-adjuntar" onclick="triggerUpload('xml')">
+            <i data-lucide="file-code" style="width: 16px;"></i> Adjuntar XML
+        </button>
+    </div>
+
+    <input type="file" id="file-pdf" accept=".pdf" style="display:none" onchange="handleUpload(event, 'pdf')">
+    <input type="file" id="file-xml" accept=".xml" style="display:none" onchange="handleUpload(event, 'xml')">
+
+    <div id="modalDescargaFacturas" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header-card">
+                <h2>Descargar Facturas</h2>
+                <p>Genera un archivo ZIP con la estructura de carpetas.</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                <div class="filter-group">
+                    <label class="filter-label" style="display:block; margin-bottom:6px;">Semana a descargar</label>
+                    <select id="descarga-semana" class="input" onchange="actualizarProveedoresDescarga(this.value)">
+                        <option value="">— Seleccionar semana —</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" style="display:block; margin-bottom:6px;">Proveedor</label>
+                    <select id="descarga-prov" class="input">
+                        <option value="todos">Todos los proveedores</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="cerrarModalDescarga()" style="height: 40px; padding: 0 16px;">Cancelar</button>
+                <button type="button" class="btn-adjuntar" id="btn-ejecutar-descarga" onclick="descargarZip()" style="height: 40px;">
+                    <i data-lucide="download" style="width:16px;"></i> Descargar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-alert">
         <div class="modal-card-alert">
             <div id="alert-icon-container"></div>
             <h3 id="alert-title"></h3>
@@ -394,581 +429,685 @@
     </div>
 
 <script>
+    // Inicialización de Firebase con los nuevos datos de FRANVE
     const firebaseConfig = {
-        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
-        authDomain: "frave-4fbbf.firebaseapp.com",
-        projectId: "frave-4fbbf",
-        storageBucket: "frave-4fbbf.firebasestorage.app",
-        messagingSenderId: "687825589857",
-        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
+        apiKey: "AIzaSyDUM2w0L-3GNm0unSgKHZCrrW9xKQY0_is",
+        authDomain: "franve-1b62e.firebaseapp.com",
+        projectId: "franve-1b62e",
+        storageBucket: "franve-1b62e.firebasestorage.app",
+        messagingSenderId: "118420640551",
+        appId: "1:118420640551:web:9b79daa79a2d46eefe4f02"
     };
-    
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
-    let listaUsuariosGlobal = [];
-    let incidenciasGlobales = [];
-    let tabActual = 'pendientes';
-    let historialCompletoCargado = false; 
-    let incidenciaSeleccionadaId = null;
+    let facturasGlobales = [];
 
-    function formatearFecha(fechaField) {
-        if (!fechaField) return "—";
-        if (fechaField && typeof fechaField.toDate === 'function') {
-            const d = fechaField.toDate();
-            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
-        }
-        if (fechaField && fechaField.seconds) {
-            const d = new Date(fechaField.seconds * 1000);
-            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
-        }
-        if (typeof fechaField === 'string') {
-            if (fechaField.includes("Timestamp")) return "—";
-            return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
-        }
-        return "—";
-    }
+    const optionsIndicativo = [
+        "Mtto de inmuebles correctivo naturaleza del equipo",
+        "Mtto de inmuebles correctivo deterioro del restaurante",
+        "Mtto de inmuebles correctivo mejoras al restaurante",
+        "Mtto de inmuebles preventivo institucional",
+        "Mtto de inmuebles correctivo causa operativa",
+        "Mtto de inmuebles preventivo electromecanico",
+        "Agua",
+        "Gestora",
+        "Mantenimiento y accesorios",
+        "Seguros y fianzas",
+        "Energia electrica",
+        "Herramientas",
+        "Gasolina edenred",
+        "Gasolina y lubricantes"
+    ];
 
-    function parsearFechaFirebase(fechaField) {
-        if (!fechaField) return new Date(0);
-        if (typeof fechaField.toDate === 'function') return fechaField.toDate();
-        if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
-        return new Date(fechaField);
-    }
+    const optionsCapexOpex = [
+        "Opex",
+        "Capex",
+        "Otros gastos",
+        "Pipas",
+        "Fosas",
+        "Pfp"
+    ];
 
-    function toDatetimeLocal(fechaField) {
-        let d = parsearFechaFirebase(fechaField);
-        if(isNaN(d.getTime())) d = new Date();
-        const offset = d.getTimezoneOffset();
-        const local = new Date(d.getTime() - (offset*60000));
-        return local.toISOString().slice(0,16);
-    }
+    const optionsTipificacion = [
+        "Pipas",
+        "Fosas",
+        "Desgaste natural",
+        "Vicios ocultos",
+        "Causa operativa",
+        "Siniestro",
+        "Mejoras"
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
-        try { if (window.lucide) lucide.createIcons(); } catch (e) { console.warn("Lucide no cargó inicialmente"); }
+        if (window.lucide) { lucide.createIcons(); }
         
-        try {
-            const savedUser = sessionStorage.getItem('loginUser');
-            if(savedUser && document.getElementById('user-initial-header')) {
-                document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
-            }
-            const appDataStr = sessionStorage.getItem('loginSession');
-            if(appDataStr) {
-                const appData = JSON.parse(appDataStr);
-                if(document.getElementById('welcome-username-display')) {
-                    document.getElementById('welcome-username-display').innerText = appData.nombreProveedor || savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
-                }
-                const dropdownName = document.querySelector('.user-name');
-                if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
-            } else {
-                if(document.getElementById('welcome-username-display')) {
-                    document.getElementById('welcome-username-display').innerText = savedUser || "FRANVE MANTENIMIENTO Y REMODELACION";
-                }
-            }
-        } catch (e) { console.error("Error validando sesión:", e); }
+        const savedUser = sessionStorage.getItem('loginUser');
+        if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
 
-        try {
-            const toggles = document.querySelectorAll('[data-sidebar-toggle]');
-            toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.toggle('open')));
-            document.querySelector('[data-sidebar-close]')?.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.remove('open'));
-        } catch (e) { console.warn("Error en eventos de menú"); }
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if(appDataStr) {
+            const appData = JSON.parse(appDataStr);
+            const welcomeTitle = document.getElementById('welcome-username-display');
+            if(welcomeTitle) welcomeTitle.innerText = appData.nombreProveedor || savedUser;
+            const dropdownName = document.querySelector('.user-name');
+            if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
+        }
 
-        cargarListaUsuarios().then(() => {
-            cargarIncidenciasFirebase(false); 
-        }).catch(err => {
-            console.error(err);
-            cargarIncidenciasFirebase(false);
-        });
+        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
+        toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar').classList.toggle('open')));
+        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
+
+        cargarDatosFacturacion();
     });
 
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
-        document.getElementById('alert-title').innerText = title;
-        document.getElementById('alert-msg').innerText = message;
+        const alertTitle = document.getElementById('alert-title');
+        const alertMsg = document.getElementById('alert-msg');
         const alertIcon = document.getElementById('alert-icon-container');
         const alertBtn = document.getElementById('alert-btn');
 
+        alertTitle.innerText = title;
+        alertMsg.innerText = message;
+
         if(isSuccess) {
             alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
-            alertBtn.style.background = '#16a34a';
         } else {
             alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
-            alertBtn.style.background = '#DC2626';
         }
+
         alertBox.style.display = 'flex';
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
+        lucide.createIcons();
     }
+    
     function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+    
+    function formateaMoneda(valor) { return "$" + parseFloat(valor || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
 
-    async function cargarListaUsuarios() {
-        try {
-            const appDataStr = sessionStorage.getItem('loginSession');
-            if (appDataStr) {
-                const appData = JSON.parse(appDataStr);
-                if (appData.tecnicos && appData.tecnicos.length > 0) {
-                    listaUsuariosGlobal = appData.tecnicos;
-                    return;
-                }
-            }
-            const usuariosSnapshot = await db.collection("usuarios").get();
-            listaUsuariosGlobal = [];
-            usuariosSnapshot.forEach(doc => {
-                const u = doc.data();
-                if (u.nombre) listaUsuariosGlobal.push(u.nombre);
-            });
-            if (listaUsuariosGlobal.length === 0) {
-                listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS", "SOPORTE TÉCNICO"];
-            }
-        } catch (error) {
-            console.error("Error catálogo:", error);
-            listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS"];
-        }
+    function getWeekNumber(dStr) {
+        if(!dStr) return "";
+        const d = new Date(dStr);
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
     }
 
-    function cargarIncidenciasFirebase(traerTodoElHistorial = false) {
-        const tbody = document.getElementById('tabla-incidencias-body');
-        tbody.innerHTML = '<tr><td colspan="7" class="co-table-empty">Cargando incidencias...</td></tr>';
-
-        let query = db.collection("incidencias");
-        if (!traerTodoElHistorial) {
-            query = query.limit(100); 
-            historialCompletoCargado = false;
-        } else {
-            historialCompletoCargado = true;
+    function add90Days(dateStr) {
+        if(!dateStr) return "";
+        const d = new Date(dateStr);
+        d.setDate(d.getDate() + 90);
+        return d.toISOString().split('T')[0];
+    }
+    
+    function getWeekDateRange(year, weekNo) {
+        let d = new Date(Date.UTC(year, 0, 1));
+        let dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        let weekTime = d.getTime() + (weekNo - 1) * 604800000;
+        
+        let start = new Date(weekTime);
+        start.setUTCDate(start.getUTCDate() - 3); 
+        let end = new Date(weekTime);
+        end.setUTCDate(end.getUTCDate() + 3); 
+        
+        const fmt = (date) => {
+            let dd = date.getUTCDate().toString().padStart(2, '0');
+            let mm = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+            return `${dd}/${mm}/${date.getUTCFullYear()}`;
         }
+        return `${fmt(start)} al ${fmt(end)}`;
+    }
 
-        query.get().then((querySnapshot) => {
-            incidenciasGlobales = [];
-            querySnapshot.forEach((doc) => {
-                let data = doc.data();
-                data.id_documento = doc.id;
-                incidenciasGlobales.push(data);
-            });
-            actualizarBadges();
-            ejecutarFiltradoLogico();
-        }).catch((error) => {
-            console.error("Error: ", error);
-            tbody.innerHTML = '<tr><td colspan="7" class="co-table-empty" style="color: #ef4444;">Error al conectar con Firebase.</td></tr>';
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
+    function cargarDatosFacturacion() {
+        db.collection("tickets_mantenimiento")
+          .where("estado_confirmacion", "==", "Costos Aprobados")
+          .get()
+          .then((querySnapshot) => {
+              facturasGlobales = [];
+              querySnapshot.forEach((doc) => { 
+                  let data = doc.data();
+                  
+                  if (data.estado_pago === 'Pagado') {
+                      data._estado_factura = 'Pagado';
+                  } else if (data.url_factura_xml) {
+                      data._estado_factura = 'Por pagar';
+                  } else {
+                      data._estado_factura = 'Pendiente';
+                  }
+                  
+                  facturasGlobales.push(data); 
+              });
+              
+              facturasGlobales.sort((a, b) => {
+                  let fA = a.fecha_aprobacion_costos || "";
+                  let fB = b.fecha_aprobacion_costos || "";
+                  return fA.localeCompare(fB);
+              });
+
+              actualizarMetricas();
+              renderTablaActual();
+          })
+          .catch((error) => {
+              console.error("Error: ", error);
+              document.getElementById('tabla-facturas-body').innerHTML = '<tr><td colspan="24" class="co-table-empty" style="color: red;">Error cargando datos.</td></tr>';
+          });
+    }
+
+    function actualizarMetricas() {
+        let cPend = 0, sumPend = 0;
+        let cFact = 0, sumFact = 0;
+        let cPag = 0, sumPag = 0;
+        let cTot = 0, sumTot = 0;
+
+        facturasGlobales.forEach(t => {
+            const val = parseFloat(t.costo_total_aprobado) || 0;
+            cTot++; sumTot += val;
+            
+            if (t._estado_factura === 'Pendiente') { cPend++; sumPend += val; }
+            else if (t._estado_factura === 'Por pagar') { cFact++; sumFact += val; }
+            else if (t._estado_factura === 'Pagado') { cPag++; sumPag += val; }
         });
+
+        document.getElementById('met-pendientes').innerText = `${cPend} - ${formateaMoneda(sumPend)}`;
+        document.getElementById('met-facturados').innerText = `${cFact} - ${formateaMoneda(sumFact)}`;
+        document.getElementById('met-pagados').innerText = `${cPag} - ${formateaMoneda(sumPag)}`;
+        document.getElementById('met-total').innerText = `${cTot} - ${formateaMoneda(sumTot)}`;
     }
 
-    function actualizarBadges() {
-        let p = 0, e = 0, r = 0;
-        incidenciasGlobales.forEach(inc => {
-            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
-            const estAsignacion = inc.estado_asignacion || "";
-            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") { r++; }
-            else if (asignado !== "") { e++; }
-            else { p++; }
+    function generateTableSelect(folio, field, options, currentValue) {
+        let html = `<select class="table-select" onchange="guardarAutofield('${folio}', '${field}', this.value)">`;
+        html += `<option value="">— Seleccionar —</option>`;
+        options.forEach(opt => {
+            const selected = (opt === currentValue) ? 'selected' : '';
+            html += `<option value="${opt}" ${selected}>${opt}</option>`;
         });
-        document.getElementById('badge-pendientes').innerText = p;
-        document.getElementById('badge-enviados').innerText = e;
-        document.getElementById('badge-rechazados').innerText = r;
+        html += `</select>`;
+        return html;
     }
 
-    function cambiarTab(tab) {
-        tabActual = tab;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        const btnActivo = document.getElementById('tab-' + tab);
-        if(btnActivo) btnActivo.classList.add('active');
-        incidenciaSeleccionadaId = null; 
-        gestionarBotonFlotante();
-        filtrarIncidencias();
+    function verPDFOrden(folio) {
+        const t = facturasGlobales.find(tk => tk.id_ticket === folio);
+        if(!t) { showCustomAlert("Error", "Error al cargar datos de la orden.", false); return; }
+
+        const datosParaPDF = {
+            sucursal: t.sucursal || '',
+            suc_dir: t.suc_dir || '',
+            suc_col: t.suc_col || '',
+            suc_city: t.suc_city || '',
+            suc_cp: t.suc_cp || '',
+            suc_hor: t.suc_hor || '',
+            suc_tel: t.suc_tel || '',
+            suc_mail: t.suc_mail || '',
+            ticket: t.id_ticket || 'S/N',
+            area: t.area || '',
+            subarea: t.subarea || '',
+            desc_falla: t.desc_falla || '',
+            fotos_falla: t.urls_falla || [null, null, null],
+            desc_solucion: t.desc_solucion || '',
+            fotos_solucion: t.urls_solucion || [null, null, null],
+            prov_nombre: t.prov_nombre || t.proveedor || '',
+            prov_rfc: t.prov_rfc || '',
+            prov_dir: t.prov_dir || '',
+            prov_cont: t.prov_cont || '',
+            prov_tel: t.prov_tel || '',
+            prov_mail: t.prov_mail || '',
+            tec_nombre: t.tec_nombre || '',
+            tec_celular: t.tec_celular || '',
+            comentario: t.comentario || '',
+            firma: t.url_firma || '',
+            foto_soporte: t.url_soporte || null,
+            foto_selfie: t.url_selfie || null,
+            fecha_hora: t.fecha_hora_completa 
+                ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
+                : (t.fecha_creacion || '')
+        };
+
+        sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF));
+        window.open('index2.html?from=facturacion', '_blank');
     }
 
-    function seleccionarFila(trElement, idDoc) {
-        if(tabActual !== 'pendientes') return;
-        if(incidenciaSeleccionadaId === idDoc) {
-            incidenciaSeleccionadaId = null;
-            trElement.classList.remove('row-selected');
-        } else {
-            document.querySelectorAll('.row-selected').forEach(el => el.classList.remove('row-selected'));
-            incidenciaSeleccionadaId = idDoc;
-            trElement.classList.add('row-selected');
-        }
-        gestionarBotonFlotante();
-    }
-
-    function gestionarBotonFlotante() {
-        const fab = document.getElementById('btn-editar-flotante');
-        if(incidenciaSeleccionadaId && tabActual === 'pendientes') {
-            fab.style.display = 'flex';
-        } else {
-            fab.style.display = 'none';
-        }
-    }
-
-    function renderizarTabla(listaIncidencias) {
-        const tbody = document.getElementById('tabla-incidencias-body');
+    function renderTablaActual() {
+        const tbody = document.getElementById('tabla-facturas-body');
         tbody.innerHTML = '';
-
-        if (listaIncidencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
-            return;
-        }
-
-        listaIncidencias.forEach(inc => {
-            const idDoc = inc.id_documento;
-            const codigoIncidencia = inc.incidencia || "—";
-            const fechaRec = formatearFecha(inc.fechaRecepcion);
-            const tienda = inc.restaurante_nombre || inc.tienda || inc.usuario || "—";
-            const fallos = inc.fallos || "—";
-            const origen = inc.origen || "Correctiva";
-            const tipo = inc.tipo || "Anomalía";
-            const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
-            const estAsignacion = inc.estado_asignacion || "";
-            const motivoRechazo = inc.motivo_rechazo_trabajador || "";
-
-            // LÓGICA DE ESTATUS UNIFICADA
-            let estatusHtml = `<div class="flex flex-col gap-1 items-center">`;
-            estatusHtml += `<span class="badge-origin">${origen}</span>`;
-            estatusHtml += `<span class="badge-type">${tipo}</span>`;
-            
-            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") {
-                estatusHtml += `<span class="badge-estatus-rechazado">Rechazado</span>`;
-                if (motivoRechazo) {
-                    estatusHtml += `<span class="rechazo-motivo-badge" title="${motivoRechazo}">Motivo: ${motivoRechazo}</span>`;
-                }
-            } else if (asignadoActual !== "") {
-                estatusHtml += `<span class="badge-estatus">Asignado</span>`;
-            } else {
-                estatusHtml += `<span class="badge-estatus-pendiente">Pendiente</span>`;
-            }
-            estatusHtml += `</div>`;
-
-            const tieneAsignacion = asignadoActual !== "";
-            const selectDisabled = tieneAsignacion ? "disabled" : "";
-            const btnText = tieneAsignacion ? "Editar" : "Asignar";
-            const btnIcon = tieneAsignacion ? "edit-3" : "user-plus";
-
-            let selectHtml = `<select id="select-${idDoc}" class="assign-select" ${selectDisabled}>`;
-            selectHtml += `<option value="">— SELECCIONAR —</option>`;
-            listaUsuariosGlobal.forEach(user => {
-                const isSelected = (user.toUpperCase().trim() === asignadoActual.toUpperCase().trim()) ? 'selected' : '';
-                selectHtml += `<option value="${user}" ${isSelected}>${user}</option>`;
-            });
-            selectHtml += `</select>`;
-
-            let btnHtml = `
-                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="event.stopPropagation(); manejarAccionFila('${idDoc}')">
-                    <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
-                    <span class="lbl-text">${btnText}</span>
-                </button>
-            `;
-
-            const isSelectedClass = incidenciaSeleccionadaId === idDoc ? 'row-selected' : '';
-            const tr = document.createElement('tr');
-            tr.className = isSelectedClass;
-            tr.setAttribute('onclick', `seleccionarFila(this, '${idDoc}')`);
-            tr.style.cursor = 'pointer';
-
-            // TABLA REDUCIDA A 7 COLUMNAS
-            tr.innerHTML = `
-                <td><span class="incidencia-bold">${codigoIncidencia}</span></td>
-                <td>${fechaRec}</td>
-                <td style="text-align: left;">${tienda}</td>
-                <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
-                <td>${estatusHtml}</td>
-                <td>
-                    ${selectHtml}
-                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
-                </td>
-                <td>${btnHtml}</td>
-            `;
-            tbody.appendChild(tr);
-        });
         
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
-    }
-
-    async function manejarAccionFila(idDoc) {
-        const btn = document.getElementById(`btn-action-${idDoc}`);
-        const select = document.getElementById(`select-${idDoc}`);
-        if (!btn || !select) return;
-
-        const textSpan = btn.querySelector('.lbl-text');
-        const modoActual = textSpan.innerText.trim();
-
-        if (modoActual.toLowerCase() === "editar") {
-            select.disabled = false;
-            textSpan.innerText = "Asignar";
-            btn.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
-            select.focus();
-        } else {
-            const usuarioAsignado = select.value;
-            await guardarAsignacionFirebase(idDoc, usuarioAsignado, select, btn);
-        }
-    }
-
-    async function guardarAsignacionFirebase(idDocumento, usuarioAsignado, selectElement, buttonElement) {
-        if (!idDocumento) return;
-        selectElement.disabled = true;
-        buttonElement.disabled = true;
-        const textSpan = buttonElement.querySelector('.lbl-text');
-        textSpan.innerText = "Guardando...";
-
-        try {
-            const nuevoEstado = usuarioAsignado ? "Asignado" : "Pendiente";
-            const updateData = {
-                usuario_asignado: usuarioAsignado,
-                usuario_assigned: usuarioAsignado,
-                fecha_asignacion: new Date().toISOString(),
-                estado_asignacion: nuevoEstado
-            };
-
-            const estAsignacion = incidenciasGlobales.find(i => i.id_documento === idDocumento)?.estado_asignacion || "";
-            if (estAsignacion === "Rechazado Trabajador") {
-                updateData.motivo_rechazo_trabajador = firebase.firestore.FieldValue.delete();
-                updateData.fecha_rechazo_trabajador = firebase.firestore.FieldValue.delete();
-            }
-
-            await db.collection("incidencias").doc(idDocumento).update(updateData);
-
-            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDocumento);
-            if (index !== -1) {
-                incidenciasGlobales[index].usuario_asignado = usuarioAsignado;
-                incidenciasGlobales[index].usuario_assigned = usuarioAsignado;
-                incidenciasGlobales[index].estado_asignacion = nuevoEstado;
-                incidenciasGlobales[index].fecha_asignacion = new Date().toISOString();
-                if (estAsignacion === "Rechazado Trabajador") {
-                    incidenciasGlobales[index].motivo_rechazo_trabajador = "";
-                    incidenciasGlobales[index].fecha_rechazo_trabajador = "";
-                }
-            }
-
-            actualizarBadges();
-            selectElement.disabled = true;
-            buttonElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
-
-            if (usuarioAsignado) {
-                showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada a: ${usuarioAsignado}.`, true);
-            } else {
-                showCustomAlert("Actualizado", "Se ha removido la asignación.", true);
-            }
-            
-            incidenciaSeleccionadaId = null;
-            gestionarBotonFlotante();
-            ejecutarFiltradoLogico();
-
-        } catch (error) {
-            console.error("Error al actualizar:", error);
-            showCustomAlert("Error de Asignación", "No se pudo guardar en Firebase.", false);
-            selectElement.disabled = false;
-            buttonElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
-        } finally {
-            buttonElement.disabled = false;
-        }
-    }
-
-    function abrirModalAgregar() {
-        document.getElementById('add-incidencia').value = '';
-        document.getElementById('add-fecha').value = toDatetimeLocal(new Date());
-        document.getElementById('add-tienda').value = '';
-        document.getElementById('add-codigo').value = '';
-        document.getElementById('add-instalacion').value = '';
-        document.getElementById('add-tipo').value = 'Anomalía';
-        document.getElementById('add-fallo').value = '';
-        document.getElementById('add-obs').value = '';
-        document.getElementById('modalAgregar').classList.add('active');
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
-    }
-    function cerrarModalAgregar() { document.getElementById('modalAgregar').classList.remove('active'); }
-
-    async function guardarNuevaIncidencia() {
-        const incidencia = document.getElementById('add-incidencia').value.trim();
-        const fechaVal = document.getElementById('add-fecha').value;
-        const tienda = document.getElementById('add-tienda').value.trim();
-        const codigo = document.getElementById('add-codigo').value.trim();
-        const instalacion = document.getElementById('add-instalacion').value.trim();
-        const tipo = document.getElementById('add-tipo').value.trim();
-        const fallo = document.getElementById('add-fallo').value.trim();
-        const obs = document.getElementById('add-obs').value.trim();
-
-        if(!incidencia || !tienda) {
-            showCustomAlert("Atención", "Incidencia y Tienda son obligatorias.", false);
-            return;
-        }
-
-        const btn = document.getElementById('btn-guardar-add');
-        btn.disabled = true;
-        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:16px;"></i> Guardando...';
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
-
-        try {
-            const newDoc = {
-                incidencia: incidencia,
-                fechaRecepcion: fechaVal ? new Date(fechaVal) : new Date(),
-                restaurante_nombre: tienda,
-                tienda: tienda,
-                usuario: tienda,
-                codigoEquipo: codigo,
-                instalacion: instalacion,
-                tipo: tipo,
-                origen: "Manual",
-                fallos: fallo,
-                observaciones: obs,
-                estado_asignacion: "Pendiente",
-                usuario_asignado: "",
-                usuario_assigned: ""
-            };
-            await db.collection("incidencias").add(newDoc);
-            showCustomAlert("Éxito", "Incidencia agregada correctamente.", true);
-            cerrarModalAgregar();
-            cargarIncidenciasFirebase(false); 
-        } catch (error) {
-            console.error("Error al agregar:", error);
-            showCustomAlert("Error", "No se pudo guardar la incidencia.", false);
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="save" style="width:16px;"></i> Guardar';
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
-        }
-    }
-
-    function abrirModalEdicion() {
-        if(!incidenciaSeleccionadaId) return;
-        const inc = incidenciasGlobales.find(i => i.id_documento === incidenciaSeleccionadaId);
-        if(!inc) return;
-
-        document.getElementById('edit-id-doc').value = inc.id_documento;
-        document.getElementById('edit-incidencia').value = inc.incidencia || "";
-        document.getElementById('edit-fecha').value = toDatetimeLocal(inc.fechaRecepcion);
-        document.getElementById('edit-tienda').value = inc.restaurante_nombre || inc.tienda || inc.usuario || "";
-        document.getElementById('edit-codigo').value = inc.codigoEquipo || "";
-        document.getElementById('edit-instalacion').value = inc.instalacion || "";
-        document.getElementById('edit-tipo').value = inc.tipo || "";
-        document.getElementById('edit-fallo').value = inc.fallos || "";
-        document.getElementById('edit-obs').value = inc.observaciones || "";
-        
-        document.getElementById('modalEditar').classList.add('active');
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
-    }
-    function cerrarModalEdicion() { document.getElementById('modalEditar').classList.remove('active'); }
-
-    async function guardarEdicionIncidencia() {
-        const idDoc = document.getElementById('edit-id-doc').value;
-        const incidencia = document.getElementById('edit-incidencia').value.trim();
-        const fechaVal = document.getElementById('edit-fecha').value;
-        const tienda = document.getElementById('edit-tienda').value.trim();
-        const codigo = document.getElementById('edit-codigo').value.trim();
-        const instalacion = document.getElementById('edit-instalacion').value.trim();
-        const tipo = document.getElementById('edit-tipo').value.trim();
-        const fallo = document.getElementById('edit-fallo').value.trim();
-        const obs = document.getElementById('edit-obs').value.trim();
-
-        if(!incidencia || !tienda) {
-            showCustomAlert("Atención", "Incidencia y Tienda son obligatorias.", false);
-            return;
-        }
-
-        const btn = document.getElementById('btn-guardar-edit');
-        btn.disabled = true;
-        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:16px;"></i> Actualizando...';
-        try { if(window.lucide) lucide.createIcons(); } catch(e){}
-
-        try {
-            const updateData = {
-                incidencia: incidencia,
-                fechaRecepcion: fechaVal ? new Date(fechaVal) : new Date(),
-                restaurante_nombre: tienda,
-                tienda: tienda,
-                usuario: tienda,
-                codigoEquipo: codigo,
-                instalacion: instalacion,
-                tipo: tipo,
-                fallos: fallo,
-                observaciones: obs
-            };
-
-            await db.collection("incidencias").doc(idDoc).update(updateData);
-
-            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
-            if (index !== -1) {
-                incidenciasGlobales[index] = { ...incidenciasGlobales[index], ...updateData };
-            }
-
-            showCustomAlert("Éxito", "Incidencia actualizada correctamente.", true);
-            cerrarModalEdicion();
-            
-            incidenciaSeleccionadaId = null;
-            gestionarBotonFlotante();
-            ejecutarFiltradoLogico();
-
-        } catch (error) {
-            console.error("Error al actualizar:", error);
-            showCustomAlert("Error", "No se pudo actualizar la incidencia.", false);
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="save" style="width:16px;"></i> Actualizar';
-            try { if(window.lucide) lucide.createIcons(); } catch(e){}
-        }
-    }
-
-    function filtrarIncidencias() {
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
+        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase();
+        const fEstado = document.getElementById('filtro-estado').value;
 
-        if ((fInicio || fFin) && !historialCompletoCargado) {
-            cargarIncidenciasFirebase(true); 
-            return;
-        }
-        ejecutarFiltradoLogico();
-    }
+        let filtrados = facturasGlobales.filter(t => {
+            if(fEstado !== 'todos' && t._estado_factura !== fEstado) return false;
 
-    function ejecutarFiltradoLogico() {
-        const fInicio = document.getElementById('filtro-inicio').value;
-        const fFin = document.getElementById('filtro-fin').value;
-        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
+            const fDoc = t.fecha_aprobacion_costos ? t.fecha_aprobacion_costos.split('T')[0] : "";
+            if(fInicio && fDoc < fInicio) return false;
+            if(fFin && fDoc > fFin) return false;
 
-        let filtrados = incidenciasGlobales.filter(inc => {
-            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
-            const estAsignacion = inc.estado_asignacion || "";
-
-            if (tabActual === 'pendientes') {
-                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador" || asignado !== "") return false;
-            } else if (tabActual === 'enviados') {
-                if (asignado === "" || estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") return false;
-            } else if (tabActual === 'rechazados') {
-                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados" && estAsignacion !== "Rechazado Trabajador") return false;
-            }
-
-            if (fBuscar) {
-                const incidenciaCod = (inc.incidencia || "").toLowerCase();
-                const nombreTienda = (inc.restaurante_nombre || inc.tienda || inc.usuario || "").toLowerCase();
-                const trabajador = asignado.toLowerCase();
-                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
-                    return false;
-                }
-            }
-
-            if (fInicio || fFin) {
-                const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
-                if (fInicio) {
-                    const dateInicioObj = new Date(fInicio + "T00:00:00");
-                    if (fechaDocObj < dateInicioObj) return false;
-                }
-                if (fFin) {
-                    const dateFinObj = new Date(fFin + "T23:59:59");
-                    if (fechaDocObj > dateFinObj) return false;
-                }
+            if(fBuscar) {
+                const folio = (t.id_ticket || "").toLowerCase();
+                const suc = (t.sucursal || "").toLowerCase();
+                if(!folio.includes(fBuscar) && !suc.includes(fBuscar)) return false;
             }
             return true;
         });
 
-        renderizarTabla(filtrados);
+        if(filtrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="24" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay folios que coincidan con la búsqueda.</span></div></td></tr>`;
+            lucide.createIcons();
+            limpiarSeleccion();
+            return;
+        }
+
+        filtrados.forEach(t => {
+            const folio = t.id_ticket;
+            const suc = t.sucursal || "N/A";
+            const fechaOrden = t.fecha_creacion ? new Date(t.fecha_creacion).toLocaleDateString('es-MX') : "—";
+            const fechaEnvio = t.fecha_aprobacion_costos ? new Date(t.fecha_aprobacion_costos).toLocaleDateString('es-MX') : "—";
+            
+            const totalVal = parseFloat(t.costo_total_aprobado) || 0;
+            const totalTxt = formateaMoneda(totalVal);
+            
+            const btnVerOrden = `<button class="btn-download-primary" style="min-width: 105px; white-space: nowrap;" onclick="verPDFOrden('${folio}')" title="Ver Orden Original"><i data-lucide="search" style="width:12px; height:12px;"></i> Ver Orden</button>`;
+
+            const btnPdf = t.url_factura_pdf 
+                ? `<button class="btn-download-primary" onclick="window.open('${t.url_factura_pdf}', '_blank')"><i data-lucide="file-text" style="width:12px;"></i> PDF</button>` 
+                : `<button class="btn-download-disabled" disabled><i data-lucide="minus" style="width:12px;"></i> PDF</button>`;
+            
+            const btnXml = t.url_factura_xml 
+                ? `<button class="btn-download-primary" onclick="window.open('${t.url_factura_xml}', '_blank')"><i data-lucide="file-code" style="width:12px;"></i> XML</button>` 
+                : `<button class="btn-download-disabled" disabled><i data-lucide="minus" style="width:12px;"></i> XML</button>`;
+
+            const numFact = t.factura_numero || "—";
+            const fechaFact = t.factura_fecha ? new Date(t.factura_fecha).toLocaleDateString('es-MX') : "—";
+            const semFact = t.factura_semana || "—";
+            const impFact = t.factura_importe ? formateaMoneda(t.factura_importe) : "—";
+            const fechaTentativa = t.factura_fecha_tentativa ? new Date(t.factura_fecha_tentativa).toLocaleDateString('es-MX') : "—";
+
+            const btnEliminar = `<button class="btn-delete-red" onclick="eliminarFactura('${folio}')" title="Borrar factura y reiniciar"><i data-lucide="trash-2" style="width:14px; color:white;"></i> Factura</button>`;
+
+            let estadoHtml = "";
+            if (t._estado_factura === 'Pendiente') {
+                estadoHtml = `<span class="status-badge bg-yellow"><i class="status-dot dot-yellow"></i> Pendiente</span>`;
+            } else if (t._estado_factura === 'Por pagar') {
+                estadoHtml = `<span class="status-badge bg-blue"><i class="status-dot dot-blue"></i> Por pagar</span>`;
+            } else if (t._estado_factura === 'Pagado') {
+                estadoHtml = `<span class="status-badge bg-green"><i class="status-dot dot-green"></i> Pagado</span>`;
+            }
+
+            const saasVal = t.saas_codigo || '';
+            const inSaas = `<input type="text" value="${saasVal}" maxlength="6" class="table-input-auto" 
+                                placeholder="6 dig." onblur="guardarSAASAutonomo('${folio}', this.value)" 
+                                ${t._estado_factura === 'Pendiente' ? 'disabled' : ''}>`;
+            
+            const fechaSaas = t.saas_fecha ? new Date(t.saas_fecha).toLocaleDateString('es-MX') : "—";
+            const semSaas = t.saas_semana || "—";
+
+            const isPagado = (t._estado_factura === 'Pagado');
+            const canPay = (t._estado_factura === 'Por pagar' || isPagado);
+            const chkPago = `<input type="checkbox" class="chk-custom" onchange="marcarComoPagado('${folio}', this.checked)" ${isPagado ? 'checked' : ''} ${!canPay ? 'disabled title="Sube la factura XML primero"' : ''}>`;
+            const fechaPago = t.fecha_pago ? new Date(t.fecha_pago).toLocaleDateString('es-MX') : "—";
+
+            const selIndicativo = generateTableSelect(folio, 'indicativo_gasto', optionsIndicativo, t.indicativo_gasto);
+            const selCapexOpex = generateTableSelect(folio, 'calificacion_capex_opex', optionsCapexOpex, t.calificacion_capex_opex);
+            const selTipificacion = generateTableSelect(folio, 'tipificacion_gasto', optionsTipificacion, t.tipificacion_gasto);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="checkbox" class="chk-custom chk-row-upload" value="${folio}" data-total="${totalVal}" onchange="actualizarBarraFlotante()"></td>
+                <td><strong>${folio}</strong></td>
+                <td>${suc}</td>
+                <td>${fechaOrden}</td>
+                <td>${fechaEnvio}</td>
+                <td style="text-align: right; font-weight: 600; color: #81D0DC;">${totalTxt}</td>
+                <td>${btnVerOrden}</td>
+                
+                <td>${btnPdf}</td>
+                <td>${btnXml}</td>
+                <td>${numFact}</td>
+                <td>${fechaFact}</td>
+                <td>${semFact}</td>
+                <td style="text-align: right; font-weight: 600;">${impFact}</td>
+                
+                <td>${estadoHtml}</td>
+                <td>${btnEliminar}</td>
+                <td style="color: #ea580c; font-weight: 600;">${fechaTentativa}</td>
+                
+                <td>${inSaas}</td>
+                <td>${fechaSaas}</td>
+                <td>${semSaas}</td>
+                <td>${chkPago}</td>
+                <td>${fechaPago}</td>
+                <td>${selIndicativo}</td> 
+                <td>${selCapexOpex}</td> 
+                <td>${selTipificacion}</td> 
+            `;
+            tbody.appendChild(tr);
+        });
+        lucide.createIcons();
     }
 
-    function limpiarFiltros() {
-        document.getElementById('filtro-inicio').value = '';
-        document.getElementById('filtro-fin').value = '';
-        document.getElementById('filtro-buscar').value = '';
-        cargarIncidenciasFirebase(false); 
+    function actualizarBarraFlotante() {
+        const checkboxes = document.querySelectorAll('.chk-row-upload:checked');
+        let count = 0; let sum = 0;
+        
+        checkboxes.forEach(cb => {
+            count++;
+            sum += parseFloat(cb.getAttribute('data-total')) || 0;
+        });
+
+        document.getElementById('lbl-sel-count').innerText = `${count} folio${count !== 1 ? 's' : ''}`;
+        document.getElementById('lbl-sel-sum').innerText = formateaMoneda(sum);
+
+        const bar = document.getElementById('upload-bar');
+        if (count > 0) bar.classList.add('show');
+        else bar.classList.remove('show');
+    }
+
+    function limpiarSeleccion() {
+        document.querySelectorAll('.chk-row-upload').forEach(cb => cb.checked = false);
+        actualizarBarraFlotante();
+        document.getElementById('file-pdf').value = "";
+        document.getElementById('file-xml').value = "";
+    }
+
+    function triggerUpload(tipo) {
+        if(tipo === 'pdf') document.getElementById('file-pdf').click();
+        if(tipo === 'xml') document.getElementById('file-xml').click();
+    }
+
+    async function handleUpload(event, tipo) {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        const checkboxes = document.querySelectorAll('.chk-row-upload:checked');
+        if(checkboxes.length === 0) return;
+
+        const selectedFolios = Array.from(checkboxes).map(cb => cb.value);
+        const sumSelected = parseFloat(document.getElementById('lbl-sel-sum').innerText.replace(/[^0-9.-]+/g,""));
+
+        let updateData = {};
+
+        if (tipo === 'xml') {
+            try {
+                const text = await file.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                const comprobante = xmlDoc.getElementsByTagName("cfdi:Comprobante")[0] || xmlDoc.getElementsByTagName("Comprobante")[0];
+
+                if (!comprobante) {
+                    showCustomAlert("Error", "El archivo XML no es un formato CFDI válido.", false);
+                    document.getElementById('file-xml').value = "";
+                    return;
+                }
+
+                const totalXML = parseFloat(comprobante.getAttribute("Total") || comprobante.getAttribute("total") || 0);
+                const fechaXMLStr = comprobante.getAttribute("Fecha") || comprobante.getAttribute("fecha") || "";
+                const fechaXML = fechaXMLStr.split('T')[0];
+                const folioXML = comprobante.getAttribute("Folio") || comprobante.getAttribute("folio") || "";
+                const serieXML = comprobante.getAttribute("Serie") || comprobante.getAttribute("serie") || "";
+                const numFactura = (serieXML + folioXML) || "S/N";
+
+                if (Math.abs(totalXML - sumSelected) > 1) {
+                    showCustomAlert("Total Incorrecto", `El total del XML (${formateaMoneda(totalXML)}) no coincide con las órdenes seleccionadas (${formateaMoneda(sumSelected)}). La carga ha sido bloqueada.`, false);
+                    document.getElementById('file-xml').value = "";
+                    return;
+                }
+
+                updateData.factura_numero = numFactura;
+                updateData.factura_fecha = fechaXML;
+                updateData.factura_semana = getWeekNumber(fechaXML);
+                updateData.factura_importe = totalXML;
+                updateData.factura_fecha_tentativa = add90Days(fechaXML);
+                updateData.estado_pago = "Por Pagar"; 
+
+            } catch (err) {
+                console.error(err);
+                showCustomAlert("Error", "Ocurrió un error al leer el archivo XML. Asegúrate de que sea un CFDI válido.", false);
+                document.getElementById('file-xml').value = "";
+                return;
+            }
+        }
+
+        const alertBtn = document.getElementById('alert-btn');
+        alertBtn.style.display = 'none'; 
+        showCustomAlert("Procesando", `Subiendo y validando ${tipo.toUpperCase()}...`, true);
+
+        try {
+            const ext = file.name.split('.').pop();
+            const filePath = `facturas/${Date.now()}_bloque.${ext}`;
+            const ref = storage.ref(filePath);
+            
+            const snapshot = await ref.put(file);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+
+            if (tipo === 'pdf') updateData.url_factura_pdf = downloadURL;
+            if (tipo === 'xml') updateData.url_factura_xml = downloadURL;
+
+            const batch = db.batch();
+            selectedFolios.forEach(folio => {
+                const docRef = db.collection('tickets_mantenimiento').doc(folio);
+                batch.update(docRef, updateData);
+            });
+
+            await batch.commit();
+
+            alertBtn.style.display = 'block'; 
+            showCustomAlert("¡Éxito!", `Archivo ${tipo.toUpperCase()} vinculado correctamente.`, true);
+            
+            limpiarSeleccion();
+            cargarDatosFacturacion(); 
+
+        } catch (error) {
+            console.error("Error al subir:", error);
+            alertBtn.style.display = 'block'; 
+            showCustomAlert("Error", "No se pudo subir el archivo. Revisa tu conexión.", false);
+        }
+    }
+
+    async function guardarSAASAutonomo(folio, val) {
+        val = val.trim();
+        if(!val) return; 
+
+        if(val.length !== 6 || isNaN(val)) {
+            showCustomAlert("Atención", "El código SAAS debe ser exactamente de 6 dígitos numéricos.", false);
+            cargarDatosFacturacion(); 
+            return;
+        }
+
+        const ticket = facturasGlobales.find(t => t.id_ticket === folio);
+        if(ticket && ticket.saas_codigo === val) return; 
+
+        try {
+            const hoy = new Date().toISOString().split('T')[0];
+            const sem = getWeekNumber(hoy);
+
+            await db.collection("tickets_mantenimiento").doc(folio).update({
+                saas_codigo: val,
+                saas_fecha: hoy,
+                saas_semana: sem
+            });
+            
+            cargarDatosFacturacion(); 
+        } catch (e) {
+            console.error(e);
+            showCustomAlert("Error", "No se pudo autoguardar el SAAS.", false);
+            cargarDatosFacturacion();
+        }
+    }
+
+    async function guardarAutofield(folio, field, value) {
+        try {
+            let updateData = {};
+            updateData[field] = value;
+            await db.collection("tickets_mantenimiento").doc(folio).update(updateData);
+        } catch (e) {
+            console.error(e);
+            showCustomAlert("Error", "No se pudo guardar la selección.", false);
+        }
+    }
+
+    async function marcarComoPagado(folio, isChecked) {
+        const nuevoEstado = isChecked ? 'Pagado' : 'Por Pagar'; 
+        const fechaPago = isChecked ? new Date().toISOString() : null;
+
+        try {
+            await db.collection("tickets_mantenimiento").doc(folio).update({
+                estado_pago: nuevoEstado,
+                fecha_pago: fechaPago
+            });
+            cargarDatosFacturacion(); 
+        } catch (error) {
+            console.error("Error actualizando pago:", error);
+            showCustomAlert("Error", "No se pudo actualizar el estado de pago.", false);
+            cargarDatosFacturacion(); 
+        }
+    }
+
+    async function eliminarFactura(folio) {
+        if(!confirm(`¿Estás completamente seguro de borrar la factura del folio ${folio}?\nSe eliminarán archivos PDF, XML, datos de factura, SAAS y el estatus volverá a 'Pendiente'.`)) return;
+
+        try {
+            await db.collection("tickets_mantenimiento").doc(folio).update({
+                url_factura_pdf: firebase.firestore.FieldValue.delete(),
+                url_factura_xml: firebase.firestore.FieldValue.delete(),
+                factura_numero: firebase.firestore.FieldValue.delete(),
+                factura_fecha: firebase.firestore.FieldValue.delete(),
+                factura_semana: firebase.firestore.FieldValue.delete(),
+                factura_importe: firebase.firestore.FieldValue.delete(),
+                factura_fecha_tentativa: firebase.firestore.FieldValue.delete(),
+                saas_codigo: firebase.firestore.FieldValue.delete(),
+                saas_fecha: firebase.firestore.FieldValue.delete(),
+                saas_semana: firebase.firestore.FieldValue.delete(),
+                estado_pago: firebase.firestore.FieldValue.delete(), 
+                fecha_pago: firebase.firestore.FieldValue.delete()
+            });
+
+            showCustomAlert("Eliminado", "La factura ha sido borrada exitosamente y la orden regresó a 'Pendiente'.", true);
+            cargarDatosFacturacion();
+        } catch (error) {
+            console.error(error);
+            showCustomAlert("Error", "Ocurrió un error al intentar eliminar la factura.", false);
+        }
+    }
+
+    function abrirModalDescarga() {
+        const selectSemana = document.getElementById('descarga-semana');
+        const selectProv = document.getElementById('descarga-prov');
+        
+        selectSemana.innerHTML = '';
+        
+        const hoy = new Date();
+        const currentYear = hoy.getFullYear();
+        const currentWeek = getWeekNumber(hoy.toISOString());
+        
+        const currentRange = getWeekDateRange(currentYear, currentWeek);
+        selectSemana.innerHTML += `<option value="${currentWeek}">Semana ${currentWeek} (${currentRange}) - Actual</option>`;
+        
+        for(let i=1; i<=52; i++) {
+            if(i !== currentWeek) {
+                let range = getWeekDateRange(currentYear, i);
+                selectSemana.innerHTML += `<option value="${i}">Semana ${i} (${range})</option>`;
+            }
+        }
+
+        selectProv.innerHTML = '<option value="todos">Todos los proveedores</option>';
+        document.getElementById('modalDescargaFacturas').classList.add('active');
+        
+        actualizarProveedoresDescarga(currentWeek);
+        lucide.createIcons();
+    }
+
+    function cerrarModalDescarga() {
+        document.getElementById('modalDescargaFacturas').classList.remove('active');
+    }
+
+    function actualizarProveedoresDescarga(semanaSeleccionada) {
+        const selectProv = document.getElementById('descarga-prov');
+        selectProv.innerHTML = '<option value="todos">Todos los proveedores</option>';
+        
+        if(!semanaSeleccionada) return;
+
+        const facturasSemana = facturasGlobales.filter(t => t.factura_semana == semanaSeleccionada && (t.url_factura_pdf || t.url_factura_xml));
+        const provsUnicos = [...new Set(facturasSemana.map(t => t.proveedor || t.prov_nombre || 'Sin Proveedor'))].sort();
+
+        provsUnicos.forEach(p => {
+            selectProv.innerHTML += `<option value="${p}">${p}</option>`;
+        });
+    }
+
+    async function descargarZip() {
+        const semana = document.getElementById('descarga-semana').value;
+        const proveedorSel = document.getElementById('descarga-prov').value;
+
+        if(!semana) {
+            showCustomAlert("Atención", "Por favor, selecciona una semana para descargar.", false);
+            return;
+        }
+
+        const facturasDescargar = facturasGlobales.filter(t => {
+            if (t.factura_semana != semana) return false;
+            if (proveedorSel !== 'todos' && (t.proveedor || t.prov_nombre || 'Sin Proveedor') !== proveedorSel) return false;
+            if (!t.url_factura_pdf && !t.url_factura_xml) return false;
+            return true;
+        });
+
+        if(facturasDescargar.length === 0) {
+            showCustomAlert("Aviso", "No hay facturas cargadas para la semana y proveedor indicados.", false);
+            return;
+        }
+
+        const btn = document.getElementById('btn-ejecutar-descarga');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:16px;"></i> Generando ZIP...';
+        lucide.createIcons();
+
+        try {
+            const zip = new JSZip();
+            const carpetaPrincipal = zip.folder(`SEMANA ${semana}`);
+
+            for(let f of facturasDescargar) {
+                const nombreProv = f.proveedor || f.prov_nombre || "Sin Proveedor";
+                const numFact = f.factura_numero || f.id_ticket; 
+                
+                const carpetaProv = carpetaPrincipal.folder(nombreProv);
+                const carpetaFact = carpetaProv.folder(numFact);
+
+                const fetchArchivo = async (url) => {
+                    const res = await fetch(url);
+                    return await res.blob();
+                };
+
+                if (f.url_factura_pdf) {
+                    try {
+                        const blobPdf = await fetchArchivo(f.url_factura_pdf);
+                        carpetaFact.file(`${numFact}.pdf`, blobPdf);
+                    } catch(e) { console.error(`No se pudo descargar PDF de ${numFact}`, e); }
+                }
+
+                if (f.url_factura_xml) {
+                    try {
+                        const blobXml = await fetchArchivo(f.url_factura_xml);
+                        carpetaFact.file(`${numFact}.xml`, blobXml);
+                    } catch(e) { console.error(`No se pudo descargar XML de ${numFact}`, e); }
+                }
+            }
+
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            saveAs(zipContent, `Facturas_Semana_${semana}.zip`);
+            
+            cerrarModalDescarga();
+            showCustomAlert("¡Descarga completada!", "El archivo ZIP se ha generado y descargado correctamente.", true);
+
+        } catch (error) {
+            console.error("Error al generar ZIP:", error);
+            showCustomAlert("Error", "Ocurrió un error al generar el archivo. Verifica los permisos de red.", false);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="download" style="width:16px;"></i> Descargar';
+            lucide.createIcons();
+        }
     }
 </script>
 </body>
-</html>
+</html> 
