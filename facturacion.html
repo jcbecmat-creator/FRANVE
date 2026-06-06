@@ -39,13 +39,11 @@
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 120px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
         
-        /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
         
-        /* === CORRECCIÓN DEL MENÚ ACTIVO === */
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
         
@@ -54,13 +52,11 @@
 
         .facturacion-wrap { max-width: 100%; margin: 0 auto; padding: 24px; }
 
-        /* === MÉTRICAS SUPERIORES === */
         .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
         .metric-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: center; }
         .metric-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px;}
         .metric-value { font-size: 18px; font-weight: 800; color: #111827; }
 
-        /* === FILTROS === */
         .filters-bar { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
         .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 140px; flex: 1; }
         .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; }
@@ -69,31 +65,14 @@
         .filter-actions { display: flex; gap: 12px; }
         .btn-secondary { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         
-        /* === TABLA === */
         .data-table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
-        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 2500px; }
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
         .data-table thead th { background: #f8fafc; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; padding: 16px 12px; text-align: center; border-bottom: 1px solid #E5E7EB; white-space: nowrap;}
         .data-table tbody td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; font-size: 12px; color: #111827; vertical-align: middle; text-align: center; background: white; }
         .data-table tbody tr:hover td { background: #f1f5f9; } 
         
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
-        /* === CONGELAMIENTO DE LAS PRIMERAS 7 COLUMNAS === */
-        @media (min-width: 1024px) {
-            .data-table th:nth-child(1), .data-table td:nth-child(1) { position: sticky; left: 0px;   min-width: 40px; max-width: 40px; z-index: 5; }
-            .data-table th:nth-child(2), .data-table td:nth-child(2) { position: sticky; left: 40px;  min-width: 120px; max-width: 120px; z-index: 5; }
-            .data-table th:nth-child(3), .data-table td:nth-child(3) { position: sticky; left: 160px; min-width: 150px; max-width: 150px; z-index: 5; }
-            .data-table th:nth-child(4), .data-table td:nth-child(4) { position: sticky; left: 310px; min-width: 110px; max-width: 110px; z-index: 5; }
-            .data-table th:nth-child(5), .data-table td:nth-child(5) { position: sticky; left: 420px; min-width: 110px; max-width: 110px; z-index: 5; }
-            .data-table th:nth-child(6), .data-table td:nth-child(6) { position: sticky; left: 530px; min-width: 100px; max-width: 100px; z-index: 5; }
-            .data-table th:nth-child(7), .data-table td:nth-child(7) { position: sticky; left: 630px; min-width: 120px; max-width: 120px; z-index: 5; border-right: 2px solid #cbd5e1; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.05); }
-            
-            .data-table th:nth-child(-n+7) { z-index: 10 !important; background: #f8fafc; }
-            .data-table td:nth-child(-n+7) { background: white; }
-            .data-table tbody tr:hover td:nth-child(-n+7) { background: #f1f5f9; }
-        }
-
-        /* Componentes de la tabla */
         .chk-custom { width: 18px; height: 18px; cursor: pointer; accent-color: #81D0DC; }
         
         .btn-download-primary { height: 28px; background: #81D0DC; color: #131520; border: none; padding: 0 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: opacity 0.2s; }
@@ -110,22 +89,6 @@
         .bg-blue { background: #dbeafe; color: #1e40af; } .dot-blue { background-color: #2563eb; }
         .bg-green { background: #dcfce7; color: #166534; } .dot-green { background-color: #16a34a; }
 
-        .table-input-auto { 
-            width: 80px; text-align: center; height: 30px; font-size: 12px; 
-            border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb;
-            transition: all 0.2s;
-        }
-        .table-input-auto:focus { background: white; outline: none; border-color: #81D0DC; box-shadow: 0 0 0 1px #81D0DC; }
-        .table-input-auto:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .table-select {
-            height: 30px; font-size: 12px; padding: 0 8px;
-            border: 1px solid #d1d5db; border-radius: 6px; background: #f9fafb;
-            width: 100%; min-width: 150px;
-        }
-        .table-select:focus { background: white; outline: none; border-color: #81D0DC; }
-
-        /* === BARRA FLOTANTE DE SUBIDA === */
         .upload-bottom-bar { 
             position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); 
             background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 0 1px #e5e7eb; 
@@ -141,29 +104,13 @@
         .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s;}
         .btn-adjuntar:hover { opacity: 0.85; }
 
-        /* === BOTÓN FLOTANTE DESCARGA === */
         .fab-download {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #81D0DC;
-            color: #131520;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 24px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 100;
-            transition: all 0.3s;
+            position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none;
+            border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: flex; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s;
         }
         .fab-download:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
 
-        /* === MODALES === */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
         
@@ -336,23 +283,12 @@
                                     <th>FECHA FACTURA</th>
                                     <th>SEM. FAC.</th>
                                     <th style="text-align: right;">IMPORTE FACTURA</th>
-                                    
                                     <th>ESTATUS</th> 
                                     <th>ACCIÓN</th>
-                                    <th>PAGO TENTATIVO</th>
-                                    
-                                    <th>CÓDIGO SAAS</th>
-                                    <th>FECHA SAAS</th>
-                                    <th>SEM. SAAS</th>
-                                    <th title="Marcar como pagado">PAGADO (CHK)</th>
-                                    <th>FECHA PAGO</th>
-                                    <th>INDICATIVO DE GASTO</th> 
-                                    <th>CALIFICACIÓN CAPEX / OPEX</th> 
-                                    <th>TIPIFICACIÓN DE GASTO</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-facturas-body">
-                                <tr><td colspan="24" class="co-table-empty">Cargando datos...</td></tr>
+                                <tr><td colspan="15" class="co-table-empty">Cargando datos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -429,7 +365,6 @@
     </div>
 
 <script>
-    // Inicialización de Firebase con los nuevos datos de FRANVE
     const firebaseConfig = {
         apiKey: "AIzaSyDUM2w0L-3GNm0unSgKHZCrrW9xKQY0_is",
         authDomain: "franve-1b62e.firebaseapp.com",
@@ -443,42 +378,6 @@
     const storage = firebase.storage();
 
     let facturasGlobales = [];
-
-    const optionsIndicativo = [
-        "Mtto de inmuebles correctivo naturaleza del equipo",
-        "Mtto de inmuebles correctivo deterioro del restaurante",
-        "Mtto de inmuebles correctivo mejoras al restaurante",
-        "Mtto de inmuebles preventivo institucional",
-        "Mtto de inmuebles correctivo causa operativa",
-        "Mtto de inmuebles preventivo electromecanico",
-        "Agua",
-        "Gestora",
-        "Mantenimiento y accesorios",
-        "Seguros y fianzas",
-        "Energia electrica",
-        "Herramientas",
-        "Gasolina edenred",
-        "Gasolina y lubricantes"
-    ];
-
-    const optionsCapexOpex = [
-        "Opex",
-        "Capex",
-        "Otros gastos",
-        "Pipas",
-        "Fosas",
-        "Pfp"
-    ];
-
-    const optionsTipificacion = [
-        "Pipas",
-        "Fosas",
-        "Desgaste natural",
-        "Vicios ocultos",
-        "Causa operativa",
-        "Siniestro",
-        "Mejoras"
-    ];
 
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) { lucide.createIcons(); }
@@ -591,7 +490,7 @@
           })
           .catch((error) => {
               console.error("Error: ", error);
-              document.getElementById('tabla-facturas-body').innerHTML = '<tr><td colspan="24" class="co-table-empty" style="color: red;">Error cargando datos.</td></tr>';
+              document.getElementById('tabla-facturas-body').innerHTML = '<tr><td colspan="15" class="co-table-empty" style="color: red;">Error cargando datos.</td></tr>';
           });
     }
 
@@ -616,52 +515,22 @@
         document.getElementById('met-total').innerText = `${cTot} - ${formateaMoneda(sumTot)}`;
     }
 
-    function generateTableSelect(folio, field, options, currentValue) {
-        let html = `<select class="table-select" onchange="guardarAutofield('${folio}', '${field}', this.value)">`;
-        html += `<option value="">— Seleccionar —</option>`;
-        options.forEach(opt => {
-            const selected = (opt === currentValue) ? 'selected' : '';
-            html += `<option value="${opt}" ${selected}>${opt}</option>`;
-        });
-        html += `</select>`;
-        return html;
-    }
-
     function verPDFOrden(folio) {
         const t = facturasGlobales.find(tk => tk.id_ticket === folio);
         if(!t) { showCustomAlert("Error", "Error al cargar datos de la orden.", false); return; }
 
         const datosParaPDF = {
-            sucursal: t.sucursal || '',
-            suc_dir: t.suc_dir || '',
-            suc_col: t.suc_col || '',
-            suc_city: t.suc_city || '',
-            suc_cp: t.suc_cp || '',
-            suc_hor: t.suc_hor || '',
-            suc_tel: t.suc_tel || '',
-            suc_mail: t.suc_mail || '',
-            ticket: t.id_ticket || 'S/N',
-            area: t.area || '',
-            subarea: t.subarea || '',
-            desc_falla: t.desc_falla || '',
-            fotos_falla: t.urls_falla || [null, null, null],
-            desc_solucion: t.desc_solucion || '',
-            fotos_solucion: t.urls_solucion || [null, null, null],
-            prov_nombre: t.prov_nombre || t.proveedor || '',
-            prov_rfc: t.prov_rfc || '',
-            prov_dir: t.prov_dir || '',
-            prov_cont: t.prov_cont || '',
-            prov_tel: t.prov_tel || '',
-            prov_mail: t.prov_mail || '',
-            tec_nombre: t.tec_nombre || '',
-            tec_celular: t.tec_celular || '',
-            comentario: t.comentario || '',
-            firma: t.url_firma || '',
-            foto_soporte: t.url_soporte || null,
-            foto_selfie: t.url_selfie || null,
-            fecha_hora: t.fecha_hora_completa 
-                ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
-                : (t.fecha_creacion || '')
+            sucursal: t.sucursal || '', suc_dir: t.suc_dir || '', suc_col: t.suc_col || '',
+            suc_city: t.suc_city || '', suc_cp: t.suc_cp || '', suc_hor: t.suc_hor || '',
+            suc_tel: t.suc_tel || '', suc_mail: t.suc_mail || '', ticket: t.id_ticket || 'S/N',
+            area: t.area || '', subarea: t.subarea || '', desc_falla: t.desc_falla || '',
+            fotos_falla: t.urls_falla || [null, null, null], desc_solucion: t.desc_solucion || '',
+            fotos_solucion: t.urls_solucion || [null, null, null], prov_nombre: t.prov_nombre || t.proveedor || '',
+            prov_rfc: t.prov_rfc || '', prov_dir: t.prov_dir || '', prov_cont: t.prov_cont || '',
+            prov_tel: t.prov_tel || '', prov_mail: t.prov_mail || '', tec_nombre: t.tec_nombre || '',
+            tec_celular: t.tec_celular || '', comentario: t.comentario || '', firma: t.url_firma || '',
+            foto_soporte: t.url_soporte || null, foto_selfie: t.url_selfie || null,
+            fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '')
         };
 
         sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF));
@@ -693,7 +562,7 @@
         });
 
         if(filtrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="24" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay folios que coincidan con la búsqueda.</span></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="15" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay folios que coincidan con la búsqueda.</span></div></td></tr>`;
             lucide.createIcons();
             limpiarSeleccion();
             return;
@@ -722,7 +591,6 @@
             const fechaFact = t.factura_fecha ? new Date(t.factura_fecha).toLocaleDateString('es-MX') : "—";
             const semFact = t.factura_semana || "—";
             const impFact = t.factura_importe ? formateaMoneda(t.factura_importe) : "—";
-            const fechaTentativa = t.factura_fecha_tentativa ? new Date(t.factura_fecha_tentativa).toLocaleDateString('es-MX') : "—";
 
             const btnEliminar = `<button class="btn-delete-red" onclick="eliminarFactura('${folio}')" title="Borrar factura y reiniciar"><i data-lucide="trash-2" style="width:14px; color:white;"></i> Factura</button>`;
 
@@ -735,22 +603,9 @@
                 estadoHtml = `<span class="status-badge bg-green"><i class="status-dot dot-green"></i> Pagado</span>`;
             }
 
-            const saasVal = t.saas_codigo || '';
-            const inSaas = `<input type="text" value="${saasVal}" maxlength="6" class="table-input-auto" 
-                                placeholder="6 dig." onblur="guardarSAASAutonomo('${folio}', this.value)" 
-                                ${t._estado_factura === 'Pendiente' ? 'disabled' : ''}>`;
-            
-            const fechaSaas = t.saas_fecha ? new Date(t.saas_fecha).toLocaleDateString('es-MX') : "—";
-            const semSaas = t.saas_semana || "—";
-
             const isPagado = (t._estado_factura === 'Pagado');
             const canPay = (t._estado_factura === 'Por pagar' || isPagado);
             const chkPago = `<input type="checkbox" class="chk-custom" onchange="marcarComoPagado('${folio}', this.checked)" ${isPagado ? 'checked' : ''} ${!canPay ? 'disabled title="Sube la factura XML primero"' : ''}>`;
-            const fechaPago = t.fecha_pago ? new Date(t.fecha_pago).toLocaleDateString('es-MX') : "—";
-
-            const selIndicativo = generateTableSelect(folio, 'indicativo_gasto', optionsIndicativo, t.indicativo_gasto);
-            const selCapexOpex = generateTableSelect(folio, 'calificacion_capex_opex', optionsCapexOpex, t.calificacion_capex_opex);
-            const selTipificacion = generateTableSelect(folio, 'tipificacion_gasto', optionsTipificacion, t.tipificacion_gasto);
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -770,17 +625,14 @@
                 <td style="text-align: right; font-weight: 600;">${impFact}</td>
                 
                 <td>${estadoHtml}</td>
-                <td>${btnEliminar}</td>
-                <td style="color: #ea580c; font-weight: 600;">${fechaTentativa}</td>
-                
-                <td>${inSaas}</td>
-                <td>${fechaSaas}</td>
-                <td>${semSaas}</td>
-                <td>${chkPago}</td>
-                <td>${fechaPago}</td>
-                <td>${selIndicativo}</td> 
-                <td>${selCapexOpex}</td> 
-                <td>${selTipificacion}</td> 
+                <td>
+                    <div style="display:flex; gap:8px; align-items:center; justify-content:center;">
+                        <label style="display:flex; align-items:center; gap:4px; cursor:pointer;" title="Marcar como pagado">
+                            ${chkPago} <span style="font-size:11px; color:#4b5563;">Pagado</span>
+                        </label>
+                        ${btnEliminar}
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -905,48 +757,6 @@
         }
     }
 
-    async function guardarSAASAutonomo(folio, val) {
-        val = val.trim();
-        if(!val) return; 
-
-        if(val.length !== 6 || isNaN(val)) {
-            showCustomAlert("Atención", "El código SAAS debe ser exactamente de 6 dígitos numéricos.", false);
-            cargarDatosFacturacion(); 
-            return;
-        }
-
-        const ticket = facturasGlobales.find(t => t.id_ticket === folio);
-        if(ticket && ticket.saas_codigo === val) return; 
-
-        try {
-            const hoy = new Date().toISOString().split('T')[0];
-            const sem = getWeekNumber(hoy);
-
-            await db.collection("tickets_mantenimiento").doc(folio).update({
-                saas_codigo: val,
-                saas_fecha: hoy,
-                saas_semana: sem
-            });
-            
-            cargarDatosFacturacion(); 
-        } catch (e) {
-            console.error(e);
-            showCustomAlert("Error", "No se pudo autoguardar el SAAS.", false);
-            cargarDatosFacturacion();
-        }
-    }
-
-    async function guardarAutofield(folio, field, value) {
-        try {
-            let updateData = {};
-            updateData[field] = value;
-            await db.collection("tickets_mantenimiento").doc(folio).update(updateData);
-        } catch (e) {
-            console.error(e);
-            showCustomAlert("Error", "No se pudo guardar la selección.", false);
-        }
-    }
-
     async function marcarComoPagado(folio, isChecked) {
         const nuevoEstado = isChecked ? 'Pagado' : 'Por Pagar'; 
         const fechaPago = isChecked ? new Date().toISOString() : null;
@@ -965,7 +775,7 @@
     }
 
     async function eliminarFactura(folio) {
-        if(!confirm(`¿Estás completamente seguro de borrar la factura del folio ${folio}?\nSe eliminarán archivos PDF, XML, datos de factura, SAAS y el estatus volverá a 'Pendiente'.`)) return;
+        if(!confirm(`¿Estás completamente seguro de borrar la factura del folio ${folio}?\nSe eliminarán archivos PDF, XML, datos de factura, SAAS, indicativos y el estatus volverá a 'Pendiente'.`)) return;
 
         try {
             await db.collection("tickets_mantenimiento").doc(folio).update({
@@ -980,7 +790,10 @@
                 saas_fecha: firebase.firestore.FieldValue.delete(),
                 saas_semana: firebase.firestore.FieldValue.delete(),
                 estado_pago: firebase.firestore.FieldValue.delete(), 
-                fecha_pago: firebase.firestore.FieldValue.delete()
+                fecha_pago: firebase.firestore.FieldValue.delete(),
+                indicativo_gasto: firebase.firestore.FieldValue.delete(),
+                calificacion_capex_opex: firebase.firestore.FieldValue.delete(),
+                tipificacion_gasto: firebase.firestore.FieldValue.delete()
             });
 
             showCustomAlert("Eliminado", "La factura ha sido borrada exitosamente y la orden regresó a 'Pendiente'.", true);
@@ -1110,4 +923,4 @@
     }
 </script>
 </body>
-</html> 
+</html>
