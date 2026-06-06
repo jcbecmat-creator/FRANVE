@@ -81,7 +81,6 @@
         .co-table tr:hover td { background-color: #F8FAFC; }
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
-        /* Fila seleccionada para edición */
         .co-table tr.row-selected td { background-color: #e0f2fe !important; } 
 
         .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
@@ -92,15 +91,12 @@
 
         .btn-action-trigger { height: 36px; background-color: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 400 !important; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; box-shadow: 0 2px 4px rgba(129, 208, 220, 0.15); min-width: 100px; text-transform: none !important; }
         .btn-action-trigger:hover { opacity: 0.85; }
-        .btn-action-trigger:disabled { background-color: #CBD5E1; color: #94A3B8; cursor: not-allowed; box-shadow: none; }
         .btn-action-trigger span { font-weight: 400 !important; text-transform: none !important; }
 
         .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
-        
         .rechazo-motivo-badge { display: block; margin-top: 4px; font-size: 10px; color: #DC2626; font-weight: 600; text-transform: none !important; background: #FEE2E2; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* MODALES Y FORMULARIOS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
         
@@ -122,7 +118,6 @@
         .btn-save-modal:hover { opacity: 0.85; }
         .btn-save-modal:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* BOTÓN FLOTANTE EDICIÓN */
         .fab-edit { position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700 !important; cursor: pointer; box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: none; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s; }
         .fab-edit:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
 
@@ -177,44 +172,24 @@
                 </button>
                 <div class="sidebar-content">
                     <nav class="sidebar-nav">
-                        <a class="sidebar-link" href="inicio.html">
-                            <i data-lucide="home"></i> Inicio
-                        </a>
+                        <a class="sidebar-link" href="inicio.html"><i data-lucide="home"></i> Inicio</a>
                         <div class="sidebar-section">
                             <div class="sidebar-section-title">Formas</div>
-                            <a class="sidebar-link" href="index.html">
-                                <i data-lucide="wrench"></i> Mantenimiento correctivo
-                            </a>
-                            <a class="sidebar-link activa" href="orden_de_servicio.html">
-                                <i data-lucide="calendar-check"></i> Órdenes de servicio
-                            </a>
-                            <a class="sidebar-link" href="misordenes.html">
-                                <i data-lucide="clipboard-check"></i> Mis Órdenes
-                            </a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
+                            <a class="sidebar-link activa" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Órdenes de servicio</a>
+                            <a class="sidebar-link" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-admin">
                             <div class="sidebar-section-title">Administración</div>
-                            <a class="sidebar-link" href="confirmacion.html">
-                                <i data-lucide="check-circle-2"></i> Confirmación operativa
-                            </a>
-                            <a class="sidebar-link" href="costos.html">
-                                <i data-lucide="calculator"></i> Costos de reparación
-                            </a>
-                            <a class="sidebar-link" href="aprobacion.html">
-                                <i data-lucide="badge-check"></i> Aprobación de costos
-                            </a>
-                            <a class="sidebar-link" href="aprobacion_gerencia.html">
-                                <i data-lucide="shield-check"></i> Aprobación gerencia
-                            </a>
-                            <a class="sidebar-link" href="facturacion.html">
-                                <i data-lucide="file-text"></i> Facturación
-                            </a>
+                            <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
+                            <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
+                            <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
+                            <a class="sidebar-link" href="aprobacion_gerencia.html"><i data-lucide="shield-check"></i> Aprobación gerencia</a>
+                            <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
                             <div class="sidebar-section-title">Reportes</div>
-                            <a class="sidebar-link" href="index.html">
-                                <i data-lucide="bar-chart-3"></i> Reportes
-                            </a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="bar-chart-3"></i> Reportes</a>
                         </div>
                     </nav>
                 </div>
@@ -458,12 +433,11 @@
         return new Date(fechaField);
     }
 
-    // Convierte fecha a formato yyyy-MM-ddThh:mm para el input datetime-local
     function toDatetimeLocal(fechaField) {
         let d = parsearFechaFirebase(fechaField);
         if(isNaN(d.getTime())) d = new Date();
-        const offset = d.getTimezoneOffset()
-        const local = new Date(d.getTime() - (offset*60000))
+        const offset = d.getTimezoneOffset();
+        const local = new Date(d.getTime() - (offset*60000));
         return local.toISOString().slice(0,16);
     }
 
@@ -550,7 +524,7 @@
 
     function cargarIncidenciasFirebase(traerTodoElHistorial = false) {
         const tbody = document.getElementById('tabla-incidencias-body');
-        tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Cargando incidencias...</td></tr>';
 
         let query = db.collection("incidencias");
         if (!traerTodoElHistorial) {
@@ -595,21 +569,17 @@
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         const btnActivo = document.getElementById('tab-' + tab);
         if(btnActivo) btnActivo.classList.add('active');
-        incidenciaSeleccionadaId = null; // Limpiar selección al cambiar tab
+        incidenciaSeleccionadaId = null; 
         gestionarBotonFlotante();
         filtrarIncidencias();
     }
 
     function seleccionarFila(trElement, idDoc) {
-        // Solo permitir selección en pendientes
         if(tabActual !== 'pendientes') return;
-
         if(incidenciaSeleccionadaId === idDoc) {
-            // Deseleccionar
             incidenciaSeleccionadaId = null;
             trElement.classList.remove('row-selected');
         } else {
-            // Seleccionar nuevo
             document.querySelectorAll('.row-selected').forEach(el => el.classList.remove('row-selected'));
             incidenciaSeleccionadaId = idDoc;
             trElement.classList.add('row-selected');
@@ -641,7 +611,7 @@
             const codigoIncidencia = inc.incidencia || "—";
             const fechaRec = formatearFecha(inc.fechaRecepcion);
             
-            // CAMBIO SOLICITADO: Toma primero restaurante_nombre, luego tienda, luego usuario
+            // CAMBIO SOLICITADO: Tomar nombre de DATOS DEL RESTAURANTE
             const tienda = inc.restaurante_nombre || inc.tienda || inc.usuario || "—";
             
             const codigoEq = inc.codigoEquipo || "—";
@@ -678,7 +648,6 @@
             `;
 
             const isSelectedClass = incidenciaSeleccionadaId === idDoc ? 'row-selected' : '';
-
             const tr = document.createElement('tr');
             tr.className = isSelectedClass;
             tr.setAttribute('onclick', `seleccionarFila(this, '${idDoc}')`);
@@ -732,7 +701,6 @@
 
     async function guardarAsignacionFirebase(idDocumento, usuarioAsignado, selectElement, buttonElement) {
         if (!idDocumento) return;
-
         selectElement.disabled = true;
         buttonElement.disabled = true;
         const textSpan = buttonElement.querySelector('.lbl-text');
@@ -778,7 +746,6 @@
                 showCustomAlert("Actualizado", "Se ha removido la asignación.", true);
             }
             
-            // Remover selección y ocultar botón flotante
             incidenciaSeleccionadaId = null;
             gestionarBotonFlotante();
             ejecutarFiltradoLogico();
@@ -835,4 +802,178 @@
             const newDoc = {
                 incidencia: incidencia,
                 fechaRecepcion: fechaVal ? new Date(fechaVal) : new Date(),
-                restauran
+                restaurante_nombre: tienda, // Guardar como restaurante
+                tienda: tienda,
+                usuario: tienda, // Respaldo
+                codigoEquipo: codigo,
+                instalacion: instalacion,
+                tipo: tipo,
+                origen: "Manual",
+                fallos: fallo,
+                observaciones: obs,
+                estado_asignacion: "Pendiente",
+                usuario_asignado: "",
+                usuario_assigned: ""
+            };
+            await db.collection("incidencias").add(newDoc);
+            showCustomAlert("Éxito", "Incidencia agregada correctamente.", true);
+            cerrarModalAgregar();
+            cargarIncidenciasFirebase(false); 
+        } catch (error) {
+            console.error("Error al agregar:", error);
+            showCustomAlert("Error", "No se pudo guardar la incidencia.", false);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="save" style="width:16px;"></i> Guardar';
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
+        }
+    }
+
+    // ==========================================
+    // LÓGICA DEL MODAL EDITAR
+    // ==========================================
+    function abrirModalEdicion() {
+        if(!incidenciaSeleccionadaId) return;
+        const inc = incidenciasGlobales.find(i => i.id_documento === incidenciaSeleccionadaId);
+        if(!inc) return;
+
+        document.getElementById('edit-id-doc').value = inc.id_documento;
+        document.getElementById('edit-incidencia').value = inc.incidencia || "";
+        document.getElementById('edit-fecha').value = toDatetimeLocal(inc.fechaRecepcion);
+        document.getElementById('edit-tienda').value = inc.restaurante_nombre || inc.tienda || inc.usuario || "";
+        document.getElementById('edit-codigo').value = inc.codigoEquipo || "";
+        document.getElementById('edit-instalacion').value = inc.instalacion || "";
+        document.getElementById('edit-tipo').value = inc.tipo || "";
+        document.getElementById('edit-fallo').value = inc.fallos || "";
+        document.getElementById('edit-obs').value = inc.observaciones || "";
+        
+        document.getElementById('modalEditar').classList.add('active');
+        try { if(window.lucide) lucide.createIcons(); } catch(e){}
+    }
+    function cerrarModalEdicion() { document.getElementById('modalEditar').classList.remove('active'); }
+
+    async function guardarEdicionIncidencia() {
+        const idDoc = document.getElementById('edit-id-doc').value;
+        const incidencia = document.getElementById('edit-incidencia').value.trim();
+        const fechaVal = document.getElementById('edit-fecha').value;
+        const tienda = document.getElementById('edit-tienda').value.trim();
+        const codigo = document.getElementById('edit-codigo').value.trim();
+        const instalacion = document.getElementById('edit-instalacion').value.trim();
+        const tipo = document.getElementById('edit-tipo').value.trim();
+        const fallo = document.getElementById('edit-fallo').value.trim();
+        const obs = document.getElementById('edit-obs').value.trim();
+
+        if(!incidencia || !tienda) {
+            showCustomAlert("Atención", "Incidencia y Tienda son obligatorias.", false);
+            return;
+        }
+
+        const btn = document.getElementById('btn-guardar-edit');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:16px;"></i> Actualizando...';
+        try { if(window.lucide) lucide.createIcons(); } catch(e){}
+
+        try {
+            const updateData = {
+                incidencia: incidencia,
+                fechaRecepcion: fechaVal ? new Date(fechaVal) : new Date(),
+                restaurante_nombre: tienda,
+                tienda: tienda,
+                usuario: tienda,
+                codigoEquipo: codigo,
+                instalacion: instalacion,
+                tipo: tipo,
+                fallos: fallo,
+                observaciones: obs
+            };
+
+            await db.collection("incidencias").doc(idDoc).update(updateData);
+
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
+            if (index !== -1) {
+                incidenciasGlobales[index] = { ...incidenciasGlobales[index], ...updateData };
+            }
+
+            showCustomAlert("Éxito", "Incidencia actualizada correctamente.", true);
+            cerrarModalEdicion();
+            
+            incidenciaSeleccionadaId = null;
+            gestionarBotonFlotante();
+            ejecutarFiltradoLogico();
+
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            showCustomAlert("Error", "No se pudo actualizar la incidencia.", false);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="save" style="width:16px;"></i> Actualizar';
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
+        }
+    }
+
+    // ==========================================
+    // FILTROS
+    // ==========================================
+    function filtrarIncidencias() {
+        const fInicio = document.getElementById('filtro-inicio').value;
+        const fFin = document.getElementById('filtro-fin').value;
+
+        if ((fInicio || fFin) && !historialCompletoCargado) {
+            cargarIncidenciasFirebase(true); 
+            return;
+        }
+        ejecutarFiltradoLogico();
+    }
+
+    function ejecutarFiltradoLogico() {
+        const fInicio = document.getElementById('filtro-inicio').value;
+        const fFin = document.getElementById('filtro-fin').value;
+        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
+
+        let filtrados = incidenciasGlobales.filter(inc => {
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const estAsignacion = inc.estado_asignacion || "";
+
+            if (tabActual === 'pendientes') {
+                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador" || asignado !== "") return false;
+            } else if (tabActual === 'enviados') {
+                if (asignado === "" || estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") return false;
+            } else if (tabActual === 'rechazados') {
+                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados" && estAsignacion !== "Rechazado Trabajador") return false;
+            }
+
+            if (fBuscar) {
+                const incidenciaCod = (inc.incidencia || "").toLowerCase();
+                const nombreTienda = (inc.restaurante_nombre || inc.tienda || inc.usuario || "").toLowerCase();
+                const trabajador = asignado.toLowerCase();
+                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
+                    return false;
+                }
+            }
+
+            if (fInicio || fFin) {
+                const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
+                if (fInicio) {
+                    const dateInicioObj = new Date(fInicio + "T00:00:00");
+                    if (fechaDocObj < dateInicioObj) return false;
+                }
+                if (fFin) {
+                    const dateFinObj = new Date(fFin + "T23:59:59");
+                    if (fechaDocObj > dateFinObj) return false;
+                }
+            }
+            return true;
+        });
+
+        renderizarTabla(filtrados);
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('filtro-inicio').value = '';
+        document.getElementById('filtro-fin').value = '';
+        document.getElementById('filtro-buscar').value = '';
+        cargarIncidenciasFirebase(false); 
+    }
+</script>
+</body>
+</html>
