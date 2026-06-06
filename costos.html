@@ -236,7 +236,7 @@
                             <a class="sidebar-link activa" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
-                            <a class="sidebar-link" href="aprobacion_gerencia.html"><i data-lucide="shield-check"></i> Aprobación gerencia</a>
+                            <!-- ENLACE DE APROBACIÓN GERENCIA ELIMINADO -->
                             <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
@@ -523,7 +523,6 @@
 
         let ticketsFiltrados = ticketsGlobales.filter(t => {
             if(tabActual === 'pendientes' && t.estado_confirmacion !== 'Confirmado') return false;
-            // Enviados muestra los que están esperando aprobación Y los que ya se aprobaron al 100%
             if(tabActual === 'enviados' && (t.estado_confirmacion !== 'Pendiente de Aprobación' && t.estado_confirmacion !== 'Costos Aprobados')) return false;
             if(tabActual === 'rechazados' && t.estado_confirmacion !== 'Costos Rechazados') return false;
 
@@ -563,7 +562,6 @@
                 conceptos = t.cantidad_conceptos || 0;
                 totalTxt = formateaMoneda(t.costo_total || 0);
                 
-                // Si el admin ya los aprobó al 100%, cambia la viñeta
                 if(t.estado_confirmacion === 'Costos Aprobados') {
                     estadoHtml = `<span class="status-badge" style="background:#dcfce7; color:#166534;"><i class="status-dot" style="background-color:#15803d;"></i> Aprobado</span>`;
                 } else {
@@ -573,7 +571,6 @@
                 accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${folio}', 'lectura')"><i data-lucide="eye" style="width:14px;"></i> Ver Costos</button>`;
             
             } else if (tabActual === 'rechazados') {
-                // LÓGICA RECHAZADOS: Muestra la suma de lo APROBADO, y cantidad de conceptos X de Y
                 let cantRechazados = 0;
                 let cantTotales = t.conceptos_costos ? t.conceptos_costos.length : 0;
                 if(t.conceptos_costos) {
@@ -613,7 +610,6 @@
         document.getElementById('modal-folio-hidden').value = folio;
         document.getElementById('modal-modo-actual').value = modo;
         
-        // Ajuste de interfaz según modo
         const titulo = document.getElementById('modal-main-title');
         const subtitulo = document.getElementById('modal-main-subtitle');
         const seccionBtnAgregar = document.getElementById('seccion-btn-agregar');
@@ -693,7 +689,6 @@
         const estEval = datos ? datos.estado_evaluacion : null;
         const motRech = datos ? datos.motivo_rechazo : '';
 
-        // Determinamos si la fila es editable
         let isReadOnly = false;
         let isEditableRechazo = false;
         
@@ -868,32 +863,16 @@
         if(!t) { showCustomAlert("Error", "Error al cargar datos del ticket.", false); return; }
 
         const datosParaPDF = {
-            sucursal: t.sucursal || '',
-            suc_dir: t.suc_dir || '',
-            suc_col: t.suc_col || '',
-            suc_city: t.suc_city || '',
-            suc_cp: t.suc_cp || '',
-            suc_hor: t.suc_hor || '',
-            suc_tel: t.suc_tel || '',
-            suc_mail: t.suc_mail || '',
-            ticket: t.id_ticket || 'S/N',
-            area: t.area || '',
-            subarea: t.subarea || '',
-            desc_falla: t.desc_falla || '',
-            fotos_falla: t.urls_falla || [null, null, null],
-            desc_solucion: t.desc_solucion || '',
+            sucursal: t.sucursal || '', suc_dir: t.suc_dir || '', suc_col: t.suc_col || '',
+            suc_city: t.suc_city || '', suc_cp: t.suc_cp || '', suc_hor: t.suc_hor || '',
+            suc_tel: t.suc_tel || '', suc_mail: t.suc_mail || '', ticket: t.id_ticket || 'S/N',
+            area: t.area || '', subarea: t.subarea || '', desc_falla: t.desc_falla || '',
+            fotos_falla: t.urls_falla || [null, null, null], desc_solucion: t.desc_solucion || '',
             fotos_solucion: t.urls_solucion || [null, null, null],
-            prov_nombre: t.prov_nombre || t.proveedor || '',
-            prov_rfc: t.prov_rfc || '',
-            prov_dir: t.prov_dir || '',
-            prov_cont: t.prov_cont || '',
-            prov_tel: t.prov_tel || '',
-            prov_mail: t.prov_mail || '',
-            tec_nombre: t.tec_nombre || '',
-            tec_celular: t.tec_celular || '',
-            comentario: t.comentario || '',
-            firma: t.url_firma || '',
-            foto_soporte: t.url_soporte || null,
+            prov_nombre: t.prov_nombre || t.proveedor || '', prov_rfc: t.prov_rfc || '',
+            prov_dir: t.prov_dir || '', prov_cont: t.prov_cont || '', prov_tel: t.prov_tel || '',
+            prov_mail: t.prov_mail || '', tec_nombre: t.tec_nombre || '', tec_celular: t.tec_celular || '',
+            comentario: t.comentario || '', firma: t.url_firma || '', foto_soporte: t.url_soporte || null,
             foto_selfie: t.url_selfie || null,
             fecha_hora: t.fecha_hora_completa 
                 ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
