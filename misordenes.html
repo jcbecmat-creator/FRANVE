@@ -2,12 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Confirmación Operativa | FRANVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Órdenes | FRANVE</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/fonts.css">
     <link rel="stylesheet" href="https://tims-orden-de-servicio.onrender.com/static/css/style.css">
@@ -18,10 +17,10 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+    
     <script>
         if (!sessionStorage.getItem('loginSession')) {
-            window.location.replace('index.html');
+            window.location.href = 'index.html';
         } else {
             document.documentElement.classList.add('is-logged-in');
         }
@@ -32,30 +31,27 @@
     </script>
 
     <style>
-        body { margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; line-height: 1.25; }
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
-
+        
         /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
 
-        /* === ESTILOS DEL MENÚ === */
+        /* MENÚ LATERAL */
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
 
-        /* === CONFIRMACIÓN OPERATIVA STYLES === */
-        .confirmacion-wrap { max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-16); }
-        .page-header-section { margin-bottom: var(--space-6); padding-bottom: var(--space-4); border-bottom: 1px solid var(--gray-200); }
-        .page-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-6); flex-wrap: wrap; }
-        .page-header-content h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); color: var(--gray-900); letter-spacing: var(--tracking-tight); margin: 0 0 var(--space-2) 0; }
-        .page-header-content p { font-size: var(--text-sm); color: var(--gray-500); margin: 0; }
-        
-        /* === ESTILOS DE PESTAÑAS (TABS) === */
+        .mis-ordenes-wrap { max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-16); }
+        .page-header-content h1 { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; color: #111827; line-height: 1; }
+        .page-header-content p { color: #6b7280; margin: 0; line-height: 1.5; }
+
+        /* PESTAÑAS */
         .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { background: #e5e7eb; }
@@ -63,138 +59,62 @@
         .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
         .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
 
-        /* === FILTROS === */
+        /* FILTROS Y TABLA */
         .co-filters { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
         .co-filters-grid { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
         .co-filter-group { flex: 1; min-width: 160px; }
         .co-filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; display: block; }
         .co-filter-input { height: 42px; width: 100%; padding: 0 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #111827; box-sizing: border-box; }
-        .btn-filtrar { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; }
+        .btn-secondary { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; }
 
-        /* === TABLA === */
-        .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
-        .co-table { width: 100%; border-collapse: collapse; }
-        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #E5E7EB; white-space: nowrap; }
-        .co-table td { padding: 16px 20px; text-align: center; font-size: 14px; color: #111827; border-bottom: 1px solid #f3f4f6; }
-        .co-table-empty { text-align: center; padding: 40px 20px !important; color: #6b7280; font-size: 14px; }
+        .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
+        .co-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #E5E7EB; background-color: #F8FAFC; white-space: nowrap; }
         
-        .btn-action-primary { height: 32px; background: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; }
-        .btn-action-primary:hover { opacity: 0.85; }
-        .btn-action-gray { height: 32px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; padding: 0 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background 0.2s; }
-        .btn-action-gray:hover { background: #e5e7eb; }
+        /* REGLA PARA MAYÚSCULAS EN TODA LA TABLA */
+        .co-table td { 
+            padding: 16px 20px; text-align: center; font-size: 14px; color: #111827; 
+            border-bottom: 1px solid #f3f4f6; text-transform: uppercase !important; 
+        }
+        
+        .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
+        
+        .status-badge { height: 28px; display: inline-flex; align-items: center; justify-content: center; padding: 0 14px; border-radius: 14px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .bg-yellow { background: #fef3c7; color: #92400e; }
+        .bg-green { background: #dcfce7; color: #166534; }
+        .bg-red { background: #fee2e2; color: #991b1b; }
 
-        .status-badge { height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; border-radius: 16px; font-size: 12px; font-weight: 700; text-transform: none !important; box-sizing: border-box; }
-        .status-en-proceso { background: #FEF3C7; color: #92400E; }
-        .status-confirmado { background: #D1FAE5; color: #065F46; } 
-        .status-rechazado { background: #fee2e2; color: #b91c1c; }
+        /* CONTENEDOR DE ESTADO PARA APILAR BADGE Y FECHA */
+        .status-cell-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .status-date { font-size: 10px; color: #6b7280; font-weight: 600; }
 
-        /* === MODAL STYLES === */
+        /* BOTONES DE ACCIÓN APILADOS */
+        .action-buttons-stack { display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; }
+        .btn-aprobar-row { height: 34px; width: 120px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; }
+        .btn-aprobar-row:hover { background: #15803d; }
+        .btn-rechazar-row { height: 34px; width: 120px; background: #DC2626; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; }
+        .btn-rechazar-row:hover { background: #b91c1c; }
+
+        /* MODAL DE RECHAZO */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
-        .modal-card { background: white; width: 100%; max-width: 600px; border-radius: 16px; display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
-        .modal-card.maximized { max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; border-radius: 0; }
-        
-        .modal-header { padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; background: #fff; position: sticky; top: 0; z-index: 100; }
-        .modal-header h2 { margin: 0; font-size: 18px; color: #111827; font-weight: 800; }
-        .modal-header p { margin: 2px 0 0 0; font-size: 13px; color: #6b7280; }
-        
-        .modal-header-actions { display: flex; align-items: center; gap: 10px; }
-        .modal-header-btn { background: none; border: none; padding: 5px; cursor: pointer; color: #6b7280; display: flex; align-items: center; justify-content: center; }
-        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #6b7280; padding: 5px; display: flex; align-items: center; justify-content: center; }
-        
-        .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        /* Botones del footer */
-        .modal-footer { padding: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px; background: #f9fafb; border-radius: 0 0 16px 16px; position: sticky; bottom: 0; z-index: 100; }
-        .modal-footer button { height: 44px; padding: 0 24px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; gap: 8px; transition: all 0.2s; }
-        .btn-cancelar { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
-        .btn-cancelar:hover { background: #e2e8f0; }
-        .btn-enviar { background: #81D0DC; color: #131520; border: none; font-weight: 700; }
-        .btn-enviar:hover { opacity: 0.85; }
-        .btn-enviar:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; } 
+        .modal-rechazo-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        .modal-rechazo-header { margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
+        .modal-rechazo-header h2 { margin: 0; font-size: 20px; color: #111827; font-weight: 800; }
+        .modal-rechazo-header p { margin: 4px 0 0 0; font-size: 13px; color: #6b7280; }
+        .motivo-rechazo-textarea { width: 100%; height: 120px; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; resize: none; box-sizing: border-box; margin-bottom: 20px; transition: border-color 0.2s; }
+        .motivo-rechazo-textarea:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
+        .modal-rechazo-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        .btn-cancelar-rechazo { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-confirmar-rechazo { background: #DC2626; color: white; border: none; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; }
+        .btn-confirmar-rechazo:hover { background: #b91c1c; }
 
-        /* === PREGUNTAS Y RESPUESTAS === */
-        .eval-field-group { width: 100%; display: flex; flex-direction: column; }
-        .eval-label { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
-        .eval-label i { color: #374151; width: 16px; height: 16px; flex-shrink: 0; }
-        
-        .eval-input-wrapper { display: flex; flex-direction: column; width: 100%; }
-        .eval-input-control { 
-            width: 100% !important; 
-            padding: 0 1rem !important; 
-            line-height: 40px !important; 
-            font-size: 14px !important; 
-            color: #111827 !important; 
-            background-color: #f3f4f6 !important; 
-            border-radius: 0.5rem !important; 
-            border: 1px solid #d1d5db !important; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; 
-            box-sizing: border-box !important; 
-            font-family: inherit !important; 
-            height: 42px !important; 
-            display: block !important;
-            transition: all 0.2s ease !important; 
-        }
-        
-        textarea.eval-input-control {
-            height: auto !important; 
-            min-height: 100px !important; 
-            padding: 0.75rem 1rem !important; 
-            line-height: 1.5 !important; 
-        }
-
-        .eval-input-control:focus { outline: none; background-color: #ffffff !important; border-color: #81D0DC !important; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.2) !important; }
-        .eval-input-control::placeholder { color: #9ca3af !important; }
-        .eval-input-control[readonly], select.eval-input-control:disabled { background-color: #e5e7eb !important; color: #4b5563 !important; cursor: not-allowed !important; border-color: #e5e7eb !important; box-shadow: none !important; opacity: 1; }
-        
-        select.eval-input-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
-
-        /* === FOTO Y FIRMA === */
-        .btn-photo-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-photo { background: #81D0DC; color: #131520; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
-        .btn-photo:hover { opacity: 0.85; }
-        .btn-photo-upload { background: #ffffff; color: #374151; border: 1px solid #d1d5db; }
-        .btn-photo-upload:hover { background: #f3f4f6; opacity: 1; }
-        
-        .photo-container-centered { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; margin-top: 10px; }
-        .photo-slot { aspect-ratio: 4/3; width: 160px; border: 2px dashed #d1d5db; border-radius: 8px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: zoom-in; }
-        .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-placeholder { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #9ca3af; }
-        
-        .photo-slot.zoomed { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; cursor: zoom-out; border: none; border-radius: 0; background: rgba(0,0,0,0.9); }
-        .photo-slot.zoomed img { width: auto; height: 100%; max-width: 100%; margin: 0 auto; object-fit: contain; }
-
-        .btn-remove-photo { display: none; position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(220, 38, 38, 0.9); color: white; border: none; cursor: pointer; align-items: center; justify-content: center; padding: 0; z-index: 10; }
-        .photo-slot:hover .btn-remove-photo, .photo-slot.zoomed .btn-remove-photo { display: flex; }
-
-        .signature-pad-container { background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 8px; width: 100%; height: 150px; position: relative; cursor: crosshair; touch-action: none; overflow: hidden; }
-        .firma-canvas { width: 100%; height: 100%; }
-
-        #camera-overlay { display: none; position: fixed !important; z-index: 999999 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.95) !important; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        #camera-overlay.show { display: flex !important; }
-        #camera-stream { width: 100%; max-width: 600px; aspect-ratio: 4/3; background: black; border-radius: 12px; overflow: hidden; position: relative; }
-        #camera-video { width: 100%; height: 100%; object-fit: cover; }
-        .camera-controls { display: flex; gap: 10px; margin-top: 20px; }
-
-        /* MODAL ALERTA CUSTOM */
-        #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        /* ALERTAS */
+        #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
         #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
-        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: #131520; background: #81D0DC; font-weight: 700; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
-        #alert-btn:hover { opacity: 0.85; }
-
-        @media (max-width: 768px) {
-            .confirmacion-wrap { padding: var(--space-4) var(--space-4) var(--space-16); }
-            .co-filters-grid { flex-direction: column; }
-            .co-filter-group { width: 100%; }
-            .co-table-container { overflow-x: auto; }
-            .co-table { min-width: 750px; }
-            .photo-container-group { flex-direction: column; align-items: center; }
-            .btn-photo-group { width: 100%; }
-            .page-header-row { flex-direction: column; }
-        }
+        #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
     </style>
 </head>
 <body class="has-sidebar">
@@ -202,7 +122,9 @@
     <div id="app-screen" style="display: block;">
         <header class="main-header">
             <div class="header-left">
-                <button class="header-hamburger" type="button" data-sidebar-toggle><span class="hamburger"></span></button>
+                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle>
+                    <span class="hamburger"></span>
+                </button>
                 <a href="inicio.html">
                     <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px;">
                 </a>
@@ -217,7 +139,7 @@
                         <div class="user-card">
                             <div class="user-circle-avatar user-circle-initial">U</div>
                             <div class="user-meta">
-                                <div class="user-name" id="dropdown-username">Cargando...</div>
+                                <div class="user-name">Cargando...</div>
                             </div>
                         </div>
                         <div class="user-actions">
@@ -235,16 +157,16 @@
                 <button class="sidebar-close" type="button" data-sidebar-close><span class="close-icon">X</span></button>
                 <div class="sidebar-content">
                     <nav class="sidebar-nav">
-                        <a href="inicio.html" class="sidebar-link" id="nav-inicio"><i data-lucide="home"></i> Inicio</a>
+                        <a class="sidebar-link" href="inicio.html"><i data-lucide="home"></i> Inicio</a>
                         <div class="sidebar-section">
                             <div class="sidebar-section-title">Formas</div>
-                            <a href="index.html" class="sidebar-link"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
-                            <a href="orden_de_servicio.html" class="sidebar-link" id="nav-preventivo"><i data-lucide="calendar-check"></i> Ordenes de servicio</a>
-                            <a class="sidebar-link" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
+                            <a class="sidebar-link" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Órdenes de servicio</a>
+                            <a class="sidebar-link activa" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-admin">
                             <div class="sidebar-section-title">Administración</div>
-                            <a class="sidebar-link activa" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
+                            <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
                             <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
                             <!-- SE ELIMINÓ LA LÍNEA DE APROBACIÓN GERENCIA AQUÍ -->
@@ -252,57 +174,47 @@
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
                             <div class="sidebar-section-title">Reportes</div>
-                            <a href="index.html" class="sidebar-link"><i data-lucide="bar-chart-3"></i> Reportes</a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="bar-chart-3"></i> Reportes</a>
                         </div>
                     </nav>
                 </div>
             </aside>
             <div class="sidebar-backdrop" id="sidebar-backdrop" data-sidebar-backdrop></div>
 
-            <main class="main-content app-content" id="main-scroll-area">
-                
+            <main class="main-content app-content">
                 <div id="global-welcome-section" style="text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white;">
                     <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: 700;">Bienvenido</h1>
                     <h2 id="welcome-username-display" style="margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2;">CARGANDO...</h2>
                 </div>
 
-                <div class="confirmacion-wrap">
-                    
-        <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px;">
+                <div class="mis-ordenes-wrap">
+                    <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px;">
                         <div class="page-header-content">
-                            <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px; color: #111827;">Confirmación Operativa</h1>
-                            <p style="color: #6b7280; margin: 0;">Revisa y aprueba las órdenes de servicio generadas por los técnicos</p>
+                            <h1>Mis Órdenes Asignadas</h1>
+                            <p>Revisa y acepta o rechaza las incidencias asignadas a ti</p>
                         </div>
                         <div class="tabs-container" style="margin-bottom: 0; padding-bottom: 0;">
-                            <button class="tab-btn active" onclick="cambiarTab('En proceso')" id="tab-En proceso">
-                                En proceso <span class="tab-badge" id="badge-en-proceso">0</span>
+                            <button class="tab-btn active" onclick="cambiarTab('pendientes')" id="tab-pendientes">
+                                Pendientes <span class="tab-badge" id="badge-pendientes">0</span>
                             </button>
-                            <button class="tab-btn" onclick="cambiarTab('Confirmados')" id="tab-Confirmados">
-                                Confirmados <span class="tab-badge" id="badge-confirmados">0</span>
+                            <button class="tab-btn" onclick="cambiarTab('aprobados')" id="tab-aprobados">
+                                Aprobados <span class="tab-badge" id="badge-aprobados">0</span>
                             </button>
-                            <button class="tab-btn" onclick="cambiarTab('Rechazados')" id="tab-Rechazados">
+                            <button class="tab-btn" onclick="cambiarTab('rechazados')" id="tab-rechazados">
                                 Rechazados <span class="tab-badge" id="badge-rechazados">0</span>
                             </button>
                         </div>
                     </header>
 
-                    <form method="GET" class="co-filters">
+                    <form class="co-filters">
                         <div class="co-filters-grid">
                             <div class="co-filter-group">
-                                <label class="co-filter-label">Fecha inicio</label>
-                                <input type="date" class="co-filter-input" id="filtro-fecha-inicio">
+                                <label class="co-filter-label">Buscar Incidencia</label>
+                                <input type="text" class="co-filter-input" id="filtro-buscar" placeholder="Ej. 12323-00225...">
                             </div>
-                            <div class="co-filter-group">
-                                <label class="co-filter-label">Fecha fin</label>
-                                <input type="date" class="co-filter-input" id="filtro-fecha-fin">
-                            </div>
-                            <div class="co-filter-group" style="flex: 2;">
-                                <label class="co-filter-label">Buscar Folio / Sucursal</label>
-                                <input type="text" class="co-filter-input" id="filtro-buscar" placeholder="Ej. MC-0001">
-                            </div>
-                            <div class="flex gap-2 flex-shrink-0">
-                                <button class="btn-filtrar" type="button" onclick="renderTablaConfirmacion()">
-                                    <i data-lucide="filter" style="width: 18px; height: 18px;"></i> Filtrar
+                            <div class="flex gap-2 flex-shrink-0" style="align-self: flex-end;">
+                                <button class="btn-secondary" type="button" onclick="renderTabla()">
+                                    <i data-lucide="search" style="width: 18px; height: 18px;"></i> Buscar
                                 </button>
                             </div>
                         </div>
@@ -312,199 +224,103 @@
                         <table class="co-table">
                             <thead>
                                 <tr>
-                                    <th>Folio</th>
-                                    <th>Sucursal</th>
-                                    <th>Técnico / Proveedor</th>
-                                    <th>Fecha Envío</th>
+                                    <th>Incidencia</th>
+                                    <th>Fecha Recepción</th>
+                                    <th>Tienda / Usuario</th>
+                                    <th>Código Equipo</th>
+                                    <th>Fallo Reportado</th>
                                     <th>Estado</th>
-                                    <th>Acción</th>
+                                    <th style="text-align: center;">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabla-confirmacion-body">
-                                <tr>
-                                    <td colspan="6" style="padding: 20px; text-align: center; color: #6b7280;">Cargando órdenes de servicio...</td>
-                                </tr>
+                            <tbody id="tabla-mis-ordenes-body">
+                                <tr><td colspan="7" class="co-table-empty">Cargando...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
 
-    <div id="modalEvaluacion" class="modal-overlay">
-        <div class="modal-card" id="modal-card-eval">
-            <div class="modal-header">
-                <div>
-                    <h2>Confirmación Operativa</h2>
-                    <p>Revisa la orden de servicio</p>
-                </div>
-                <div class="modal-header-actions">
-                    <button class="modal-header-btn" title="Maximizar" onclick="toggleMaximizarModal()">
-                        <i data-lucide="maximize-2" id="maximize-icon" style="width: 20px; height: 20px;"></i>
-                        <i data-lucide="minimize-2" id="minimize-icon" style="width: 20px; height: 20px; display: none;"></i>
-                    </button>
-                    <button class="modal-close" onclick="cerrarModal()" title="Cerrar">&times;</button>
-                </div>
+    <!-- MODAL DE RECHAZO -->
+    <div id="modalRechazo" class="modal-overlay">
+        <div class="modal-rechazo-card">
+            <div class="modal-rechazo-header">
+                <h2>Rechazar Incidencia</h2>
+                <p>Por favor, indica el motivo por el cual rechazas esta orden</p>
             </div>
-            
-            <div class="modal-body">
-                <input type="hidden" id="eval-id-ticket">
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="eval-field-group">
-                        <label class="eval-label"><i data-lucide="hash"></i>Folio</label>
-                        <div class="eval-input-wrapper">
-                            <input type="text" id="eval-folio" class="eval-input-control" readonly style="font-weight: 700;">
-                        </div>
-                    </div>
-                    <div class="eval-field-group" style="display: flex; flex-direction: column; justify-content: flex-end;">
-                        <button type="button" onclick="verPDF()" style="height: 42px; background: #131520; color: #81D0DC; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: background 0.2s;">
-                        <i data-lucide="file-text" style="width: 18px; height: 18px; color: #81D0DC;"></i> Ver PDF de la Orden
-                    </button>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="eval-field-group">
-                        <label class="eval-label"><i data-lucide="user"></i>Nombre del Empleado (Tienda)</label>
-                        <div class="eval-input-wrapper">
-                            <input type="text" id="eval-nombre" class="eval-input-control" placeholder="Ej. Juan Pérez">
-                        </div>
-                    </div>
-                    <div class="eval-field-group">
-                        <label class="eval-label"><i data-lucide="id-card"></i>Número de Empleado</label>
-                        <div class="eval-input-wrapper">
-                            <input type="text" id="eval-numero" class="eval-input-control" placeholder="Ej. 10452">
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="eval-field-group">
-                        <label class="eval-label"><i data-lucide="briefcase"></i>Cargo de Empleado</label>
-                        <div class="eval-input-wrapper">
-                            <input type="text" id="eval-cargo" class="eval-input-control" placeholder="Ej. Gerente en turno">
-                        </div>
-                    </div>
-                    <div class="eval-field-group">
-                        <label class="eval-label"><i data-lucide="star"></i>Nivel de Servicio</label>
-                        <div class="eval-input-wrapper">
-                            <select id="eval-nivel" class="eval-input-control">
-                                <option value="">Selecciona...</option>
-                                <option value="Aceptado">Aceptado</option>
-                                <option value="No Aceptado">No Aceptado</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="eval-field-group">
-                    <label class="eval-label"><i data-lucide="message-square"></i>Comentario de Salida</label>
-                    <div class="eval-input-wrapper">
-                        <textarea id="eval-comentario" class="eval-input-control" placeholder="Observaciones sobre el trabajo realizado..."></textarea>
-                    </div>
-                </div>
-
-                <div class="eval-field-group">
-                    <label class="eval-label"><i data-lucide="user-check"></i>Selfie del Empleado</label>
-                    
-                    <div class="btn-photo-group">
-                        <button type="button" class="btn-photo" id="btn-photo-take" onclick="abrirCamaraEvaluacion()">
-                            <i data-lucide="camera" style="width: 16px; height: 16px;"></i> Toma Foto
-                        </button>
-                        <button type="button" class="btn-photo btn-photo-upload" id="btn-photo-upload" onclick="document.getElementById('eval-photo-input').click()">
-                            <i data-lucide="upload" style="width: 16px; height: 16px;"></i> Subir Archivo
-                        </button>
-                        <input type="file" id="eval-photo-input" accept="image/*" style="display: none;" onchange="handleFileUpload(this)">
-                    </div>
-
-                    <div class="photo-container-centered">
-                        <div class="photo-slot" id="eval-selfie-slot" onclick="toggleZoom(this)">
-                            <button class="btn-remove-photo" id="btn-remove-selfie" onclick="quitarFoto(event)"><i data-lucide="x"></i></button>
-                            
-                            <div class="photo-placeholder" id="eval-selfie-placeholder">
-                                <i data-lucide="image" style="width: 24px; height: 24px;"></i>
-                                <span style="font-size: 12px; font-weight: 600;">Sin foto</span>
-                            </div>
-                            
-                            <img id="eval-selfie-img" src="" style="display: none;">
-                        </div>
-                    </div>
-                    <input type="hidden" id="eval-selfie-data">
-                </div>
-
-                <div class="eval-field-group">
-                    <label class="eval-label"><i data-lucide="pen-tool"></i>Firma Táctil</label>
-                    <div class="signature-pad-container">
-                        <canvas id="eval-firma-canvas" class="firma-canvas"></canvas>
-                    </div>
-                    <div style="text-align: right; margin-top: 8px;">
-                        <button type="button" id="btn-clear-firma" onclick="limpiarFirmaModal()" style="padding: 6px 12px; font-size: 13px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #d1d5db; background: white; color: #4b5563; cursor:pointer;">
-                            <i data-lucide="eraser" style="width: 14px; height: 14px;"></i> Limpiar
-                        </button>
-                    </div>
-                    <input type="hidden" id="eval-firma-data">
-                </div>
-
-            </div>
-            
-            <div class="modal-footer">
-                <button class="btn-cancelar" onclick="cerrarModal()" id="btn-cancelar-eval">
-                    <i data-lucide="x-circle" style="color: currentColor; width: 18px; height: 18px;"></i> Cancelar 
-                </button>
-                <button class="btn-enviar" onclick="enviarEvaluacion()" id="btn-enviar-eval">
-                    <i data-lucide="check-circle" style="color: currentColor; width: 18px; height: 18px;"></i> Confirmar Orden
+            <input type="hidden" id="rechazo-id-doc">
+            <textarea id="rechazo-motivo" class="motivo-rechazo-textarea" placeholder="Escribe el motivo del rechazo..."></textarea>
+            <div class="modal-rechazo-actions">
+                <button class="btn-cancelar-rechazo" onclick="cerrarModalRechazo()">Cancelar</button>
+                <button class="btn-confirmar-rechazo" onclick="confirmarRechazo()">
+                    <i data-lucide="x-circle" style="width: 16px;"></i> Confirmar Rechazo
                 </button>
             </div>
         </div>
     </div>
 
-    <canvas id="tempCanvasModal" style="display:none"></canvas>
-    <div id="camera-overlay">
-        <div id="camera-stream"><video id="camera-video" autoplay="true" playsinline></video></div>
-        <div class="camera-controls">
-            <button onclick="cerrarCamaraEvaluacion()" style="padding:10px 20px; border-radius:8px; border:1px solid #d1d5db; background:white; cursor:pointer; color:#374151; font-weight:bold;">Cerrar</button>
-            <button onclick="switchCameraEvaluacion()" style="padding:10px 20px; border-radius:8px; border:1px solid #d1d5db; background:#f3f4f6; cursor:pointer; color:#374151; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="refresh-cw"></i> Girar</button>
-            <button onclick="capturarSelfieEvaluacion()" style="padding:10px 20px; border-radius:8px; background:#81D0DC; color:#131520; border:none; cursor:pointer; font-weight:bold;">Capturar</button>
-        </div>
-    </div>
-
-    <div id="custom-alert">
-        <div class="modal-card-alert">
-            <div id="alert-icon-container"></div>
-            <h3 id="alert-title"></h3>
-            <p id="alert-msg"></p>
-            <button id="alert-btn" onclick="closeCustomAlert()">Aceptar</button>
+    <!-- ALERTA CUSTOM -->
+    <div id="custom-alert" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-card-alert" style="background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div id="alert-icon-container" style="margin-bottom: 16px; display: flex; justify-content: center;"></div>
+            <h3 id="alert-title" style="margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700;"></h3>
+            <p id="alert-msg" style="margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5;"></p>
+            <button id="alert-btn" onclick="closeCustomAlert()" style="width: 100%; padding: 12px; border-radius: 8px; border: none; background: #81D0DC; color: #131520; font-weight: 700; font-size: 14px; cursor: pointer;">Aceptar</button>
         </div>
     </div>
 
 <script>
-    // ==========================================
-    // 1. CONFIGURACIÓN DE FIREBASE
-    // ==========================================
+    // Firebase Config
     const firebaseConfig = {
-        apiKey: "AIzaSyDUM2w0L-3GNm0unSgKHZCrrW9xKQY0_is",
-        authDomain: "franve-1b62e.firebaseapp.com",
-        projectId: "franve-1b62e",
-        storageBucket: "franve-1b62e.firebasestorage.app",
-        messagingSenderId: "118420640551",
-        appId: "1:118420640551:web:9b79daa79a2d46eefe4f02"
+        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
+        authDomain: "frave-4fbbf.firebaseapp.com",
+        projectId: "frave-4fbbf",
+        storageBucket: "frave-4fbbf.firebasestorage.app",
+        messagingSenderId: "687825589857",
+        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
     };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
-    let ticketsGlobales = []; 
-    let tabActual = 'En proceso'; 
+    let incidenciasGlobales = [];
+    let tabActual = 'pendientes';
+    let nombreUsuarioLogueado = '';
 
-    // ==========================================
-    // 2. ALERTAS PERSONALIZADAS
-    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) { lucide.createIcons(); }
+        
+        const savedUser = sessionStorage.getItem('loginUser');
+        if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if(appDataStr) {
+            const appData = JSON.parse(appDataStr);
+            nombreUsuarioLogueado = appData.nombreUsuario || savedUser; 
+            
+            const welcomeTitle = document.getElementById('welcome-username-display');
+            if(welcomeTitle) welcomeTitle.innerText = nombreUsuarioLogueado;
+            const dropdownName = document.querySelector('.user-name');
+            if(dropdownName) dropdownName.innerText = nombreUsuarioLogueado;
+        }
+
+        const userMenu = document.querySelector('[data-user-menu]');
+        if (userMenu) {
+            const trigger = userMenu.querySelector('[data-user-trigger]');
+            const dropdown = userMenu.querySelector('[data-user-dropdown]');
+            const closeMenus = (event) => { if (!userMenu.contains(event.target)) dropdown.classList.remove('show'); };
+            trigger.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('show'); });
+            document.addEventListener('click', closeMenus);
+        }
+
+        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
+        toggles.forEach(t => t.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open')));
+        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
+
+        cargarMisIncidencias();
+    });
+
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
         const alertTitle = document.getElementById('alert-title');
@@ -517,579 +333,244 @@
 
         if(isSuccess) {
             alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
-            alertBtn.style.background = '#16a34a';
+            alertBtn.style.background = '#16a34a'; alertBtn.style.color = '#FFFFFF';
         } else {
             alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
-            alertBtn.style.background = '#DC2626';
+            alertBtn.style.background = '#DC2626'; alertBtn.style.color = '#FFFFFF';
         }
         alertBox.style.display = 'flex';
         lucide.createIcons();
     }
+
     function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
+    function formatearFecha(fechaField) {
+        if (!fechaField) return "—";
+        if (fechaField && typeof fechaField.toDate === 'function') {
+            const d = fechaField.toDate();
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (fechaField && fechaField.seconds) {
+            const d = new Date(fechaField.seconds * 1000);
+            return d.toLocaleDateString('es-MX') + ' ' + d.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (typeof fechaField === 'string') {
+            if (fechaField.includes("Timestamp")) return "—";
+            return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "A.M.").replace("p.m. UTC-6", "P.M.");
+        }
+        return "—";
+    }
 
-    // ==========================================
-    // 3. INICIALIZACIÓN DE LA PÁGINA
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', function () {
-        const savedSession = sessionStorage.getItem('loginSession');
-        const savedUser = sessionStorage.getItem('loginUser');
+    // Función específica para las fechas de aprobación/rechazo guardadas como ISO string
+    function formatearFechaEvaluacion(isoString) {
+        if (!isoString) return "";
+        try {
+            const date = new Date(isoString);
+            return date.toLocaleString('es-MX', { 
+                day: '2-digit', month: '2-digit', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', hour12: true 
+            }).replace("a. m.", "A.M.").replace("p. m.", "P.M.");
+        } catch (e) { return ""; }
+    }
+
+    // === CARGA DE DATOS ===
+    function cargarMisIncidencias() {
+        if(!nombreUsuarioLogueado) return;
         
-        if (savedSession && savedUser) {
-            document.getElementById('app-screen').style.display = 'block';
-            const appData = JSON.parse(savedSession);
-            
-            const inicial = savedUser.charAt(0).toUpperCase();
-            document.querySelectorAll('.user-circle-initial').forEach(el => el.innerText = inicial);
-
-            const welcomeTitle = document.getElementById('welcome-username-display');
-            if(welcomeTitle) welcomeTitle.innerText = appData.nombreProveedor || savedUser;
-            const dropdownName = document.getElementById('dropdown-username');
-            if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
-
-            if(appData.privilegio == 2 || appData.privilegio == "2") {
-                window.location.replace('index.html');
-            }
-        } else {
-            window.location.replace('index.html');
-        }
-
-        if (window.lucide) { lucide.createIcons(); }
-
-        const userMenu = document.querySelector('[data-user-menu]');
-        if (userMenu) {
-            const trigger = userMenu.querySelector('[data-user-trigger]');
-            const dropdown = userMenu.querySelector('[data-user-dropdown]');
-            const closeMenus = (event) => { if (!userMenu.contains(event.target)) dropdown.classList.remove('show'); };
-            trigger.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('show'); });
-            document.addEventListener('click', closeMenus);
-        }
-
-        const sidebar = document.querySelector('[data-app-sidebar]');
-        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
-        const closeButton = document.querySelector('[data-sidebar-close]');
-        const backdrop = document.querySelector('[data-sidebar-backdrop]');
-        if (sidebar && toggles.length) {
-            const openSidebar = () => { sidebar.classList.add('open'); if (backdrop) backdrop.classList.add('visible'); };
-            const closeSidebar = () => { sidebar.classList.remove('open'); if (backdrop) backdrop.classList.remove('visible'); };
-            toggles.forEach(t => t.addEventListener('click', () => { if (sidebar.classList.contains('open')) closeSidebar(); else openSidebar(); }));
-            if (closeButton) closeButton.addEventListener('click', closeSidebar);
-            if (backdrop) backdrop.addEventListener('click', closeSidebar);
-        }
-
-        inicializarFirmaModal();
-        cargarTodosLosTickets(); 
-    });
-
-    // ==========================================
-    // 4. CARGA DE DATOS Y PESTAÑAS (TABS)
-    // ==========================================
-    function cargarTodosLosTickets() {
-        db.collection("tickets_mantenimiento")
-          .where("estado_confirmacion", "!=", "Borrador")
+        db.collection("incidencias")
+          .where("usuario_assigned", "==", nombreUsuarioLogueado)
           .get()
           .then((querySnapshot) => {
-              ticketsGlobales = [];
-              querySnapshot.forEach((doc) => { 
+              incidenciasGlobales = [];
+              querySnapshot.forEach((doc) => {
                   let data = doc.data();
-                  data.doc_id = doc.id;
-                  ticketsGlobales.push(data); 
+                  data.id_documento = doc.id;
+                  incidenciasGlobales.push(data);
               });
-              
-              ticketsGlobales.sort((a, b) => {
-                  let fA = a.fecha_creacion || "";
-                  let fB = b.fecha_creacion || "";
-                  return fB.localeCompare(fA);
-              });
-
-              window.ticketsPendientes = {};
-              ticketsGlobales.forEach(t => { window.ticketsPendientes[t.id_ticket || t.doc_id] = t; });
-
               actualizarBadges();
-              renderTablaConfirmacion();
+              renderTabla();
           })
           .catch((error) => {
               console.error("Error: ", error);
-              document.getElementById('tabla-confirmacion-body').innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error cargando datos.</td></tr>';
+              document.getElementById('tabla-mis-ordenes-body').innerHTML = '<tr><td colspan="7" class="co-table-empty" style="color: red;">Error al cargar tus incidencias.</td></tr>';
           });
     }
 
-    // === LÓGICA DE BADGES ACTUALIZADA ===
     function actualizarBadges() {
-        const enProceso = ticketsGlobales.filter(t => t.estado_confirmacion === 'En proceso').length;
+        const pend = incidenciasGlobales.filter(i => i.estado_asignacion === "Asignado" || !i.estado_asignacion).length;
+        const apr = incidenciasGlobales.filter(i => i.estado_asignacion === "Aprobado Trabajador").length;
+        const rech = incidenciasGlobales.filter(i => i.estado_asignacion === "Rechazado Trabajador").length;
         
-        // "Confirmados" son los que tienen el nivel "Aceptado" (o no tienen, por seguridad si se confirmó antes)
-        // pero que su estado ya pasó de "En proceso"
-        const confirmados = ticketsGlobales.filter(t => 
-            t.estado_confirmacion !== 'En proceso' && 
-            t.estado_confirmacion !== 'Borrador' && 
-            (t.evaluacion_nivel === 'Aceptado' || !t.evaluacion_nivel)
-        ).length;
-        
-        // "Rechazados" son estrictamente los evaluados como "No Aceptado"
-        const rechazados = ticketsGlobales.filter(t => 
-            t.estado_confirmacion !== 'En proceso' && 
-            t.estado_confirmacion !== 'Borrador' && 
-            t.evaluacion_nivel === 'No Aceptado'
-        ).length;
-        
-        document.getElementById('badge-en-proceso').innerText = enProceso;
-        if(document.getElementById('badge-confirmados')) document.getElementById('badge-confirmados').innerText = confirmados;
-        if(document.getElementById('badge-rechazados')) document.getElementById('badge-rechazados').innerText = rechazados;
+        document.getElementById('badge-pendientes').innerText = pend;
+        document.getElementById('badge-aprobados').innerText = apr;
+        document.getElementById('badge-rechazados').innerText = rech;
     }
 
     function cambiarTab(tab) {
         tabActual = tab;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        const btnActivo = document.getElementById('tab-' + tab);
-        if(btnActivo) btnActivo.classList.add('active');
-        renderTablaConfirmacion();
+        document.getElementById('tab-' + tab).classList.add('active');
+        renderTabla();
     }
 
-    // ==========================================
-    // 5. DIBUJAR LA TABLA CON FILTROS
-    // ==========================================
-    function renderTablaConfirmacion() {
-        const tbody = document.getElementById('tabla-confirmacion-body');
+    // === RENDERIZADO DE TABLA ===
+    function renderTabla() {
+        const tbody = document.getElementById('tabla-mis-ordenes-body');
         tbody.innerHTML = '';
         
-        const fInicio = document.getElementById('filtro-fecha-inicio').value;
-        const fFin = document.getElementById('filtro-fecha-fin').value;
-        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase();
+        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
 
-        // === LÓGICA DE FILTRADO ACTUALIZADA ===
-        let ticketsFiltrados = ticketsGlobales.filter(t => {
-            if (tabActual === 'En proceso') {
-                if (t.estado_confirmacion !== 'En proceso') return false;
-            } else if (tabActual === 'Confirmados') {
-                if (t.estado_confirmacion === 'En proceso' || t.estado_confirmacion === 'Borrador') return false;
-                if (t.evaluacion_nivel === 'No Aceptado') return false; 
-            } else if (tabActual === 'Rechazados') {
-                if (t.estado_confirmacion === 'En proceso' || t.estado_confirmacion === 'Borrador') return false;
-                if (t.evaluacion_nivel !== 'No Aceptado') return false;
-            }
+        let filtrados = incidenciasGlobales.filter(inc => {
+            if(tabActual === 'pendientes' && (inc.estado_asignacion && inc.estado_asignacion !== "Asignado")) return false;
+            if(tabActual === 'aprobados' && inc.estado_asignacion !== "Aprobado Trabajador") return false;
+            if(tabActual === 'rechazados' && inc.estado_asignacion !== "Rechazado Trabajador") return false;
 
-            const fDoc = t.fecha_creacion || ""; 
-            if (fInicio && fDoc < fInicio) return false;
-            if (fFin && fDoc > fFin) return false;
-
-            if (fBuscar) {
-                const folio = (t.id_ticket || "").toLowerCase();
-                const suc = (t.sucursal || "").toLowerCase();
-                if (!folio.includes(fBuscar) && !suc.includes(fBuscar)) return false;
+            if(fBuscar) {
+                const cod = (inc.incidencia || "").toLowerCase();
+                const tienda = (inc.usuario || "").toLowerCase();
+                if(!cod.includes(fBuscar) && !tienda.includes(fBuscar)) return false;
             }
             return true;
         });
 
-        if (ticketsFiltrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 0;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay órdenes en esta sección.</span></div></td></tr>`;
+        if(filtrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay incidencias en esta sección.</span></div></td></tr>`;
             lucide.createIcons();
             return;
         }
 
-        ticketsFiltrados.forEach(t => {
-            const folio = t.id_ticket || t.doc_id;
-            const suc = t.sucursal || "N/A";
-            const tec = t.tec_nombre || t.proveedor || "N/A";
-            const fecha = t.fecha_creacion || "—";
-            
+        filtrados.forEach(inc => {
+            const idDoc = inc.id_documento;
+            const codigoIncidencia = inc.incidencia || "—";
+            const fechaRec = formatearFecha(inc.fechaRecepcion);
+            const tienda = inc.usuario || "—";
+            const codigoEq = inc.codigoEquipo || "—";
+            const fallos = inc.fallos || "—";
+
             let estadoHtml = "";
             let accionHtml = "";
 
-            if (tabActual === 'En proceso') {
-                estadoHtml = `<span class="status-badge status-en-proceso">En proceso</span>`;
-                accionHtml = `<button class="btn-action-primary" onclick="abrirModalEvaluacion('${folio}', false)">
-                                <i data-lucide="search" style="width: 14px; height: 14px;"></i> Revisar
-                              </button>`;
-            } else if (tabActual === 'Confirmados') {
-                estadoHtml = `<span class="status-badge status-confirmado">Aprobado</span>`;
-                accionHtml = `<button class="btn-action-primary" onclick="abrirModalEvaluacion('${folio}', true)">
-                                <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Ver CP
-                              </button>`;
-            } else if (tabActual === 'Rechazados') {
-                estadoHtml = `<span class="status-badge status-rechazado">No Aprobado</span>`;
-                accionHtml = `<button class="btn-action-primary" onclick="abrirModalEvaluacion('${folio}', true)">
-                                <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Ver CP
-                              </button>`;
+            if (tabActual === 'pendientes') {
+                estadoHtml = `
+                    <div class="status-cell-wrapper">
+                        <span class="status-badge bg-yellow">Pendiente</span>
+                    </div>
+                `;
+                accionHtml = `
+                    <div class="action-buttons-stack">
+                        <button class="btn-aprobar-row" onclick="aprobarIncidencia('${idDoc}')">
+                            <i data-lucide="check-circle" style="width:14px;"></i> Aprobado
+                        </button>
+                        <button class="btn-rechazar-row" onclick="abrirModalRechazo('${idDoc}')">
+                            <i data-lucide="x-circle" style="width:14px;"></i> Rechazado
+                        </button>
+                    </div>
+                `;
+            } else if (tabActual === 'aprobados') {
+                const fechaApr = formatearFechaEvaluacion(inc.fecha_aprobacion_trabajador);
+                estadoHtml = `
+                    <div class="status-cell-wrapper">
+                        <span class="status-badge bg-green">APROBADO</span>
+                        ${fechaApr ? `<span class="status-date">${fechaApr}</span>` : ''}
+                    </div>
+                `;
+                accionHtml = `<span style="color:#16a34a; font-weight:600; font-size:12px;">Aceptada por ti</span>`;
+            } else if (tabActual === 'rechazados') {
+                const fechaRech = formatearFechaEvaluacion(inc.fecha_rechazo_trabajador);
+                const motivo = inc.motivo_rechazo_trabajador || '';
+                estadoHtml = `
+                    <div class="status-cell-wrapper">
+                        <span class="status-badge bg-red">RECHAZADO</span>
+                        ${fechaRech ? `<span class="status-date">${fechaRech}</span>` : ''}
+                    </div>
+                `;
+                accionHtml = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                        <span style="color:#DC2626; font-weight:600; font-size:12px;">Rechazada</span>
+                        <span style="font-size:11px; color:#6b7280; line-height: 1.2;">${motivo}</span>
+                    </div>
+                `;
             }
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${folio}</strong></td>
-                <td>${suc}</td>
-                <td>${tec}</td>
-                <td>${fecha}</td>
+                <td><strong>${codigoIncidencia}</strong></td>
+                <td>${fechaRec}</td>
+                <td style="text-align: left;">${tienda}</td>
+                <td>${codigoEq}</td>
+                <td style="text-align: left; max-width: 230px;">${fallos}</td>
                 <td>${estadoHtml}</td>
                 <td>${accionHtml}</td>
             `;
             tbody.appendChild(tr);
         });
-
         lucide.createIcons();
     }
 
-    // ==========================================
-    // 6. FUNCIONES PARA VER EL PDF
-    // ==========================================
-    function prepararDatosParaPDF(ticketData) {
-        return {
-            sucursal: ticketData.sucursal || '',
-            suc_dir: ticketData.suc_dir || '',
-            suc_col: ticketData.suc_col || '',
-            suc_city: ticketData.suc_city || '',
-            suc_cp: ticketData.suc_cp || '',
-            suc_hor: ticketData.suc_hor || '',
-            suc_tel: ticketData.suc_tel || '',
-            suc_mail: ticketData.suc_mail || '',
-            ticket: ticketData.id_ticket || 'S/N',
-            area: ticketData.area || '',
-            subarea: ticketData.subarea || '',
-            desc_falla: ticketData.desc_falla || '',
-            fotos_falla: ticketData.urls_falla || [null, null, null],
-            desc_solucion: ticketData.desc_solucion || '',
-            fotos_solucion: ticketData.urls_solucion || [null, null, null],
-            prov_nombre: ticketData.prov_nombre || ticketData.proveedor || '',
-            prov_rfc: ticketData.prov_rfc || '',
-            prov_dir: ticketData.prov_dir || '',
-            prov_cont: ticketData.prov_cont || '',
-            prov_tel: ticketData.prov_tel || '',
-            prov_mail: ticketData.prov_mail || '',
-            tec_nombre: ticketData.tec_nombre || '',
-            tec_celular: ticketData.tec_celular || '',
-            comentario: ticketData.comentario || '',
-            firma: ticketData.url_firma || '',
-            foto_soporte: ticketData.url_soporte || null,
-            foto_selfie: ticketData.url_selfie || null,
-            fecha_hora: ticketData.fecha_hora_completa 
-                ? new Date(ticketData.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
-                : (ticketData.fecha_creacion || '')
-        };
-    }
-
-    function verPDF() {
-        const folio = document.getElementById('eval-folio').value;
-        const ticketData = window.ticketsPendientes[folio];
-        if(!ticketData) { showCustomAlert("Error", "No se encontraron los datos del ticket.", false); return; }
-        
-        sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(prepararDatosParaPDF(ticketData)));
-        window.open('index2.html', '_blank');
-    }
-    
-    // ==========================================
-    // 7. LÓGICA DEL MODAL DE EVALUACIÓN (EDIT Y LECTURA)
-    // ==========================================
-    function abrirModalEvaluacion(folio, isReadOnly = false) {
-        const ticket = window.ticketsPendientes[folio];
-        document.getElementById('eval-folio').value = folio;
-        
-        // Limpiar campos previos
-        document.getElementById('eval-nombre').value = ticket.evaluacion_nombre || '';
-        document.getElementById('eval-cargo').value = ticket.evaluacion_cargo || '';
-        document.getElementById('eval-numero').value = ticket.evaluacion_numero || '';
-        document.getElementById('eval-nivel').value = ticket.evaluacion_nivel || '';
-        document.getElementById('eval-comentario').value = ticket.evaluacion_comentario || '';
-        
-        quitarFoto(); 
-        limpiarFirmaModal();
-
-        // Cargar fotos guardadas si existen
-        if (ticket.evaluacion_selfie_url) {
-            mostrarFotoPreview(ticket.evaluacion_selfie_url);
-        }
-        if (ticket.evaluacion_firma_url) {
-            document.getElementById('eval-firma-data').value = ticket.evaluacion_firma_url;
-            const img = new Image();
-            img.onload = () => { if(ctxFirmaModal) ctxFirmaModal.drawImage(img, 0, 0, canvasFirmaModal.width, canvasFirmaModal.height); };
-            img.src = ticket.evaluacion_firma_url;
-        }
-
-        // MODO LECTURA VS MODO EDICIÓN
-        const inputs = ['eval-nombre', 'eval-cargo', 'eval-numero', 'eval-nivel', 'eval-comentario'];
-        inputs.forEach(id => {
-            const el = document.getElementById(id);
-            if (isReadOnly) {
-                el.setAttribute('readonly', 'readonly');
-                if(el.tagName === 'SELECT') el.setAttribute('disabled', 'disabled');
-            } else {
-                el.removeAttribute('readonly');
-                if(el.tagName === 'SELECT') el.removeAttribute('disabled');
-            }
-        });
-
-        // Ocultar botones de interacción si es ReadOnly
-        document.getElementById('btn-photo-take').style.display = isReadOnly ? 'none' : 'inline-flex';
-        document.getElementById('btn-photo-upload').style.display = isReadOnly ? 'none' : 'inline-flex';
-        document.getElementById('btn-clear-firma').style.display = isReadOnly ? 'none' : 'inline-flex';
-        document.getElementById('btn-enviar-eval').style.display = isReadOnly ? 'none' : 'inline-flex';
-        
-        const btnRemovePhoto = document.getElementById('btn-remove-selfie');
-        if (btnRemovePhoto) btnRemovePhoto.style.display = isReadOnly ? 'none' : '';
-
-        // Bloquear canvas
-        if (isReadOnly) {
-            if(canvasFirmaModal) canvasFirmaModal.style.pointerEvents = 'none';
-            document.getElementById('btn-cancelar-eval').innerHTML = '<i data-lucide="x-circle" style="color: currentColor; width: 18px; height: 18px;"></i> Cerrar';
-        } else {
-            if(canvasFirmaModal) canvasFirmaModal.style.pointerEvents = 'auto';
-            document.getElementById('btn-cancelar-eval').innerHTML = '<i data-lucide="x-circle" style="color: currentColor; width: 18px; height: 18px;"></i> Cancelar';
-        }
-
-        document.getElementById('modalEvaluacion').classList.add('active');
-        lucide.createIcons();
-        
-        setTimeout(() => { redimensionarCanvasFirma(); }, 100);
-    }
-
-    function cerrarModal() {
-        const slot = document.getElementById('eval-selfie-slot');
-        if(slot.classList.contains('zoomed')) { slot.classList.remove('zoomed'); }
-        if(document.getElementById('modal-card-eval').classList.contains('maximized')) { toggleMaximizarModal(); }
-        document.getElementById('modalEvaluacion').classList.remove('active');
-    }
-
-    function toggleMaximizarModal() {
-        const modal = document.getElementById('modal-card-eval');
-        const maxIcon = document.getElementById('maximize-icon');
-        const minIcon = document.getElementById('minimize-icon');
-        modal.classList.toggle('maximized');
-        maxIcon.style.display = modal.classList.contains('maximized') ? 'none' : 'block';
-        minIcon.style.display = modal.classList.contains('maximized') ? 'block' : 'none';
-        setTimeout(redimensionarCanvasFirma, 200);
-    }
-
-    // ==========================================
-    // 8. CÁMARA Y ARCHIVOS (SELFIE)
-    // ==========================================
-    let currentStreamModal;
-    let currentFacingModeModal = 'user'; 
-    
-    async function abrirCamaraEvaluacion() {
-        if (currentStreamModal) { currentStreamModal.getTracks().forEach(t => t.stop()); }
-        try { 
-            currentStreamModal = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingModeModal } }); 
-            document.getElementById('camera-video').srcObject = currentStreamModal; 
-            document.getElementById('camera-overlay').classList.add('show'); 
-        } catch (err) { window.alert("Permiso denegado o cámara no disponible."); }
-    }
-
-    function switchCameraEvaluacion() {
-        currentFacingModeModal = currentFacingModeModal === 'user' ? 'environment' : 'user';
-        abrirCamaraEvaluacion();
-    }
-    
-    function cerrarCamaraEvaluacion() { 
-        if (currentStreamModal) { currentStreamModal.getTracks().forEach(t => t.stop()); } 
-        document.getElementById('camera-overlay').classList.remove('show'); 
-    }
-    
-    function capturarSelfieEvaluacion() { 
-        const canvasT = document.getElementById('tempCanvasModal'); 
-        const video = document.getElementById('camera-video');
-        canvasT.width = video.videoWidth; canvasT.height = video.videoHeight; 
-        const ctx = canvasT.getContext('2d');
-        if (currentFacingModeModal === 'user') { ctx.translate(canvasT.width, 0); ctx.scale(-1, 1); }
-        ctx.drawImage(video, 0, 0, canvasT.width, canvasT.height); 
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        const base64Img = canvasT.toDataURL('image/jpeg', 0.8);
-        mostrarFotoPreview(base64Img);
-        cerrarCamaraEvaluacion(); 
-    }
-
-    function handleFileUpload(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) { mostrarFotoPreview(e.target.result); };
-        reader.readAsDataURL(file);
-        input.value = ''; 
-    }
-
-    function mostrarFotoPreview(base64Data) {
-        document.getElementById('eval-selfie-data').value = base64Data;
-        const imgEl = document.getElementById('eval-selfie-img');
-        imgEl.src = base64Data;
-        imgEl.style.display = 'block';
-        document.getElementById('eval-selfie-placeholder').style.display = 'none';
-        
-        const slot = document.getElementById('eval-selfie-slot');
-        slot.style.border = 'none';
-    }
-
-    function quitarFoto(event) {
-        if(event) event.stopPropagation();
-        const slot = document.getElementById('eval-selfie-slot');
-        if(slot.classList.contains('zoomed')) { slot.classList.remove('zoomed'); }
-        
-        document.getElementById('eval-selfie-data').value = '';
-        
-        const imgEl = document.getElementById('eval-selfie-img');
-        imgEl.src = '';
-        imgEl.style.display = 'none';
-        
-        document.getElementById('eval-selfie-placeholder').style.display = 'flex';
-        slot.style.border = '2px dashed #d1d5db';
-    }
-
-    function toggleZoom(slot) {
-        if(document.getElementById('eval-selfie-data').value !== '') {
-            slot.classList.toggle('zoomed');
-        }
-    }
-
-    // ==========================================
-    // 9. FIRMA TÁCTIL
-    // ==========================================
-    let canvasFirmaModal, ctxFirmaModal;
-    function inicializarFirmaModal() {
-        canvasFirmaModal = document.getElementById('eval-firma-canvas');
-        if(!canvasFirmaModal) return;
-        ctxFirmaModal = canvasFirmaModal.getContext('2d'); 
-        ctxFirmaModal.lineWidth = 3; 
-        ctxFirmaModal.lineCap = 'round'; 
-        ctxFirmaModal.strokeStyle = '#000000';
-        
-        let isDrawing = false;
-        function getCoordinates(e) {
-            const rect = canvasFirmaModal.getBoundingClientRect(); 
-            const cx = e.touches ? e.touches[0].clientX : e.clientX; 
-            const cy = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: (cx - rect.left) * (canvasFirmaModal.width / rect.width), y: (cy - rect.top) * (canvasFirmaModal.height / rect.height) };
-        }
-        const startDrawing = (e) => { 
-            isDrawing = true; 
-            const p = getCoordinates(e); 
-            ctxFirmaModal.beginPath(); ctxFirmaModal.moveTo(p.x, p.y); 
-        };
-        const draw = (e) => { 
-            if (!isDrawing) return;
-            e.preventDefault(); const p = getCoordinates(e); 
-            ctxFirmaModal.lineTo(p.x, p.y); ctxFirmaModal.stroke(); 
-        };
-        const stopDrawing = () => { 
-            if(isDrawing) { 
-                isDrawing = false; 
-                document.getElementById('eval-firma-data').value = canvasFirmaModal.toDataURL(); 
-            } 
-        };
-        canvasFirmaModal.addEventListener('mousedown', startDrawing);
-        canvasFirmaModal.addEventListener('mousemove', draw);
-        window.addEventListener('mouseup', stopDrawing);
-        canvasFirmaModal.addEventListener('touchstart', startDrawing, {passive: false});
-        canvasFirmaModal.addEventListener('touchmove', draw, {passive: false});
-        window.addEventListener('touchend', stopDrawing);
-    }
-
-    function redimensionarCanvasFirma() {
-        if(canvasFirmaModal) {
-            const container = canvasFirmaModal.parentElement;
-            canvasFirmaModal.width = container.offsetWidth;
-            canvasFirmaModal.height = container.offsetHeight;
-        }
-    }
-
-    function limpiarFirmaModal() { 
-        if(ctxFirmaModal && canvasFirmaModal) {
-            ctxFirmaModal.clearRect(0, 0, canvasFirmaModal.width, canvasFirmaModal.height); 
-            document.getElementById('eval-firma-data').value = ''; 
-        }
-    }
-
-    // ==========================================
-    // 10. ENVÍO DE DATOS A FIREBASE (STORAGE Y FIRESTORE)
-    // ==========================================
-    function dataURItoBlob(dataURI) {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], {type: mimeString});
-    }
-
-    async function enviarEvaluacion() {
-        const folio = document.getElementById('eval-folio').value;
-        const nombre = document.getElementById('eval-nombre').value.trim();
-        const numero = document.getElementById('eval-numero').value.trim();
-        const cargo = document.getElementById('eval-cargo').value.trim();
-        const nivel = document.getElementById('eval-nivel').value;
-        const comentario = document.getElementById('eval-comentario').value.trim();
-
-        // 1. FORZAR EXTRACCIÓN DE LA FIRMA
-        const canvasFirmaReal = document.getElementById('eval-firma-canvas');
-        const firmaVacia = document.createElement('canvas');
-        firmaVacia.width = canvasFirmaReal.width; firmaVacia.height = canvasFirmaReal.height;
-
-        if (canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL()) {
-            document.getElementById('eval-firma-data').value = canvasFirmaReal.toDataURL();
-        }
-
-        const selfieBase64 = document.getElementById('eval-selfie-data').value;
-        const firmaBase64 = document.getElementById('eval-firma-data').value;
-
-        // Validaciones
-        if (!nombre || !nivel) {
-            showCustomAlert("Atención", "Por favor, completa al menos el Nombre del Empleado y el Nivel de Servicio.", false);
-            return;
-        }
-        if (!firmaBase64) {
-            showCustomAlert("Atención", "La firma de autorización es obligatoria.", false);
-            return;
-        }
-
-        // Bloquear botones mientras carga
-        const btnEnviar = document.getElementById('btn-enviar-eval');
-        const btnCancelar = document.getElementById('btn-cancelar-eval');
-        btnEnviar.disabled = true;
-        btnEnviar.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i> Guardando...';
-        btnCancelar.disabled = true;
-
+    // === ACCIONES ===
+    async function aprobarIncidencia(idDoc) {
         try {
-            // Función auxiliar optimizada para subir archivos
-            const checkAndUpload = async (fileData, path) => {
-                if (fileData && fileData.startsWith('data:image')) {
-                    const ref = storage.ref(path);
-                    await ref.put(dataURItoBlob(fileData));
-                    return await ref.getDownloadURL();
-                }
-                return fileData || null; 
-            };
-
-            // Usamos la carpeta "ordenes/"
-            const selfieUrl = await checkAndUpload(selfieBase64, `ordenes/${folio}/eval_selfie_${Date.now()}.jpg`);
-            const firmaUrl = await checkAndUpload(firmaBase64, `ordenes/${folio}/eval_firma_${Date.now()}.png`);
-
-            // Obtener ID real del documento
-            const docObj = window.ticketsPendientes[folio];
-            if (!docObj) throw new Error("No se encontró el ticket localmente.");
-            const docRealId = docObj.doc_id || folio;
-            
-            // Actualizar en Firestore
-            await db.collection("tickets_mantenimiento").doc(docRealId).update({
-                evaluacion_nombre: nombre,
-                evaluacion_numero: numero,
-                evaluacion_cargo: cargo,
-                evaluacion_nivel: nivel,
-                evaluacion_comentario: comentario,
-                evaluacion_selfie_url: selfieUrl,
-                evaluacion_firma_url: firmaUrl,
-                estado_confirmacion: "Confirmado", // Avanza a la siguiente etapa
-                fecha_evaluacion: new Date().toISOString()
+            await db.collection("incidencias").doc(idDoc).update({
+                estado_asignacion: "Aprobado Trabajador",
+                fecha_aprobacion_trabajador: new Date().toISOString(),
+                motivo_rechazo_trabajador: firebase.firestore.FieldValue.delete()
             });
 
-            showCustomAlert("¡Éxito!", "Orden Confirmada exitosamente.", true);
-            cerrarModal();
-            cargarTodosLosTickets(); // Recargar la tabla y badges
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
+            if (index !== -1) {
+                incidenciasGlobales[index].estado_asignacion = "Aprobado Trabajador";
+                incidenciasGlobales[index].fecha_aprobacion_trabajador = new Date().toISOString();
+            }
 
+            showCustomAlert("¡Aprobada!", "Has aprobado la incidencia exitosamente.", true);
+            actualizarBadges();
+            renderTabla();
         } catch (error) {
-            console.error("Error confirmando la orden:", error);
-            showCustomAlert("Error al guardar", error.message || "Revisa tu conexión a internet.", false);
-        } finally {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = '<i data-lucide="check-circle" style="color: currentColor; width: 18px; height: 18px;"></i> Confirmar Orden';
-            btnCancelar.disabled = false;
-            lucide.createIcons();
+            console.error("Error al aprobar:", error);
+            showCustomAlert("Error", "No se pudo aprobar la incidencia.", false);
+        }
+    }
+
+    function abrirModalRechazo(idDoc) {
+        document.getElementById('rechazo-id-doc').value = idDoc;
+        document.getElementById('rechazo-motivo').value = '';
+        document.getElementById('modalRechazo').classList.add('active');
+    }
+
+    function cerrarModalRechazo() {
+        document.getElementById('modalRechazo').classList.remove('active');
+    }
+
+    async function confirmarRechazo() {
+        const idDoc = document.getElementById('rechazo-id-doc').value;
+        const motivo = document.getElementById('rechazo-motivo').value.trim();
+
+        if (!motivo) {
+            showCustomAlert("Atención", "Debes escribir un motivo para rechazar la incidencia.", false);
+            return;
+        }
+
+        try {
+            await db.collection("incidencias").doc(idDoc).update({
+                estado_asignacion: "Rechazado Trabajador",
+                motivo_rechazo_trabajador: motivo,
+                fecha_rechazo_trabajador: new Date().toISOString()
+            });
+
+            const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
+            if (index !== -1) {
+                incidenciasGlobales[index].estado_asignacion = "Rechazado Trabajador";
+                incidenciasGlobales[index].motivo_rechazo_trabajador = motivo;
+                incidenciasGlobales[index].fecha_rechazo_trabajador = new Date().toISOString();
+            }
+
+            cerrarModalRechazo();
+            showCustomAlert("Rechazada", "La incidencia ha sido rechazada.", true);
+            actualizarBadges();
+            renderTabla();
+        } catch (error) {
+            console.error("Error al rechazar:", error);
+            showCustomAlert("Error", "No se pudo rechazar la incidencia.", false);
         }
     }
 </script>
