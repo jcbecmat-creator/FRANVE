@@ -63,6 +63,8 @@
         .btn-search:hover { opacity: 0.9; }
         .btn-reset { height: 42px; background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; padding: 0 16px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background 0.2s; }
         .btn-reset:hover { background: #E2E8F0; }
+        .btn-add { height: 42px; background: #16a34a; color: white; border: none; padding: 0 16px; border-radius: 8px; font-weight: 400 !important; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; }
+        .btn-add:hover { opacity: 0.9; }
         
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
         .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
@@ -79,6 +81,9 @@
         .co-table tr:hover td { background-color: #F8FAFC; }
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
+        /* Fila seleccionada para edición */
+        .co-table tr.row-selected td { background-color: #e0f2fe !important; } 
+
         .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
 
         .assign-select { height: 36px; padding: 0 32px 0 12px; font-size: 13px; color: #111827; background-color: #FFFFFF; border: 1.5px solid #D1D5DB; border-radius: 6px; width: 100%; max-width: 200px; box-sizing: border-box; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; transition: all 0.2s ease; cursor: pointer; }
@@ -93,10 +98,34 @@
         .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         
-        /* ESTILOS PARA MOTIVO DE RECHAZO */
         .rechazo-motivo-badge { display: block; margin-top: 4px; font-size: 10px; color: #DC2626; font-weight: 600; text-transform: none !important; background: #FEE2E2; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+        /* MODALES Y FORMULARIOS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-card-form { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 600px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-form-header { margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-form-header h2 { margin: 0; font-size: 20px; color: #111827; font-weight: 800 !important; }
+        .modal-form-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #6b7280; }
+        
+        .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .modal-form-full { grid-column: span 2; }
+        .form-input-modal { width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+        textarea.form-input-modal { resize: vertical; min-height: 80px; }
+        .form-input-modal:focus { outline: none; border-color: #81D0DC; box-shadow: 0 0 0 3px rgba(129, 208, 220, 0.15); }
+        .form-label-modal { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 6px; text-transform: uppercase; }
+        
+        .modal-form-actions { display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        .btn-cancel-modal { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600 !important; cursor: pointer; }
+        .btn-save-modal { background: #81D0DC; color: #131520; border: none; height: 44px; padding: 0 20px; border-radius: 8px; font-weight: 600 !important; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
+        .btn-save-modal:hover { opacity: 0.85; }
+        .btn-save-modal:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* BOTÓN FLOTANTE EDICIÓN */
+        .fab-edit { position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700 !important; cursor: pointer; box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: none; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s; }
+        .fab-edit:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
+
         #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700 !important; }
@@ -238,6 +267,9 @@
                             <button class="btn-reset" type="button" onclick="limpiarFiltros()">
                                 <i data-lucide="refresh-cw" style="width: 14px;"></i> Limpiar
                             </button>
+                            <button class="btn-add" type="button" onclick="abrirModalAgregar()">
+                                <i data-lucide="plus" style="width: 14px;"></i> Agregar
+                            </button>
                         </div>
                     </form>
 
@@ -247,7 +279,7 @@
                                 <tr>
                                     <th>Incidencia</th>
                                     <th>Fecha Recepción</th>
-                                    <th>Tienda / Usuario</th>
+                                    <th>Tienda</th>
                                     <th>Código Equipo</th>
                                     <th>Instalación</th>
                                     <th>Origen / Tipo</th>
@@ -266,6 +298,113 @@
             </main>
         </div>
     </div>
+
+    <!-- MODAL AGREGAR INCIDENCIA -->
+    <div id="modalAgregar" class="modal-overlay">
+        <div class="modal-card-form">
+            <div class="modal-form-header">
+                <h2>Agregar Incidencia</h2>
+                <button onclick="cerrarModalAgregar()">&times;</button>
+            </div>
+            <div class="modal-form-grid">
+                <div>
+                    <label class="form-label-modal">Incidencia</label>
+                    <input type="text" id="add-incidencia" class="form-input-modal" placeholder="Ej. 13036-00001">
+                </div>
+                <div>
+                    <label class="form-label-modal">Fecha Recepción</label>
+                    <input type="datetime-local" id="add-fecha" class="form-input-modal">
+                </div>
+                <div>
+                    <label class="form-label-modal">Tienda</label>
+                    <input type="text" id="add-tienda" class="form-input-modal" placeholder="Nombre del restaurante">
+                </div>
+                <div>
+                    <label class="form-label-modal">Código Equipo</label>
+                    <input type="text" id="add-codigo" class="form-input-modal" placeholder="Ej. AC-001">
+                </div>
+                <div>
+                    <label class="form-label-modal">Instalación</label>
+                    <input type="text" id="add-instalacion" class="form-input-modal" placeholder="Ej. Cocina">
+                </div>
+                <div>
+                    <label class="form-label-modal">Tipo</label>
+                    <input type="text" id="add-tipo" class="form-input-modal" placeholder="Ej. Anomalía">
+                </div>
+                <div class="modal-form-full">
+                    <label class="form-label-modal">Fallo Reportado</label>
+                    <textarea id="add-fallo" class="form-input-modal" placeholder="Descripción del fallo..."></textarea>
+                </div>
+                <div class="modal-form-full">
+                    <label class="form-label-modal">Observaciones</label>
+                    <textarea id="add-obs" class="form-input-modal" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+            </div>
+            <div class="modal-form-actions">
+                <button class="btn-cancel-modal" type="button" onclick="cerrarModalAgregar()">Cancelar</button>
+                <button class="btn-save-modal" id="btn-guardar-add" type="button" onclick="guardarNuevaIncidencia()">
+                    <i data-lucide="save" style="width:16px;"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR INCIDENCIA -->
+    <div id="modalEditar" class="modal-overlay">
+        <div class="modal-card-form">
+            <div class="modal-form-header">
+                <h2>Editar Incidencia</h2>
+                <button onclick="cerrarModalEdicion()">&times;</button>
+            </div>
+            <input type="hidden" id="edit-id-doc">
+            <div class="modal-form-grid">
+                <div>
+                    <label class="form-label-modal">Incidencia</label>
+                    <input type="text" id="edit-incidencia" class="form-input-modal">
+                </div>
+                <div>
+                    <label class="form-label-modal">Fecha Recepción</label>
+                    <input type="datetime-local" id="edit-fecha" class="form-input-modal">
+                </div>
+                <div>
+                    <label class="form-label-modal">Tienda</label>
+                    <input type="text" id="edit-tienda" class="form-input-modal">
+                </div>
+                <div>
+                    <label class="form-label-modal">Código Equipo</label>
+                    <input type="text" id="edit-codigo" class="form-input-modal">
+                </div>
+                <div>
+                    <label class="form-label-modal">Instalación</label>
+                    <input type="text" id="edit-instalacion" class="form-input-modal">
+                </div>
+                <div>
+                    <label class="form-label-modal">Tipo</label>
+                    <input type="text" id="edit-tipo" class="form-input-modal">
+                </div>
+                <div class="modal-form-full">
+                    <label class="form-label-modal">Fallo Reportado</label>
+                    <textarea id="edit-fallo" class="form-input-modal"></textarea>
+                </div>
+                <div class="modal-form-full">
+                    <label class="form-label-modal">Observaciones</label>
+                    <textarea id="edit-obs" class="form-input-modal"></textarea>
+                </div>
+            </div>
+            <div class="modal-form-actions">
+                <button class="btn-cancel-modal" type="button" onclick="cerrarModalEdicion()">Cancelar</button>
+                <button class="btn-save-modal" id="btn-guardar-edit" type="button" onclick="guardarEdicionIncidencia()">
+                    <i data-lucide="save" style="width:16px;"></i> Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE EDICIÓN -->
+    <button id="btn-editar-flotante" class="fab-edit" onclick="abrirModalEdicion()">
+        <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i> 
+        Editar Incidencia
+    </button>
 
     <div id="custom-alert" class="modal-overlay">
         <div class="modal-card-alert">
@@ -293,6 +432,7 @@
     let incidenciasGlobales = [];
     let tabActual = 'pendientes';
     let historialCompletoCargado = false; 
+    let incidenciaSeleccionadaId = null;
 
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
@@ -315,35 +455,26 @@
         if (!fechaField) return new Date(0);
         if (typeof fechaField.toDate === 'function') return fechaField.toDate();
         if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
-        
-        try {
-            const meses = {
-                "enero": 0, "febrero": 1, "marzo": 2, "abril": 3, "mayo": 4, "junio": 5,
-                "julio": 6, "agosto": 7, "septiembre": 8, "octubre": 9, "noviembre": 10, "diciembre": 11
-            };
-            const partes = fechaField.toLowerCase().split(' ');
-            const dia = parseInt(partes[0]);
-            const mesStr = partes[2];
-            const año = parseInt(partes[4]);
-            
-            if (!isNaN(dia) && meses[mesStr] !== undefined && !isNaN(año)) {
-                return new Date(año, meses[mesStr], dia);
-            }
-        } catch (e) {}
         return new Date(fechaField);
     }
 
+    // Convierte fecha a formato yyyy-MM-ddThh:mm para el input datetime-local
+    function toDatetimeLocal(fechaField) {
+        let d = parsearFechaFirebase(fechaField);
+        if(isNaN(d.getTime())) d = new Date();
+        const offset = d.getTimezoneOffset()
+        const local = new Date(d.getTime() - (offset*60000))
+        return local.toISOString().slice(0,16);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        try {
-            if (window.lucide) { lucide.createIcons(); }
-        } catch (e) { console.warn("Lucide no cargó inicialmente"); }
+        try { if (window.lucide) lucide.createIcons(); } catch (e) { console.warn("Lucide no cargó inicialmente"); }
         
         try {
             const savedUser = sessionStorage.getItem('loginUser');
             if(savedUser && document.getElementById('user-initial-header')) {
                 document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
             }
-
             const appDataStr = sessionStorage.getItem('loginSession');
             if(appDataStr) {
                 const appData = JSON.parse(appDataStr);
@@ -375,13 +506,10 @@
 
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
-        const alertTitle = document.getElementById('alert-title');
-        const alertMsg = document.getElementById('alert-msg');
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = message;
         const alertIcon = document.getElementById('alert-icon-container');
         const alertBtn = document.getElementById('alert-btn');
-
-        alertTitle.innerText = title;
-        alertMsg.innerText = message;
 
         if(isSuccess) {
             alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
@@ -390,14 +518,10 @@
             alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
             alertBtn.style.background = '#DC2626';
         }
-
         alertBox.style.display = 'flex';
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
-
-    function closeCustomAlert() {
-        document.getElementById('custom-alert').style.display = 'none';
-    }
+    function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
     async function cargarListaUsuarios() {
         try {
@@ -409,14 +533,12 @@
                     return;
                 }
             }
-            
             const usuariosSnapshot = await db.collection("usuarios").get();
             listaUsuariosGlobal = [];
             usuariosSnapshot.forEach(doc => {
                 const u = doc.data();
                 if (u.nombre) listaUsuariosGlobal.push(u.nombre);
             });
-
             if (listaUsuariosGlobal.length === 0) {
                 listaUsuariosGlobal = ["JUAN PÉREZ", "CARLOS MENDOZA", "JOSE ALFREDO JIMENEZ MIJANGOS", "SOPORTE TÉCNICO"];
             }
@@ -431,7 +553,6 @@
         tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Consultando colección en Cloud Firestore...</td></tr>';
 
         let query = db.collection("incidencias");
-        
         if (!traerTodoElHistorial) {
             query = query.limit(100); 
             historialCompletoCargado = false;
@@ -439,22 +560,20 @@
             historialCompletoCargado = true;
         }
 
-        query.get()
-            .then((querySnapshot) => {
-                incidenciasGlobales = [];
-                querySnapshot.forEach((doc) => {
-                    let data = doc.data();
-                    data.id_documento = doc.id;
-                    incidenciasGlobales.push(data);
-                });
-                actualizarBadges();
-                ejecutarFiltradoLogico();
-            })
-            .catch((error) => {
-                console.error("Error: ", error);
-                tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty" style="color: #ef4444;"><i data-lucide="alert-circle" class="inline mr-2"></i> Error al conectar con Firebase.</td></tr>';
-                try { if(window.lucide) lucide.createIcons(); } catch(e){}
+        query.get().then((querySnapshot) => {
+            incidenciasGlobales = [];
+            querySnapshot.forEach((doc) => {
+                let data = doc.data();
+                data.id_documento = doc.id;
+                incidenciasGlobales.push(data);
             });
+            actualizarBadges();
+            ejecutarFiltradoLogico();
+        }).catch((error) => {
+            console.error("Error: ", error);
+            tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty" style="color: #ef4444;">Error al conectar con Firebase.</td></tr>';
+            try { if(window.lucide) lucide.createIcons(); } catch(e){}
+        });
     }
 
     function actualizarBadges() {
@@ -462,14 +581,9 @@
         incidenciasGlobales.forEach(inc => {
             const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
             const estAsignacion = inc.estado_asignacion || "";
-
-            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") {
-                r++;
-            } else if (asignado !== "") {
-                e++;
-            } else {
-                p++;
-            }
+            if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") { r++; }
+            else if (asignado !== "") { e++; }
+            else { p++; }
         });
         document.getElementById('badge-pendientes').innerText = p;
         document.getElementById('badge-enviados').innerText = e;
@@ -481,7 +595,35 @@
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         const btnActivo = document.getElementById('tab-' + tab);
         if(btnActivo) btnActivo.classList.add('active');
+        incidenciaSeleccionadaId = null; // Limpiar selección al cambiar tab
+        gestionarBotonFlotante();
         filtrarIncidencias();
+    }
+
+    function seleccionarFila(trElement, idDoc) {
+        // Solo permitir selección en pendientes
+        if(tabActual !== 'pendientes') return;
+
+        if(incidenciaSeleccionadaId === idDoc) {
+            // Deseleccionar
+            incidenciaSeleccionadaId = null;
+            trElement.classList.remove('row-selected');
+        } else {
+            // Seleccionar nuevo
+            document.querySelectorAll('.row-selected').forEach(el => el.classList.remove('row-selected'));
+            incidenciaSeleccionadaId = idDoc;
+            trElement.classList.add('row-selected');
+        }
+        gestionarBotonFlotante();
+    }
+
+    function gestionarBotonFlotante() {
+        const fab = document.getElementById('btn-editar-flotante');
+        if(incidenciaSeleccionadaId && tabActual === 'pendientes') {
+            fab.style.display = 'flex';
+        } else {
+            fab.style.display = 'none';
+        }
     }
 
     function renderizarTabla(listaIncidencias) {
@@ -498,7 +640,10 @@
             const idDoc = inc.id_documento;
             const codigoIncidencia = inc.incidencia || "—";
             const fechaRec = formatearFecha(inc.fechaRecepcion);
-            const tienda = inc.usuario || "—";
+            
+            // CAMBIO SOLICITADO: Toma primero restaurante_nombre, luego tienda, luego usuario
+            const tienda = inc.restaurante_nombre || inc.tienda || inc.usuario || "—";
+            
             const codigoEq = inc.codigoEquipo || "—";
             const instalacion = inc.instalacion || "—";
             const origen = inc.origen || "Correctiva";
@@ -521,19 +666,24 @@
             });
             selectHtml += `</select>`;
             
-            // Mostrar motivo si está en rechazados
             if (tabActual === 'rechazados' && motivoRechazo) {
                 selectHtml += `<span class="rechazo-motivo-badge" title="${motivoRechazo}">Motivo: ${motivoRechazo}</span>`;
             }
 
             let btnHtml = `
-                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="manejarAccionFila('${idDoc}')">
+                <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="event.stopPropagation(); manejarAccionFila('${idDoc}')">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
                     <span class="lbl-text">${btnText}</span>
                 </button>
             `;
 
+            const isSelectedClass = incidenciaSeleccionadaId === idDoc ? 'row-selected' : '';
+
             const tr = document.createElement('tr');
+            tr.className = isSelectedClass;
+            tr.setAttribute('onclick', `seleccionarFila(this, '${idDoc}')`);
+            tr.style.cursor = 'pointer';
+
             tr.innerHTML = `
                 <td><span class="incidencia-bold">${codigoIncidencia}</span></td>
                 <td>${fechaRec}</td>
@@ -590,8 +740,6 @@
 
         try {
             const nuevoEstado = usuarioAsignado ? "Asignado" : "Pendiente";
-            
-            // Objeto base de actualización
             const updateData = {
                 usuario_asignado: usuarioAsignado,
                 usuario_assigned: usuarioAsignado,
@@ -599,7 +747,6 @@
                 estado_asignacion: nuevoEstado
             };
 
-            // Si estamos reasignando una incidencia rechazada, limpiamos los campos de rechazo
             const estAsignacion = incidenciasGlobales.find(i => i.id_documento === idDocumento)?.estado_asignacion || "";
             if (estAsignacion === "Rechazado Trabajador") {
                 updateData.motivo_rechazo_trabajador = firebase.firestore.FieldValue.delete();
@@ -621,23 +768,24 @@
             }
 
             actualizarBadges();
-
             selectElement.disabled = true;
             buttonElement.innerHTML = `<i data-lucide="edit-3" style="width:14px; height:14px;"></i> <span class="lbl-text">Editar</span>`;
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
 
             if (usuarioAsignado) {
-                showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada correctamente a: ${usuarioAsignado}.`, true);
+                showCustomAlert("¡Asignación Exitosa!", `La incidencia ha sido asignada a: ${usuarioAsignado}.`, true);
             } else {
-                showCustomAlert("Actualizado", "Se ha removido la asignación de la orden de servicio.", true);
+                showCustomAlert("Actualizado", "Se ha removido la asignación.", true);
             }
             
+            // Remover selección y ocultar botón flotante
+            incidenciaSeleccionadaId = null;
+            gestionarBotonFlotante();
             ejecutarFiltradoLogico();
 
         } catch (error) {
             console.error("Error al actualizar:", error);
-            showCustomAlert("Error de Asignación", "No se pudo guardar en Firebase. Revisa la conexión.", false);
-            
+            showCustomAlert("Error de Asignación", "No se pudo guardar en Firebase.", false);
             selectElement.disabled = false;
             buttonElement.innerHTML = `<i data-lucide="user-plus" style="width:14px; height:14px;"></i> <span class="lbl-text">Asignar</span>`;
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
@@ -646,69 +794,45 @@
         }
     }
 
-    function filtrarIncidencias() {
-        const fInicio = document.getElementById('filtro-inicio').value;
-        const fFin = document.getElementById('filtro-fin').value;
+    // ==========================================
+    // LÓGICA DEL MODAL AGREGAR
+    // ==========================================
+    function abrirModalAgregar() {
+        document.getElementById('add-incidencia').value = '';
+        document.getElementById('add-fecha').value = toDatetimeLocal(new Date());
+        document.getElementById('add-tienda').value = '';
+        document.getElementById('add-codigo').value = '';
+        document.getElementById('add-instalacion').value = '';
+        document.getElementById('add-tipo').value = 'Anomalía';
+        document.getElementById('add-fallo').value = '';
+        document.getElementById('add-obs').value = '';
+        document.getElementById('modalAgregar').classList.add('active');
+        try { if(window.lucide) lucide.createIcons(); } catch(e){}
+    }
+    function cerrarModalAgregar() { document.getElementById('modalAgregar').classList.remove('active'); }
 
-        if ((fInicio || fFin) && !historialCompletoCargado) {
-            cargarIncidenciasFirebase(true); 
+    async function guardarNuevaIncidencia() {
+        const incidencia = document.getElementById('add-incidencia').value.trim();
+        const fechaVal = document.getElementById('add-fecha').value;
+        const tienda = document.getElementById('add-tienda').value.trim();
+        const codigo = document.getElementById('add-codigo').value.trim();
+        const instalacion = document.getElementById('add-instalacion').value.trim();
+        const tipo = document.getElementById('add-tipo').value.trim();
+        const fallo = document.getElementById('add-fallo').value.trim();
+        const obs = document.getElementById('add-obs').value.trim();
+
+        if(!incidencia || !tienda) {
+            showCustomAlert("Atención", "Incidencia y Tienda son obligatorias.", false);
             return;
         }
 
-        ejecutarFiltradoLogico();
-    }
+        const btn = document.getElementById('btn-guardar-add');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:16px;"></i> Guardando...';
+        try { if(window.lucide) lucide.createIcons(); } catch(e){}
 
-    function ejecutarFiltradoLogico() {
-        const fInicio = document.getElementById('filtro-inicio').value;
-        const fFin = document.getElementById('filtro-fin').value;
-        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
-
-        let filtrados = incidenciasGlobales.filter(inc => {
-            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
-            const estAsignacion = inc.estado_asignacion || "";
-
-            if (tabActual === 'pendientes') {
-                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador" || asignado !== "") return false;
-            } else if (tabActual === 'enviados') {
-                if (asignado === "" || estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") return false;
-            } else if (tabActual === 'rechazados') {
-                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados" && estAsignacion !== "Rechazado Trabajador") return false;
-            }
-
-            if (fBuscar) {
-                const incidenciaCod = (inc.incidencia || "").toLowerCase();
-                const nombreTienda = (inc.usuario || "").toLowerCase();
-                const trabajador = asignado.toLowerCase();
-                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
-                    return false;
-                }
-            }
-
-            if (fInicio || fFin) {
-                const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
-                
-                if (fInicio) {
-                    const dateInicioObj = new Date(fInicio + "T00:00:00");
-                    if (fechaDocObj < dateInicioObj) return false;
-                }
-                if (fFin) {
-                    const dateFinObj = new Date(fFin + "T23:59:59");
-                    if (fechaDocObj > dateFinObj) return false;
-                }
-            }
-
-            return true;
-        });
-
-        renderizarTabla(filtrados);
-    }
-
-    function limpiarFiltros() {
-        document.getElementById('filtro-inicio').value = '';
-        document.getElementById('filtro-fin').value = '';
-        document.getElementById('filtro-buscar').value = '';
-        cargarIncidenciasFirebase(false); 
-    }
-</script>
-</body>
-</html>
+        try {
+            const newDoc = {
+                incidencia: incidencia,
+                fechaRecepcion: fechaVal ? new Date(fechaVal) : new Date(),
+                restauran
