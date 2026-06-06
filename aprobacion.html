@@ -260,9 +260,7 @@
                             <a class="sidebar-link activa" href="aprobacion.html">
                                 <i data-lucide="badge-check"></i> Aprobación de costos
                             </a>
-                            <a class="sidebar-link" href="aprobacion_gerencia.html">
-                                <i data-lucide="shield-check"></i> Aprobación gerencia
-                            </a>
+                            <!-- ENLACE DE APROBACIÓN GERENCIA ELIMINADO -->
                             <a class="sidebar-link" href="facturacion.html">
                                 <i data-lucide="file-text"></i> Facturación
                             </a>
@@ -569,7 +567,7 @@
 
         ticketsFiltrados.forEach(t => {
             const folio = t.id_ticket;
-            const suc = (t.sucursal || "N/A").toUpperCase(); // Transformado a mayúsculas
+            const suc = (t.sucursal || "N/A").toUpperCase();
             const fecha = t.fecha_captura_costos ? new Date(t.fecha_captura_costos).toLocaleDateString('es-MX') : (t.fecha_creacion ? new Date(t.fecha_creacion).toLocaleDateString('es-MX') : "—");
             const totalTxt = formateaMoneda(t.costo_total || 0);
             
@@ -800,7 +798,8 @@
                 conceptosActualizados[i].fecha_evaluacion = estadoEvaluaciones[i].fecha;
             }
 
-            const nuevoEstado = algunRechazado ? "Costos Rechazados" : "Pendiente Gerencia";
+            // CAMBIO CLAVE: Si aprueba, va directo a "Costos Aprobados" (Facturación). Si rechaza, a "Costos Rechazados".
+            const nuevoEstado = algunRechazado ? "Costos Rechazados" : "Costos Aprobados";
 
             const subtotalAprobadoNum = parseFloat(document.getElementById('modal-importe-aprobado').innerText.replace(/[^0-9.-]+/g,""));
             const ivaAprobadoNum = parseFloat(document.getElementById('modal-iva-aprobado').innerText.replace(/[^0-9.-]+/g,""));
@@ -834,32 +833,16 @@
         if(!t) { showCustomAlert("Error", "Error al cargar datos del ticket.", false); return; }
 
         const datosParaPDF = {
-            sucursal: t.sucursal || '',
-            suc_dir: t.suc_dir || '',
-            suc_col: t.suc_col || '',
-            suc_city: t.suc_city || '',
-            suc_cp: t.suc_cp || '',
-            suc_hor: t.suc_hor || '',
-            suc_tel: t.suc_tel || '',
-            suc_mail: t.suc_mail || '',
-            ticket: t.id_ticket || 'S/N',
-            area: t.area || '',
-            subarea: t.subarea || '',
-            desc_falla: t.desc_falla || '',
-            fotos_falla: t.urls_falla || [null, null, null],
-            desc_solucion: t.desc_solucion || '',
+            sucursal: t.sucursal || '', suc_dir: t.suc_dir || '', suc_col: t.suc_col || '',
+            suc_city: t.suc_city || '', suc_cp: t.suc_cp || '', suc_hor: t.suc_hor || '',
+            suc_tel: t.suc_tel || '', suc_mail: t.suc_mail || '', ticket: t.id_ticket || 'S/N',
+            area: t.area || '', subarea: t.subarea || '', desc_falla: t.desc_falla || '',
+            fotos_falla: t.urls_falla || [null, null, null], desc_solucion: t.desc_solucion || '',
             fotos_solucion: t.urls_solucion || [null, null, null],
-            prov_nombre: t.prov_nombre || t.proveedor || '',
-            prov_rfc: t.prov_rfc || '',
-            prov_dir: t.prov_dir || '',
-            prov_cont: t.prov_cont || '',
-            prov_tel: t.prov_tel || '',
-            prov_mail: t.prov_mail || '',
-            tec_nombre: t.tec_nombre || '',
-            tec_celular: t.tec_celular || '',
-            comentario: t.comentario || '',
-            firma: t.url_firma || '',
-            foto_soporte: t.url_soporte || null,
+            prov_nombre: t.prov_nombre || t.proveedor || '', prov_rfc: t.prov_rfc || '',
+            prov_dir: t.prov_dir || '', prov_cont: t.prov_cont || '', prov_tel: t.prov_tel || '',
+            prov_mail: t.prov_mail || '', tec_nombre: t.tec_nombre || '', tec_celular: t.tec_celular || '',
+            comentario: t.comentario || '', firma: t.url_firma || '', foto_soporte: t.url_soporte || null,
             foto_selfie: t.url_selfie || null,
             fecha_hora: t.fecha_hora_completa 
                 ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
