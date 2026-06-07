@@ -296,14 +296,8 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="form-card">
-                                <h3 class="section-title"><i data-lucide="ticket"></i> Tickets</h3>
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Número de Ticket / Referencia (OPCIONAL)</label>
-                                    <input type="text" class="form-input" id="ticket_glpi" placeholder="Ej. 10293">
-                                </div>
-                            </div>
+
+                            <!-- ★ SECCIÓN TICKETS ELIMINADA ★ -->
 
                             <div class="form-card">
                                 <h3 class="section-title"><i data-lucide="layers"></i> Instalación / Fallo</h3>
@@ -416,7 +410,6 @@
         </div>
     </div>
 
-    <!-- MODAL LECTURA CP -->
     <div id="modalLecturaCP">
         <div class="modal-card-cp">
             <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; background: #fff;">
@@ -482,8 +475,6 @@
         // ==========================================
         // 1. CONFIGURACIÓN - TODO EN FRAVE
         // ==========================================
-        // ★★★ PROYECTO ÚNICO: FRAVE (frave-4fbbf) ★★★
-        // Firestore + Storage + Incidencias todo en FRAVE
         const firebaseConfig2 = {
             apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
             authDomain: "frave-4fbbf.firebaseapp.com",
@@ -493,12 +484,10 @@
             appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
         };
 
-        // Inicializar Firebase (un solo proyecto)
         if (!firebase.apps.find(app => app.name === '[DEFAULT]')) {
             firebase.initializeApp(firebaseConfig2);
         }
 
-        // ★★★ TODAS LAS CONEXIONES VAN AL PROYECTO FRAVE ★★★
         const db = firebase.firestore();
         const storage = firebase.storage();
         const dbIncidencias = firebase.firestore();
@@ -632,7 +621,7 @@
             document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="edit-2" style="width: 16px;"></i> Editando`; lucide.createIcons();
             document.getElementById('doc_id_actual').value = o.id_doc; document.getElementById('folio_mc').value = o.id_ticket || ''; document.getElementById('incidencia-input').value = o.id_incidencia || ''; document.getElementById('incidencia_doc_id').value = o.id_incidencia_doc || '';
             document.getElementById('sucursal-input').value = o.sucursal || ''; document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
-            document.getElementById('ticket_glpi').value = o.ticket_glpi || ''; document.getElementById('area-input').value = o.area || ''; document.getElementById('subarea-select').value = o.subarea || ''; document.getElementById('desc_falla').value = o.desc_falla || '';
+            document.getElementById('area-input').value = o.area || ''; document.getElementById('subarea-select').value = o.subarea || ''; document.getElementById('desc_falla').value = o.desc_falla || '';
             document.getElementById('desc_solucion').value = o.desc_solucion || ''; document.getElementById('nombre_tecnico').value = o.tec_nombre || ''; document.getElementById('celular_tecnico').value = o.tec_celular || ''; document.getElementById('comentario_salida').value = o.comentario || '';
             fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null]; fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
             while(fotos.falla.length < 3) fotos.falla.push(null); while(fotos.solucion.length < 3) fotos.solucion.push(null);
@@ -692,7 +681,6 @@
                     id_ticket: folioActual, 
                     id_incidencia: document.getElementById('incidencia-input').value || '', 
                     id_incidencia_doc: document.getElementById('incidencia_doc_id').value || '', 
-                    ticket_glpi: document.getElementById('ticket_glpi').value || '', 
                     sucursal: document.getElementById('sucursal-input').value || '', 
                     suc_dir: document.getElementById('suc-dir').innerText || '', 
                     suc_col: document.getElementById('suc-col').innerText || '', 
