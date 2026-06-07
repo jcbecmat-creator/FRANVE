@@ -138,6 +138,7 @@
                         </ul>
                     </div>
                     <div class="header-right">
+                        <!-- El logo static sí necesita crossorigin porque viene de ibb.co -->
                         <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img" crossorigin="anonymous">
                     </div>
                 </div>
@@ -295,7 +296,6 @@
             }
         }
 
-        // FUNCIÓN PARA ESPERAR A QUE CARGUEN LAS IMÁGENES DE FIREBASE
         function esperarImagenes() {
             return new Promise((resolve) => {
                 const imagenes = document.querySelectorAll('#contenido-pdf img');
@@ -308,17 +308,14 @@
                 }
 
                 imagenes.forEach((img) => {
-                    // Si la imagen ya cargó (por caché)
-                    if (img.complete) {
+                    if (img.complete && img.naturalHeight !== 0) {
                         cargadas++;
                         if (cargadas === total) resolve();
                     } else {
-                        // Si aún no carga, esperamos el evento onload
                         img.onload = () => {
                             cargadas++;
                             if (cargadas === total) resolve();
                         };
-                        // Si la imagen falla (error 404), la contamos para no bloquear el PDF
                         img.onerror = () => {
                             cargadas++;
                             if (cargadas === total) resolve();
@@ -378,40 +375,36 @@
                 document.getElementById('pdf-prov-tel').innerText = data.prov_tel;
                 document.getElementById('pdf-prov-mail').innerText = data.prov_mail;
 
-                // Inyección de imágenes con crossorigin
+                // SIN CROSSORIGIN PARA LAS IMÁGENES DINÁMICAS DE FIREBASE
                 data.fotos_falla.forEach((fotoBase64, index) => {
-                    if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}" crossorigin="anonymous">`; }
+                    if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
                 });
 
                 data.fotos_solucion.forEach((fotoBase64, index) => {
-                    if(fotoBase64) { document.getElementById(`pdf-sol-${index}`).innerHTML = `<img src="${fotoBase64}" crossorigin="anonymous">`; }
+                    if(fotoBase64) { document.getElementById(`pdf-sol-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
                 });
 
-                if(data.firma) { document.getElementById('pdf-firma').innerHTML = `<img src="${data.firma}" crossorigin="anonymous">`; }
-                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}" crossorigin="anonymous">`; }
-                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}" crossorigin="anonymous">`; }
+                if(data.firma) { document.getElementById('pdf-firma').innerHTML = `<img src="${data.firma}">`; }
+                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}">`; }
+                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}">`; }
 
             } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
         });
 
-        // FUNCIÓN ASÍNCRONA PARA DESCARGAR PDF
         async function generarPDF() {
             document.body.classList.add('pdf-generating');
 
             const btn = document.getElementById('btn-descargar');
             const btnR = document.querySelector('.btn-regresar');
             
-            // Avisamos al usuario que estamos esperando que carguen las fotos
             btn.innerText = 'Cargando fotos...';
-            btn.disabled = true; // Evitamos múltiples clics
+            btn.disabled = true;
             btnR.style.display = 'none';
 
             window.scrollTo(0, 0);
 
-            // ESPERAMOS A QUE FIREBASE TERMINE DE CARGAR LAS IMÁGENES
             await esperarImagenes();
 
-            // Una vez cargadas, avisamos que está generando el PDF
             btn.innerText = 'Generando PDF...';
 
             const elemento = document.getElementById('contenido-pdf');
@@ -436,15 +429,13 @@
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
-                    useCORS: true, 
-                    allowTaint: true, 
+                    useCORS: true,
                     scrollY: 0 
                 }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opciones).from(elemento).save().then(() => {
-                // Restauramos los botones
                 btn.style.display = 'block';
                 btnR.style.display = 'block';
                 btn.innerText = 'Descargar PDF';
