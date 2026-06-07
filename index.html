@@ -626,7 +626,7 @@
             fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null]; fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
             while(fotos.falla.length < 3) fotos.falla.push(null); while(fotos.solucion.length < 3) fotos.solucion.push(null);
             renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie');
-            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.onload = () => { if(ctxFirma) ctxFirma.drawImage(img, 0, 0); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
+            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL, se usará URL directa"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
         }
 
         async function procesarOrden(estadoFinal) {
