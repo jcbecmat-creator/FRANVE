@@ -297,8 +297,6 @@
                                 </div>
                             </div>
 
-                            <!-- ★ SECCIÓN TICKETS ELIMINADA ★ -->
-
                             <div class="form-card">
                                 <h3 class="section-title"><i data-lucide="layers"></i> Instalación / Fallo</h3>
                                 <div class="form-group" style="margin-bottom: 15px;">
@@ -626,7 +624,8 @@
             fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null]; fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
             while(fotos.falla.length < 3) fotos.falla.push(null); while(fotos.solucion.length < 3) fotos.solucion.push(null);
             renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie');
-            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.onload = () => { if(ctxFirma) ctxFirma.drawImage(img, 0, 0); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
+            // ★ FIX: crossOrigin para evitar tainted canvas al cargar firma desde URL
+            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL, se usará URL directa"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
         }
 
         async function procesarOrden(estadoFinal) {
@@ -644,13 +643,21 @@
                 const descF = document.getElementById('desc_falla').value; 
                 const tecNom = document.getElementById('nombre_tecnico').value; 
                 const inc = document.getElementById('incidencia-input').value; 
-                if(!inc || !suc || !area || !descF || !tecNom) { showCustomAlert("Atención", "Completa Incidencia, Ubicación, Instalación, Falla y Técnico.", false); return; } 
-                if(canvasFirmaReal.toDataURL() === firmaVacia.toDataURL() && !document.getElementById('firma_tecnico_data').value) { showCustomAlert("Atención", "Firma obligatoria.", false); return; } 
+                if(!inc || !suc || !area || !descF || !tecNom) { showCustomAlert("Atención", "Completa Incidencia, Ubicación, Instalación, Falla y Técnico.", false); return; }
+                const firmaData = document.getElementById('firma_tecnico_data').value;
+                let canvasTieneFirma = false;
+                try { canvasTieneFirma = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma = false; }
+                if(!canvasTieneFirma && !firmaData) { showCustomAlert("Atención", "Firma obligatoria.", false); return; } 
             }
             
-            if (canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL()) { 
-                document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); 
-            }
+            // ★ FIX: Extraer firma de forma segura (tainted canvas no crashea)
+            try { 
+                let canvasTieneFirma2 = false;
+                try { canvasTieneFirma2 = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma2 = false; }
+                if (canvasTieneFirma2) { 
+                    try { document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); } catch(e) { console.warn("Canvas tainted, usando URL guardada"); }
+                } 
+            } catch(e) { console.error("Error en firma:", e); }
             
             btnGuardar.disabled = true; btnEnviar.disabled = true; 
             btnGuardar.innerHTML = 'Procesando...'; btnEnviar.innerHTML = 'Procesando...';
@@ -733,6 +740,20 @@
 
         function abrirModalLecturaCP(id_doc) { const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; document.getElementById('cp-nombre').value = o.evaluacion_nombre || 'N/A'; document.getElementById('cp-numero').value = o.evaluacion_numero || 'N/A'; document.getElementById('cp-cargo').value = o.evaluacion_cargo || 'N/A'; document.getElementById('cp-nivel').value = o.evaluacion_nivel || 'N/A'; document.getElementById('cp-comentario').value = o.evaluacion_comentario || 'N/A'; document.getElementById('modalLecturaCP').classList.add('show-modal'); lucide.createIcons(); }
         function cerrarModalCP() { document.getElementById('modalLecturaCP').classList.remove('show-modal'); }
+
+        // ==========================================
+        // LOGIN Y MENÚ
+        // ==========================================
+        function togglePassword() { const p = document.getElementById('password'); const i = document.getElementById('toggleIcon'); if (p.type === 'password') { p.type = 'text'; i.textContent = 'visibility'; } else { p.type = 'password'; i.textContent = 'visibility_off'; } }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            const savedSession = sessionStorage.getItem('loginSession'); const savedUser = sessionStorage.getItem('loginUser');
+            if (savedSession && savedUser) {
+                window.appData = JSON.parse(savedSession); const inicial = savedUser.charAt(0).toUpperCase();
+                document.getElementById('user-initial-header').innerText = inicial; document.getElementById('welcome-username-display').innerText = window.appData.nombreUsuario || '-'; document.getElementById('user-dropdown-name').innerText = window.appData.nombreUsuario || savedUser;
+                document.getElementById('prov-info-nombre').innerText = window.appData.nombreProveedor || '-'; document.getElementById('prov-info-rfc').innerText = window.appData.proveedorInfo?.rfc || 'N/A'; document.getElementById('prov-info-dir').innerText = window.appData.proveedorInfo?.direccion || 'N/A'; document.getElementById('prov-info-cont').innerText = window.appData.proveedorInfo?.contacto || 'N/A'; document.getElementById('prov-info-tel').innerText = window.appData.proveedorInfo?.telefono || 'N/A'; document.getElementById('prov-info-mail').innerText = window.appData.proveedorInfo?.correo || 'N/A'; 
+                const listaSuc = document.getElementById('sucursales-list
 
         // ==========================================
         // LOGIN Y MENÚ
