@@ -120,7 +120,6 @@
 
     <div id="contenido-pdf">
         
-        <!-- HOJA 1 -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -139,7 +138,6 @@
                         </ul>
                     </div>
                     <div class="header-right">
-                        <!-- CAMBIO 1: crossorigin="anonymous" en logos estáticos -->
                         <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img" crossorigin="anonymous">
                     </div>
                 </div>
@@ -224,7 +222,6 @@
             </div>
         </div>
 
-        <!-- HOJA 2 -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -243,7 +240,6 @@
                         </ul>
                     </div>
                     <div class="header-right">
-                        <!-- CAMBIO 1: crossorigin="anonymous" en logos estáticos -->
                         <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img" crossorigin="anonymous">
                     </div>
                 </div>
@@ -299,6 +295,39 @@
             }
         }
 
+        // FUNCIÓN PARA ESPERAR A QUE CARGUEN LAS IMÁGENES DE FIREBASE
+        function esperarImagenes() {
+            return new Promise((resolve) => {
+                const imagenes = document.querySelectorAll('#contenido-pdf img');
+                let cargadas = 0;
+                const total = imagenes.length;
+                
+                if (total === 0) {
+                    resolve();
+                    return;
+                }
+
+                imagenes.forEach((img) => {
+                    // Si la imagen ya cargó (por caché)
+                    if (img.complete) {
+                        cargadas++;
+                        if (cargadas === total) resolve();
+                    } else {
+                        // Si aún no carga, esperamos el evento onload
+                        img.onload = () => {
+                            cargadas++;
+                            if (cargadas === total) resolve();
+                        };
+                        // Si la imagen falla (error 404), la contamos para no bloquear el PDF
+                        img.onerror = () => {
+                            cargadas++;
+                            if (cargadas === total) resolve();
+                        };
+                    }
+                });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             
             if (window.opener) {
@@ -349,7 +378,7 @@
                 document.getElementById('pdf-prov-tel').innerText = data.prov_tel;
                 document.getElementById('pdf-prov-mail').innerText = data.prov_mail;
 
-                // CAMBIO 2: Inyectar crossorigin="anonymous" en las imágenes dinámicas de Firebase
+                // Inyección de imágenes con crossorigin
                 data.fotos_falla.forEach((fotoBase64, index) => {
                     if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}" crossorigin="anonymous">`; }
                 });
@@ -365,15 +394,25 @@
             } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
         });
 
-        function generarPDF() {
+        // FUNCIÓN ASÍNCRONA PARA DESCARGAR PDF
+        async function generarPDF() {
             document.body.classList.add('pdf-generating');
 
             const btn = document.getElementById('btn-descargar');
             const btnR = document.querySelector('.btn-regresar');
-            btn.style.display = 'none';
+            
+            // Avisamos al usuario que estamos esperando que carguen las fotos
+            btn.innerText = 'Cargando fotos...';
+            btn.disabled = true; // Evitamos múltiples clics
             btnR.style.display = 'none';
 
             window.scrollTo(0, 0);
+
+            // ESPERAMOS A QUE FIREBASE TERMINE DE CARGAR LAS IMÁGENES
+            await esperarImagenes();
+
+            // Una vez cargadas, avisamos que está generando el PDF
+            btn.innerText = 'Generando PDF...';
 
             const elemento = document.getElementById('contenido-pdf');
             const pages = document.querySelectorAll('.page');
@@ -391,7 +430,6 @@
             const fechaHoraRaw = document.getElementById('pdf-fecha').innerText;
             const fechaHora = fechaHoraRaw.replace(/[\s\/:,]/g, '_'); 
             
-            // CAMBIO 3: Agregar allowTaint: true en la configuración de html2canvas
             const opciones = {
                 margin:       0,
                 filename:     `MTTO_CORR_${sucursal}_${fechaHora}.pdf`,
@@ -406,8 +444,12 @@
             };
 
             html2pdf().set(opciones).from(elemento).save().then(() => {
+                // Restauramos los botones
                 btn.style.display = 'block';
                 btnR.style.display = 'block';
+                btn.innerText = 'Descargar PDF';
+                btn.disabled = false;
+                
                 pages.forEach((p, index) => {
                     p.style.margin = originalStyles[index].margin;
                     p.style.boxShadow = originalStyles[index].boxShadow;
