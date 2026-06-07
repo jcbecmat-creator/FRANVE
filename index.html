@@ -221,7 +221,6 @@
                             <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
                             <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
-                            <a class="sidebar-link" href="aprobacion_gerencia.html"><i data-lucide="shield-check"></i> Aprobación gerencia</a>
                             <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
@@ -578,7 +577,6 @@
 
         document.getElementById('incidencia-input').addEventListener('input', function(e) {
             const val = e.target.value.trim();
-            // Búsqueda flexible: exacta o insensible a mayúsculas
             let inc = incidenciasPendientes.find(i => i.incidencia === val);
             if (!inc) {
                 inc = incidenciasPendientes.find(i => (i.incidencia || '').toLowerCase() === val.toLowerCase());
@@ -590,7 +588,6 @@
                 document.getElementById('subarea-select').value = inc.fallos || '';
                 document.getElementById('desc_falla').value = inc.observaciones || inc.fallos || '';
                 
-                // Llenar Ubicación (Trigger cascada)
                 const sucursalName = inc.usuario || '';
                 document.getElementById('sucursal-input').value = sucursalName;
                 document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
@@ -727,7 +724,6 @@
         function cambiarVista(event, idVista) {
             if(event) event.preventDefault();
             document.querySelectorAll('.modulo-vista').forEach(v => v.classList.remove('activa'));
-            // SOLUCIONADO: Solo quitar la clase activa si el usuario hace clic, no en la carga inicial
             if(event) { document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('activa')); event.currentTarget.classList.add('activa'); }
             document.getElementById(idVista).classList.add('activa');
             const sidebar = document.getElementById('sidebar');
