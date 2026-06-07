@@ -512,9 +512,23 @@
             firebase.initializeApp(firebaseConfig2, "frave");
         }
 
+        // ==========================================
+        // CONEXIONES A SERVICIOS
+        // ==========================================
+        // Firestore del proyecto FRANVE (para guardar datos de órdenes)
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        
+        // ★ CAMBIO PRINCIPAL: Storage ahora apunta al proyecto FRAVE (con suscripción pagada)
+        // Antes: const storage = firebase.storage();  ← Usaba FRANVE (sin pago)
+        // Ahora: const storage = firebase.app("frave").storage();  ← Usa FRAVE (con pago)
+        const storage = firebase.app("frave").storage();
+        
+        // Firestore del proyecto FRAVE (para incidencias)
         const dbIncidencias = firebase.app("frave").firestore();
+
+        // Verificación en consola para confirmar que Storage está conectado al proyecto correcto
+        console.log("Storage bucket configurado:", storage.ref().bucket);
+        // Debería mostrar: frave-4fbbf.firebasestorage.app
 
         lucide.createIcons();
 
@@ -678,17 +692,41 @@
             try {
                 if (!folioActual) { folioActual = await obtenerFolioGlobal(); document.getElementById('folio_mc').value = folioActual; }
                 let urlsFalla = [], urlsSolucion = []; let urlSoporte = null, urlSelfie = null, urlFirma = null;
-                const checkAndUpload = async (fileData, path) => { if (fileData && fileData.startsWith('data:image')) { const ref = storage.ref(path); await ref.put(dataURItoBlob(fileData)); return await ref.getDownloadURL(); } return fileData; };
+                
+                // ★ Las subidas ahora van al Storage de FRAVE (frave-4fbbf)
+                const checkAndUpload = async (fileData, path) => { 
+                    if (fileData && fileData.startsWith('data:image')) { 
+                        const ref = storage.ref(path); 
+                        await ref.put(dataURItoBlob(fileData)); 
+                        return await ref.getDownloadURL(); 
+                    } 
+                    return fileData; 
+                };
+                
                 for(let i=0; i<fotos.falla.length; i++) { if(fotos.falla[i]) urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`)); }
                 for(let i=0; i<fotos.solucion.length; i++) { if(fotos.solucion[i]) urlsSolucion.push(await checkAndUpload(fotos.solucion[i], `ordenes/${folioActual}/solucion_${i}_${Date.now()}.jpg`)); }
-                urlSoporte = await checkAndUpload(fotos.soporte[0], `ordenes/${folioActual}/soporte_${Date.now()}.jpg`); urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`); urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
+                urlSoporte = await checkAndUpload(fotos.soporte[0], `ordenes/${folioActual}/soporte_${Date.now()}.jpg`); 
+                urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`); 
+                urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
+                
                 const docId = document.getElementById('doc_id_actual').value || folioActual;
                 const ordenData = { id_ticket: folioActual, id_incidencia: document.getElementById('incidencia-input').value || '', id_incidencia_doc: document.getElementById('incidencia_doc_id').value || '', ticket_glpi: document.getElementById('ticket_glpi').value || '', sucursal: document.getElementById('sucursal-input').value || '', suc_dir: document.getElementById('suc-dir').innerText || '', suc_col: document.getElementById('suc-col').innerText || '', suc_city: document.getElementById('suc-city').innerText || '', suc_cp: document.getElementById('suc-cp').innerText || '', suc_tel: document.getElementById('suc-tel').innerText || '', suc_mail: document.getElementById('suc-mail').innerText || '', proveedor: window.appData.nombreProveedor, prov_nombre: document.getElementById('prov-info-nombre').innerText || '', prov_rfc: document.getElementById('prov-info-rfc').innerText || '', prov_dir: document.getElementById('prov-info-dir').innerText || '', prov_cont: document.getElementById('prov-info-cont').innerText || '', prov_tel: document.getElementById('prov-info-tel').innerText || '', prov_mail: document.getElementById('prov-info-mail').innerText || '', tipo: "Correctivo", area: document.getElementById('area-input').value || '', subarea: document.getElementById('subarea-select').value || '', desc_falla: document.getElementById('desc_falla').value || '', desc_solucion: document.getElementById('desc_solucion').value || '', tec_nombre: document.getElementById('nombre_tecnico').value || '', tec_celular: document.getElementById('celular_tecnico').value || '', comentario: document.getElementById('comentario_salida').value || '', fecha_creacion: new Date().toISOString().split('T')[0], fecha_hora_completa: new Date().toISOString(), estado_confirmacion: estadoFinal, urls_falla: urlsFalla, urls_solucion: urlsSolucion, url_soporte: urlSoporte, url_selfie: urlSelfie, url_firma: urlFirma };
+                
+                // ★ Los datos se siguen guardando en Firestore de FRANVE (como antes)
                 await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
+                
                 showCustomAlert("Éxito", estadoFinal === 'Borrador' ? "Guardado." : "Enviada.", true);
                 if (estadoFinal === 'En proceso') { sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(ordenData)); setTimeout(() => { window.location.href = 'index2.html'; }, 1500); }
                 else { document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); }
-            } catch (err) { console.error(err); showCustomAlert("Error", "Ocurrió un error.", false); } finally { btnGuardar.disabled = false; btnEnviar.disabled = false; btnGuardar.innerHTML = '<i data-lucide="save"></i> Guardar Orden'; btnEnviar.innerHTML = '<i data-lucide="send"></i> Enviar Orden'; lucide.createIcons(); }
+            } catch (err) { 
+                console.error("Error al procesar orden:", err); 
+                showCustomAlert("Error", "Ocurrió un error: " + (err.message || "Desconocido"), false); 
+            } finally { 
+                btnGuardar.disabled = false; btnEnviar.disabled = false; 
+                btnGuardar.innerHTML = '<i data-lucide="save"></i> Guardar Orden'; 
+                btnEnviar.innerHTML = '<i data-lucide="send"></i> Enviar Orden'; 
+                lucide.createIcons(); 
+            }
         }
 
         function verPDFOrden(id_doc) { const t = misOrdenes.find(x => x.id_doc === id_doc); if(!t) return; const datosParaPDF = { sucursal: t.sucursal, suc_dir: t.suc_dir, suc_col: t.suc_col, suc_city: t.suc_city, suc_cp: t.suc_cp, suc_tel: t.suc_tel, suc_mail: t.suc_mail, ticket: t.id_ticket, area: t.area, subarea: t.subarea, desc_falla: t.desc_falla, fotos_falla: t.urls_falla, desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, prov_nombre: t.prov_nombre, prov_rfc: t.prov_rfc, prov_dir: t.prov_dir, prov_cont: t.prov_cont, prov_tel: t.prov_tel, prov_mail: t.prov_mail, tec_nombre: t.tec_nombre, tec_celular: t.tec_celular, comentario: t.comentario, firma: t.url_firma, foto_soporte: t.url_soporte, foto_selfie: t.url_selfie, fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '') }; sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF)); window.open('index2.html', '_blank'); }
