@@ -644,13 +644,20 @@
                 const descF = document.getElementById('desc_falla').value; 
                 const tecNom = document.getElementById('nombre_tecnico').value; 
                 const inc = document.getElementById('incidencia-input').value; 
-                if(!inc || !suc || !area || !descF || !tecNom) { showCustomAlert("Atención", "Completa Incidencia, Ubicación, Instalación, Falla y Técnico.", false); return; } 
-                if(canvasFirmaReal.toDataURL() === firmaVacia.toDataURL() && !document.getElementById('firma_tecnico_data').value) { showCustomAlert("Atención", "Firma obligatoria.", false); return; } 
+                if(!inc || !suc || !area || !descF || !tecNom) { showCustomAlert("Atención", "Completa Incidencia, Ubicación, Instalación, Falla y Técnico.", false); return; }
+                const firmaData = document.getElementById('firma_tecnico_data').value;
+                let canvasTieneFirma = false;
+                try { canvasTieneFirma = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma = false; }
+                if(!canvasTieneFirma && !firmaData) { showCustomAlert("Atención", "Firma obligatoria.", false); return; } 
             }
             
-            if (canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL()) { 
-                document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); 
-            }
+            try { 
+                let canvasTieneFirma2 = false;
+                try { canvasTieneFirma2 = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma2 = false; }
+                if (canvasTieneFirma2) { 
+                    try { document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); } catch(e) { console.warn("Canvas tainted, usando URL guardada"); }
+                } 
+            } catch(e) { console.error("Error en firma:", e); }
             
             btnGuardar.disabled = true; btnEnviar.disabled = true; 
             btnGuardar.innerHTML = 'Procesando...'; btnEnviar.innerHTML = 'Procesando...';
