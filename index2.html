@@ -120,6 +120,7 @@
 
     <div id="contenido-pdf">
         
+        <!-- HOJA 1 -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -138,7 +139,8 @@
                         </ul>
                     </div>
                     <div class="header-right">
-                        <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img">
+                        <!-- CAMBIO 1: crossorigin="anonymous" en logos estáticos -->
+                        <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img" crossorigin="anonymous">
                     </div>
                 </div>
 
@@ -222,6 +224,7 @@
             </div>
         </div>
 
+        <!-- HOJA 2 -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -240,7 +243,8 @@
                         </ul>
                     </div>
                     <div class="header-right">
-                        <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img">
+                        <!-- CAMBIO 1: crossorigin="anonymous" en logos estáticos -->
+                        <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img" crossorigin="anonymous">
                     </div>
                 </div>
 
@@ -345,17 +349,18 @@
                 document.getElementById('pdf-prov-tel').innerText = data.prov_tel;
                 document.getElementById('pdf-prov-mail').innerText = data.prov_mail;
 
+                // CAMBIO 2: Inyectar crossorigin="anonymous" en las imágenes dinámicas de Firebase
                 data.fotos_falla.forEach((fotoBase64, index) => {
-                    if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
+                    if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}" crossorigin="anonymous">`; }
                 });
 
                 data.fotos_solucion.forEach((fotoBase64, index) => {
-                    if(fotoBase64) { document.getElementById(`pdf-sol-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
+                    if(fotoBase64) { document.getElementById(`pdf-sol-${index}`).innerHTML = `<img src="${fotoBase64}" crossorigin="anonymous">`; }
                 });
 
-                if(data.firma) { document.getElementById('pdf-firma').innerHTML = `<img src="${data.firma}">`; }
-                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}">`; }
-                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}">`; }
+                if(data.firma) { document.getElementById('pdf-firma').innerHTML = `<img src="${data.firma}" crossorigin="anonymous">`; }
+                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}" crossorigin="anonymous">`; }
+                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}" crossorigin="anonymous">`; }
 
             } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
         });
@@ -386,11 +391,17 @@
             const fechaHoraRaw = document.getElementById('pdf-fecha').innerText;
             const fechaHora = fechaHoraRaw.replace(/[\s\/:,]/g, '_'); 
             
+            // CAMBIO 3: Agregar allowTaint: true en la configuración de html2canvas
             const opciones = {
                 margin:       0,
                 filename:     `MTTO_CORR_${sucursal}_${fechaHora}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, 
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true, 
+                    scrollY: 0 
+                }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
