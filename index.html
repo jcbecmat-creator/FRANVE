@@ -339,7 +339,7 @@
                             <div class="form-card">
                                 <h3 class="section-title"><i data-lucide="wrench"></i> Descripción de la solución</h3>
                                 <div class="form-group" style="margin-bottom: 15px;"><textarea class="form-input" id="desc_solucion" rows="3" placeholder="Describe el trabajo realizado..."></textarea></div>
-                                <label style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; display: block;">Evidencia Fotográfica (Solución - Máx 3)</label>
+                                <label style="font-size: 11px; font-weight: uppercase; margin-bottom: 10px; display: block;">Evidencia Fotográfica (Solución - Máx 3)</label>
                                 <div class="photo-controls">
                                     <button type="button" class="btn-photo" onclick="triggerCamera('solucion')"><i data-lucide="camera"></i> Toma Foto</button>
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('solucion')"><i data-lucide="upload"></i> Subir Archivo</button>
@@ -495,10 +495,13 @@
             appId: "1:118420640551:web:9b79daa79a2d46eefe4f02"
         };
         
+        // ★★★ PROYECTO FRAVE - Verifica el storageBucket exacto en:
+        // Firebase Console → FRAVE → Configuración → Storage
         const firebaseConfig2 = {
             apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
             authDomain: "frave-4fbbf.firebaseapp.com",
             projectId: "frave-4fbbf",
+            // ★ SI TU BUCKET ES DIFERENTE, CAMBIALO AQUÍ:
             storageBucket: "frave-4fbbf.firebasestorage.app",
             messagingSenderId: "687825589857",
             appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
@@ -515,20 +518,21 @@
         // ==========================================
         // CONEXIONES A SERVICIOS
         // ==========================================
-        // Firestore del proyecto FRANVE (para guardar datos de órdenes)
         const db = firebase.firestore();
         
-        // ★ CAMBIO PRINCIPAL: Storage ahora apunta al proyecto FRAVE (con suscripción pagada)
-        // Antes: const storage = firebase.storage();  ← Usaba FRANVE (sin pago)
-        // Ahora: const storage = firebase.app("frave").storage();  ← Usa FRAVE (con pago)
+        // ★ Storage conectado al proyecto FRAVE (con suscripción pagada)
         const storage = firebase.app("frave").storage();
         
         // Firestore del proyecto FRAVE (para incidencias)
         const dbIncidencias = firebase.app("frave").firestore();
 
-        // Verificación en consola para confirmar que Storage está conectado al proyecto correcto
-        console.log("Storage bucket configurado:", storage.ref().bucket);
-        // Debería mostrar: frave-4fbbf.firebasestorage.app
+        // ★ Verificación detallada en consola
+        console.log("=== VERIFICACIÓN DE FIREBASE ===");
+        console.log("Storage bucket:", storage.ref().bucket);
+        console.log("Firestore FRANVE project:", db.app.options.projectId);
+        console.log("Firestore FRAVE project:", dbIncidencias.app.options.projectId);
+        console.log("Storage FRAVE bucket:", firebase.app("frave").options().storageBucket);
+        console.log("================================");
 
         lucide.createIcons();
 
@@ -693,15 +697,24 @@
                 if (!folioActual) { folioActual = await obtenerFolioGlobal(); document.getElementById('folio_mc').value = folioActual; }
                 let urlsFalla = [], urlsSolucion = []; let urlSoporte = null, urlSelfie = null, urlFirma = null;
                 
-                // ★ Las subidas ahora van al Storage de FRAVE (frave-4fbbf)
+                // ★ Subida de archivos al Storage de FRAVE con logging detallado
                 const checkAndUpload = async (fileData, path) => { 
-                    if (fileData && fileData.startsWith('data:image')) { 
+                    if (fileData && fileData.startsWith('data:image')) {
+                        console.log(`Subiendo a Storage FRAVE: ${path}`);
+                        console.log(`Bucket destino: ${storage.ref().bucket}`);
                         const ref = storage.ref(path); 
-                        await ref.put(dataURItoBlob(fileData)); 
-                        return await ref.getDownloadURL(); 
+                        const blob = dataURItoBlob(fileData);
+                        console.log(`Blob size: ${blob.size} bytes, type: ${blob.type}`);
+                        const uploadResult = await ref.put(blob);
+                        console.log(`Upload exitoso: ${path}`, uploadResult);
+                        const downloadURL = await ref.getDownloadURL();
+                        console.log(`Download URL obtenida: ${downloadURL}`);
+                        return downloadURL; 
                     } 
                     return fileData; 
                 };
+                
+                console.log("=== INICIANDO SUBIDA DE ARCHIVOS ===");
                 
                 for(let i=0; i<fotos.falla.length; i++) { if(fotos.falla[i]) urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`)); }
                 for(let i=0; i<fotos.solucion.length; i++) { if(fotos.solucion[i]) urlsSolucion.push(await checkAndUpload(fotos.solucion[i], `ordenes/${folioActual}/solucion_${i}_${Date.now()}.jpg`)); }
@@ -709,18 +722,41 @@
                 urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`); 
                 urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
                 
+                console.log("=== SUBIDA COMPLETADA ===");
+                console.log("URLs Falla:", urlsFalla);
+                console.log("URLs Solucion:", urlsSolucion);
+                console.log("URL Soporte:", urlSoporte);
+                console.log("URL Selfie:", urlSelfie);
+                console.log("URL Firma:", urlFirma);
+                
                 const docId = document.getElementById('doc_id_actual').value || folioActual;
                 const ordenData = { id_ticket: folioActual, id_incidencia: document.getElementById('incidencia-input').value || '', id_incidencia_doc: document.getElementById('incidencia_doc_id').value || '', ticket_glpi: document.getElementById('ticket_glpi').value || '', sucursal: document.getElementById('sucursal-input').value || '', suc_dir: document.getElementById('suc-dir').innerText || '', suc_col: document.getElementById('suc-col').innerText || '', suc_city: document.getElementById('suc-city').innerText || '', suc_cp: document.getElementById('suc-cp').innerText || '', suc_tel: document.getElementById('suc-tel').innerText || '', suc_mail: document.getElementById('suc-mail').innerText || '', proveedor: window.appData.nombreProveedor, prov_nombre: document.getElementById('prov-info-nombre').innerText || '', prov_rfc: document.getElementById('prov-info-rfc').innerText || '', prov_dir: document.getElementById('prov-info-dir').innerText || '', prov_cont: document.getElementById('prov-info-cont').innerText || '', prov_tel: document.getElementById('prov-info-tel').innerText || '', prov_mail: document.getElementById('prov-info-mail').innerText || '', tipo: "Correctivo", area: document.getElementById('area-input').value || '', subarea: document.getElementById('subarea-select').value || '', desc_falla: document.getElementById('desc_falla').value || '', desc_solucion: document.getElementById('desc_solucion').value || '', tec_nombre: document.getElementById('nombre_tecnico').value || '', tec_celular: document.getElementById('celular_tecnico').value || '', comentario: document.getElementById('comentario_salida').value || '', fecha_creacion: new Date().toISOString().split('T')[0], fecha_hora_completa: new Date().toISOString(), estado_confirmacion: estadoFinal, urls_falla: urlsFalla, urls_solucion: urlsSolucion, url_soporte: urlSoporte, url_selfie: urlSelfie, url_firma: urlFirma };
                 
-                // ★ Los datos se siguen guardando en Firestore de FRANVE (como antes)
                 await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
                 
                 showCustomAlert("Éxito", estadoFinal === 'Borrador' ? "Guardado." : "Enviada.", true);
                 if (estadoFinal === 'En proceso') { sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(ordenData)); setTimeout(() => { window.location.href = 'index2.html'; }, 1500); }
                 else { document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); }
             } catch (err) { 
-                console.error("Error al procesar orden:", err); 
-                showCustomAlert("Error", "Ocurrió un error: " + (err.message || "Desconocido"), false); 
+                console.error("=== ERROR AL PROCESAR ORDEN ===");
+                console.error("Error completo:", err);
+                console.error("Código de error:", err.code);
+                console.error("Mensaje:", err.message);
+                
+                let errorMsg = "Ocurrió un error al procesar.";
+                if (err.code === 'storage/unauthorized') {
+                    errorMsg = "Sin permisos en Storage. Verifica las reglas en Firebase Console → FRAVE → Storage → Reglas. Debes hacer clic en 'Publicar'.";
+                } else if (err.code === 'storage/canceled') {
+                    errorMsg = "Subida cancelada.";
+                } else if (err.code === 'storage/quota-exceeded') {
+                    errorMsg = "Cuota de Storage excedida.";
+                } else if (err.code === 'storage/unknown') {
+                    errorMsg = "Error desconocido en Storage. Verifica que el bucket sea correcto.";
+                } else if (err.message) {
+                    errorMsg = err.message;
+                }
+                
+                showCustomAlert("Error", errorMsg, false); 
             } finally { 
                 btnGuardar.disabled = false; btnEnviar.disabled = false; 
                 btnGuardar.innerHTML = '<i data-lucide="save"></i> Guardar Orden'; 
