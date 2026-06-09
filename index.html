@@ -142,6 +142,14 @@
         textarea.eval-input-control { height: auto; min-height: 80px; padding: 0.75rem 1rem; line-height: 1.5; resize: none; }
         .eval-input-control[readonly] { background-color: #e5e5e5; color: #4b5563; cursor: not-allowed; }
 
+        /* PANTALLA DE ESPERA PDF (CONTEO REGRESIVO) */
+        #countdown-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(19, 21, 32, 0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; box-sizing: border-box; }
+        #countdown-overlay.show { display: flex !important; }
+        #countdown-number { font-size: 80px; font-weight: 900; color: #81D0DC; margin: 20px 0; line-height: 1; }
+        #countdown-text { font-size: 18px; font-weight: 500; color: #cbd5e1; max-width: 400px; }
+        .spinner-loader { border: 6px solid rgba(129, 208, 220, 0.2); border-top: 6px solid #81D0DC; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         @media (max-width: 900px) {
             .upload-bottom-bar { flex-direction: column; gap: 12px; padding: 16px; bottom: -200px;}
             .up-info { flex-direction: column; text-align: center; gap: 4px; }
@@ -252,7 +260,7 @@
                             <form class="filters-bar" id="form-filtros-mtto">
                                 <div class="filter-group"><label class="filter-label">Fecha inicio</label><input type="date" class="form-input" id="filtro-inicio-mtto" style="height: 42px; background: #f9fafb;"></div>
                                 <div class="filter-group"><label class="filter-label">Fecha fin</label><input type="date" class="form-input" id="filtro-fin-mtto" style="height: 42px; background: #f9fafb;"></div>
-                                <div class="filter-group" style="flex: 2; min-width: 200px;"><label class="filter-label">Buscar</label><input type="text" class="form-input" id="filtro-buscar-mtto" placeholder="Folio o sucursal..." style="height: 42px; background: #f9fafb;"></div>
+                                <div class="filter-group" style="flex: 2; min-width: 200px;"><label class="filter-label">Buscar</label><input type="text" class="form-input" id="filtro-buscar-mtto" placeholder="Incidencia o sucursal..." style="height: 42px; background: #f9fafb;"></div>
                                 <div class="filter-actions">
                                     <button type="button" class="btn-filter-secondary" onclick="renderTablaMisOrdenes()"><i data-lucide="search" style="width: 16px;"></i> Buscar</button>
                                     <button type="button" class="btn-filter-green" onclick="exportarMisOrdenesCSV()"><i data-lucide="download" style="width: 16px;"></i> Exportar</button>
@@ -296,8 +304,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- ★ SECCIÓN TICKETS ELIMINADA ★ -->
 
                             <div class="form-card">
                                 <h3 class="section-title"><i data-lucide="layers"></i> Instalación / Fallo</h3>
@@ -471,11 +477,19 @@
         </div>
     </div>
 
+    <!-- OVERLAY DE CONTEO REGRESIVO -->
+    <div id="countdown-overlay">
+        <div class="spinner-loader"></div>
+        <div id="countdown-number">13</div>
+        <h2 style="margin: 0 0 10px 0; color: white;">Procesando Orden</h2>
+        <p id="countdown-text">Estamos preparando tus evidencias fotográficas para el PDF. Por favor, no cierres esta pantalla.</p>
+    </div>
+
     <script>
         // ==========================================
         // 1. CONFIGURACIÓN - TODO EN FRAVE
         // ==========================================
-        const firebaseConfig2 = {
+        const firebaseConfig = {
             apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
             authDomain: "frave-4fbbf.firebaseapp.com",
             projectId: "frave-4fbbf",
@@ -484,8 +498,8 @@
             appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
         };
 
-        if (!firebase.apps.find(app => app.name === '[DEFAULT]')) {
-            firebase.initializeApp(firebaseConfig2);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
 
         const db = firebase.firestore();
@@ -531,9 +545,7 @@
         // ==========================================
         function cargarIncidenciasPendientes() {
             if (!window.appData || !window.appData.nombreUsuario) { console.log("No hay usuario para buscar incidencias"); return; }
-            console.log("Buscando incidencias para:", window.appData.nombreUsuario);
             dbIncidencias.collection("incidencias").where("usuario_assigned", "==", window.appData.nombreUsuario).get().then((querySnapshot) => {
-                console.log("Incidencias encontradas:", querySnapshot.size);
                 incidenciasPendientes = [];
                 const listaInc = document.getElementById('incidencias-list');
                 listaInc.innerHTML = '';
@@ -566,6 +578,7 @@
             if (!window.appData) return;
             db.collection("tickets_mantenimiento").where("proveedor", "==", window.appData.nombreProveedor).get().then((querySnapshot) => {
                 misOrdenes = []; querySnapshot.forEach((doc) => { misOrdenes.push({ id_doc: doc.id, ...doc.data() }); });
+                // Ordenar de la más reciente a la más antigua
                 misOrdenes.sort((a, b) => (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""));
                 actualizarBadgesMtto(); if(tabMttoActual !== 'Nueva Orden') renderTablaMisOrdenes();
             }).catch(err => console.error("Error al cargar órdenes", err));
@@ -588,18 +601,26 @@
 
         function renderTablaMisOrdenes() {
             const tbody = document.getElementById('tabla-mis-ordenes'); const thead = document.querySelector('#dashboard-ordenes thead'); tbody.innerHTML = '';
-            if (tabMttoActual === 'Borrador') { thead.innerHTML = `<tr><th style="padding: 15px; width: 40px;"><input type="checkbox" id="chk-all-drafts" onchange="toggleAllDrafts(this.checked)" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></th><th>Folio</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
-            else { thead.innerHTML = `<tr><th>Folio</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
+            // Cambio: Encabezado ahora dice "Incidencia" en vez de "Folio"
+            if (tabMttoActual === 'Borrador') { thead.innerHTML = `<tr><th style="padding: 15px; width: 40px;"><input type="checkbox" id="chk-all-drafts" onchange="toggleAllDrafts(this.checked)" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></th><th>Incidencia</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
+            else { thead.innerHTML = `<tr><th>Incidencia</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
             const fInicio = document.getElementById('filtro-inicio-mtto').value; const fFin = document.getElementById('filtro-fin-mtto').value; const fBuscar = document.getElementById('filtro-buscar-mtto').value.toLowerCase();
-            let filtrados = misOrdenes.filter(o => { if(tabMttoActual === 'Borrador' && o.estado_confirmacion !== 'Borrador') return false; if(tabMttoActual === 'Realizado' && o.estado_confirmacion !== 'En proceso') return false; const fDoc = o.fecha_creacion || ""; if(fInicio && fDoc < fInicio) return false; if(fFin && fDoc > fFin) return false; if(fBuscar) { const folio = (o.id_ticket || "").toLowerCase(); const suc = (o.sucursal || "").toLowerCase(); if(!folio.includes(fBuscar) && !suc.includes(fBuscar)) return false; } return true; });
+            let filtrados = misOrdenes.filter(o => { if(tabMttoActual === 'Borrador' && o.estado_confirmacion !== 'Borrador') return false; if(tabMttoActual === 'Realizado' && o.estado_confirmacion !== 'En proceso') return false; const fDoc = o.fecha_creacion || ""; if(fInicio && fDoc < fInicio) return false; if(fFin && fDoc > fFin) return false; if(fBuscar) { const inc = (o.id_incidencia || o.id_ticket || "").toLowerCase(); const suc = (o.sucursal || "").toLowerCase(); if(!inc.includes(fBuscar) && !suc.includes(fBuscar)) return false; } return true; });
             if(filtrados.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="padding: 40px; color: #6b7280;">Sin órdenes</td></tr>`; return; }
-            filtrados.forEach(o => { let btnAccion = o.estado_confirmacion === 'Borrador' ? `<button type="button" onclick="cargarBorrador('${o.id_doc}')" style="background:#14A981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="edit-2" style="width:14px;"></i> Editar</button>` : `<button type="button" onclick="verPDFOrden('${o.id_doc}')" style="background:#81D0DC; color:#131520; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="file-text" style="width:14px;"></i> PDF</button>`; const tr = document.createElement('tr'); if (tabMttoActual === 'Borrador') { tr.innerHTML = `<td><input type="checkbox" class="chk-draft" value="${o.id_doc}" onchange="actualizarBarraBorradores()" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></td><td style="padding: 15px; font-weight: bold;">${o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } else { tr.innerHTML = `<td style="padding: 15px; font-weight: bold;">${o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } tbody.appendChild(tr); }); lucide.createIcons();
+            filtrados.forEach(o => { 
+                let btnAccion = o.estado_confirmacion === 'Borrador' ? `<button type="button" onclick="cargarBorrador('${o.id_doc}')" style="background:#14A981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="edit-2" style="width:14px;"></i> Editar</button>` : `<button type="button" onclick="verPDFOrden('${o.id_doc}')" style="background:#81D0DC; color:#131520; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="file-text" style="width:14px;"></i> PDF</button>`; 
+                const tr = document.createElement('tr'); 
+                // Cambio: Celdas ahora muestran Incidencia
+                if (tabMttoActual === 'Borrador') { tr.innerHTML = `<td><input type="checkbox" class="chk-draft" value="${o.id_doc}" onchange="actualizarBarraBorradores()" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></td><td style="padding: 15px; font-weight: bold;">${o.id_incidencia || o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } 
+                else { tr.innerHTML = `<td style="padding: 15px; font-weight: bold;">${o.id_incidencia || o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } 
+                tbody.appendChild(tr); 
+            }); lucide.createIcons();
         }
 
-        function exportarMisOrdenesCSV() { if(misOrdenes.length === 0) return; let csvContent = "data:text/csv;charset=utf-8,Folio,Sucursal,Fecha\n"; misOrdenes.forEach(row => { csvContent += `${row.id_ticket || "S/N"},"${row.sucursal || ""}",${row.fecha_creacion || ""}\n`; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `Ordenes.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+        function exportarMisOrdenesCSV() { if(misOrdenes.length === 0) return; let csvContent = "data:text/csv;charset=utf-8,Incidencia,Sucursal,Fecha\n"; misOrdenes.forEach(row => { csvContent += `${row.id_incidencia || row.id_ticket || "S/N"},"${row.sucursal || ""}",${row.fecha_creacion || ""}\n`; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `Ordenes.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
 
         function toggleAllDrafts(checked) { document.querySelectorAll('.chk-draft').forEach(cb => cb.checked = checked); actualizarBarraBorradores(); }
-        function actualizarBarraBorradores() { const checkboxes = document.querySelectorAll('.chk-draft:checked'); const count = checkboxes.length; const bar = document.getElementById('delete-draft-bar'); if (count > 0) { document.getElementById('lbl-draft-count').innerText = `${count} folio${count !== 1 ? 's' : ''}`; bar.classList.add('show'); } else { bar.classList.remove('show'); } }
+        function actualizarBarraBorradores() { const checkboxes = document.querySelectorAll('.chk-draft:checked'); const count = checkboxes.length; const bar = document.getElementById('delete-draft-bar'); if (count > 0) { document.getElementById('lbl-draft-count').innerText = `${count} incidencia${count !== 1 ? 's' : ''}`; bar.classList.add('show'); } else { bar.classList.remove('show'); } }
         function limpiarSeleccionBorradores() { document.querySelectorAll('.chk-draft').forEach(cb => cb.checked = false); const c = document.getElementById('chk-all-drafts'); if(c) c.checked = false; actualizarBarraBorradores(); }
         function borrarBorradoresSeleccionados() { const checkboxes = document.querySelectorAll('.chk-draft:checked'); if(checkboxes.length === 0) return; showConfirm("Borrar", `¿Eliminar ${checkboxes.length}?`, async () => { try { const batch = db.batch(); checkboxes.forEach(cb => { batch.delete(db.collection('tickets_mantenimiento').doc(cb.value)); }); await batch.commit(); cargarMisOrdenes(); limpiarSeleccionBorradores(); } catch(e) {} }); }
 
@@ -626,7 +647,7 @@
             fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null]; fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
             while(fotos.falla.length < 3) fotos.falla.push(null); while(fotos.solucion.length < 3) fotos.solucion.push(null);
             renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie');
-            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL, se usará URL directa"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
+            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
         }
 
         async function procesarOrden(estadoFinal) {
@@ -722,9 +743,31 @@
                 
                 await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
                 
-                showCustomAlert("Éxito", estadoFinal === 'Borrador' ? "Guardado." : "Enviada.", true);
-                if (estadoFinal === 'En proceso') { sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(ordenData)); setTimeout(() => { window.location.href = 'index2.html'; }, 1500); }
-                else { document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); }
+                if (estadoFinal === 'En proceso') { 
+                    // INICIA CONTEO REGRESIVO
+                    const overlay = document.getElementById('countdown-overlay');
+                    overlay.classList.add('show');
+                    
+                    let timeLeft = 13;
+                    const countdownElement = document.getElementById('countdown-number');
+                    
+                    const timerInterval = setInterval(() => {
+                        timeLeft--;
+                        countdownElement.innerText = timeLeft;
+                        
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                            overlay.classList.remove('show');
+                            // Redirigir al submenu Realizados
+                            cargarMisOrdenes();
+                            cambiarTabMtto('Realizado');
+                            mostrarFormularioNuevaOrden();
+                        }
+                    }, 1000);
+                } else { 
+                    showCustomAlert("Éxito", "Orden Guardada Correctamente.", true);
+                    document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); 
+                }
             } catch (err) { 
                 console.error("Error:", err);
                 showCustomAlert("Error", err.message || "Ocurrió un error.", false); 
