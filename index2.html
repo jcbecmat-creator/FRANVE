@@ -138,7 +138,6 @@
                         </ul>
                     </div>
                     <div class="header-right">
-                        <!-- El logo static sí necesita crossorigin porque viene de ibb.co -->
                         <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="logo-img" crossorigin="anonymous">
                     </div>
                 </div>
@@ -338,44 +337,47 @@
             if(dataStr) {
                 const data = JSON.parse(dataStr);
                 
-                document.getElementById('pdf-sucursal').innerText = data.sucursal;
-                document.getElementById('pdf-dir').innerText = data.suc_dir;
-                document.getElementById('pdf-col').innerText = data.suc_col;
+                // Llenar encabezado - Hoja 1 (Con prevención de "undefined" y campos alternativos)
+                document.getElementById('pdf-sucursal').innerText = data.sucursal || '';
+                document.getElementById('pdf-dir').innerText = data.suc_dir || data.direccion || '';
+                document.getElementById('pdf-col').innerText = data.suc_col || data.colonia || '';
                 
-                const ciudadLimpia = data.suc_city ? data.suc_city.split(" / C.P.")[0] : '';
-                document.getElementById('pdf-city').innerText = ciudadLimpia + " " + data.suc_cp; 
+                const ciudadLimpia = (data.suc_city || data.ciudad || '').split(" / C.P.")[0];
+                document.getElementById('pdf-city').innerText = ciudadLimpia + " " + (data.suc_cp || data.codigo_postal || ''); 
                 
-                document.getElementById('pdf-hor').innerText = data.suc_hor;
-                document.getElementById('pdf-tel').innerText = data.suc_tel;
-                document.getElementById('pdf-mail').innerText = data.suc_mail;
-                document.getElementById('pdf-ticket').innerText = data.ticket;
-                document.getElementById('pdf-fecha').innerText = data.fecha_hora;
-                document.getElementById('pdf-area').innerText = data.area;
-                document.getElementById('pdf-subarea').innerText = data.subarea;
-                document.getElementById('pdf-desc-falla').innerText = data.desc_falla;
-                document.getElementById('pdf-desc-sol').innerText = data.desc_solucion;
-                document.getElementById('pdf-tec-nom').innerText = data.tec_nombre;
-                document.getElementById('pdf-tec-cel').innerText = data.tec_celular;
-                document.getElementById('pdf-tec-empresa').innerText = data.prov_nombre;
-                document.getElementById('pdf-comentario').innerText = data.comentario;
+                document.getElementById('pdf-hor').innerText = data.suc_hor || data.horario || '';
+                document.getElementById('pdf-tel').innerText = data.suc_tel || data.telefono || '';
+                document.getElementById('pdf-mail').innerText = data.suc_mail || data.correo || '';
+                document.getElementById('pdf-ticket').innerText = data.ticket || data.id_ticket || '';
+                document.getElementById('pdf-fecha').innerText = data.fecha_hora || data.fecha_creacion || '';
+                document.getElementById('pdf-area').innerText = data.area || '';
+                document.getElementById('pdf-subarea').innerText = data.subarea || '';
+                document.getElementById('pdf-desc-falla').innerText = data.desc_falla || data.incidencia || '';
+                document.getElementById('pdf-desc-sol').innerText = data.desc_solucion || '';
+                document.getElementById('pdf-tec-nom').innerText = data.tec_nombre || '';
+                document.getElementById('pdf-tec-cel').innerText = data.tec_celular || '';
+                document.getElementById('pdf-tec-empresa').innerText = data.prov_nombre || data.proveedor || '';
+                document.getElementById('pdf-comentario').innerText = data.comentario || '';
 
-                document.getElementById('pdf-sucursal-2').innerText = data.sucursal;
-                document.getElementById('pdf-dir-2').innerText = data.suc_dir;
-                document.getElementById('pdf-col-2').innerText = data.suc_col;
-                document.getElementById('pdf-city-2').innerText = ciudadLimpia + " " + data.suc_cp; 
-                document.getElementById('pdf-hor-2').innerText = data.suc_hor;
-                document.getElementById('pdf-tel-2').innerText = data.suc_tel;
-                document.getElementById('pdf-mail-2').innerText = data.suc_mail;
-                document.getElementById('pdf-ticket-2').innerText = data.ticket;
-                document.getElementById('pdf-fecha-2').innerText = data.fecha_hora;
-                document.getElementById('pdf-prov-nombre').innerText = data.prov_nombre;
-                document.getElementById('pdf-prov-rfc').innerText = data.prov_rfc;
-                document.getElementById('pdf-prov-dir').innerText = data.prov_dir;
-                document.getElementById('pdf-prov-cont').innerText = data.prov_cont;
-                document.getElementById('pdf-prov-tel').innerText = data.prov_tel;
-                document.getElementById('pdf-prov-mail').innerText = data.prov_mail;
+                // Llenar encabezado - Hoja 2
+                document.getElementById('pdf-sucursal-2').innerText = data.sucursal || '';
+                document.getElementById('pdf-dir-2').innerText = data.suc_dir || data.direccion || '';
+                document.getElementById('pdf-col-2').innerText = data.suc_col || data.colonia || '';
+                document.getElementById('pdf-city-2').innerText = ciudadLimpia + " " + (data.suc_cp || data.codigo_postal || ''); 
+                document.getElementById('pdf-hor-2').innerText = data.suc_hor || data.horario || '';
+                document.getElementById('pdf-tel-2').innerText = data.suc_tel || data.telefono || '';
+                document.getElementById('pdf-mail-2').innerText = data.suc_mail || data.correo || '';
+                document.getElementById('pdf-ticket-2').innerText = data.ticket || data.id_ticket || '';
+                document.getElementById('pdf-fecha-2').innerText = data.fecha_hora || data.fecha_creacion || '';
+                
+                document.getElementById('pdf-prov-nombre').innerText = data.prov_nombre || data.proveedor || '';
+                document.getElementById('pdf-prov-rfc').innerText = data.prov_rfc || '';
+                document.getElementById('pdf-prov-dir').innerText = data.prov_dir || '';
+                document.getElementById('pdf-prov-cont').innerText = data.prov_cont || '';
+                document.getElementById('pdf-prov-tel').innerText = data.prov_tel || '';
+                document.getElementById('pdf-prov-mail').innerText = data.prov_mail || '';
 
-                // SIN CROSSORIGIN PARA LAS IMÁGENES DINÁMICAS DE FIREBASE
+                // Inyectar imágenes dinámicas
                 data.fotos_falla.forEach((fotoBase64, index) => {
                     if(fotoBase64) { document.getElementById(`pdf-falla-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
                 });
