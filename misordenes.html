@@ -169,7 +169,6 @@
                             <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
                             <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
-                            <!-- SE ELIMINÓ LA LÍNEA DE APROBACIÓN GERENCIA AQUÍ -->
                             <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
@@ -387,6 +386,23 @@
                   data.id_documento = doc.id;
                   incidenciasGlobales.push(data);
               });
+              
+              // === ORDENAMIENTO DESCENDENTE (MÁS RECIENTE PRIMERO) ===
+              incidenciasGlobales.sort((a, b) => {
+                  const getSeconds = (fechaField) => {
+                      if (!fechaField) return 0;
+                      if (fechaField.seconds) return fechaField.seconds; // Si es Timestamp de Firestore
+                      try { 
+                          const dateObj = new Date(fechaField);
+                          return Math.floor(dateObj.getTime() / 1000); // Si es string de fecha
+                      } catch(e) { return 0; }
+                  };
+                  const secA = getSeconds(a.fechaRecepcion || a.fecha_creacion);
+                  const secB = getSeconds(b.fechaRecepcion || b.fecha_creacion);
+                  return secB - secA; // Descendente
+              });
+              // =======================================================
+
               actualizarBadges();
               renderTabla();
           })
