@@ -273,8 +273,9 @@
                                 <input type="date" class="co-filter-input" id="filtro-fecha-fin">
                             </div>
                             <div class="co-filter-group" style="flex: 2;">
-                                <label class="co-filter-label">Buscar Folio / Sucursal</label>
-                                <input type="text" class="co-filter-input" id="filtro-buscar" placeholder="Ej. MC-0001">
+                                <!-- TEXTO ACTUALIZADO AQUÍ -->
+                                <label class="co-filter-label">Buscar Incidencia / Sucursal</label>
+                                <input type="text" class="co-filter-input" id="filtro-buscar" placeholder="Ej. 12323-00225">
                             </div>
                             <div class="flex gap-2 flex-shrink-0">
                                 <button class="btn-filtrar" type="button" onclick="renderTablaConfirmacion()">
@@ -288,7 +289,8 @@
                         <table class="co-table">
                             <thead>
                                 <tr>
-                                    <th>Folio</th>
+                                    <!-- TEXTO ACTUALIZADO AQUÍ -->
+                                    <th>Incidencia</th>
                                     <th>Sucursal</th>
                                     <th>Técnico / Proveedor</th>
                                     <th>Fecha Envío</th>
@@ -309,7 +311,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE EVALUACIÓN ACTUALIZADO -->
+    <!-- MODAL DE EVALUACIÓN -->
     <div id="modalEvaluacion" class="modal-overlay">
         <div class="modal-card" id="modal-card-eval">
             <div class="modal-header">
@@ -331,7 +333,8 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="eval-field-group">
-                        <label class="eval-label"><i data-lucide="hash"></i>Folio</label>
+                        <!-- TEXTO ACTUALIZADO AQUÍ -->
+                        <label class="eval-label"><i data-lucide="hash"></i>Incidencia</label>
                         <div class="eval-input-wrapper">
                             <input type="text" id="eval-folio" class="eval-input-control" readonly style="font-weight: 700;">
                         </div>
@@ -343,7 +346,7 @@
                     </div>
                 </div>
                 
-                <!-- FILA MODIFICADA: Nombre y Cargo juntos -->
+                <!-- FILA: Nombre y Cargo -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="eval-field-group">
                         <label class="eval-label"><i data-lucide="user"></i>Nombre</label>
@@ -363,7 +366,7 @@
                     </div>
                 </div>
 
-                <!-- NIVEL DE SERVICIO (Antes estaba en doble columna, ahora sencillo) -->
+                <!-- NIVEL DE SERVICIO -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="eval-field-group">
                         <label class="eval-label"><i data-lucide="star"></i>Nivel de Servicio</label>
@@ -375,7 +378,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="eval-field-group"></div> <!-- Espaciador -->
+                    <div class="eval-field-group"></div>
                 </div>
 
                 <div class="eval-field-group">
@@ -384,8 +387,6 @@
                         <textarea id="eval-comentario" class="eval-input-control" placeholder="Observaciones sobre el trabajo realizado..."></textarea>
                     </div>
                 </div>
-
-                <!-- SECCIÓN DE SELFIE ELIMINADA COMPLETAMENTE -->
 
                 <div class="eval-field-group">
                     <label class="eval-label"><i data-lucide="pen-tool"></i>Firma Táctil</label>
@@ -482,7 +483,7 @@
         } else if (nombreSeleccionado === 'JORGE ALBERTO ANGEL') {
             cargoInput.value = 'LIDER DE PROYECTO';
         } else {
-            cargoInput.value = ''; // Limpiar si no selecciona nada
+            cargoInput.value = '';
         }
     }
 
@@ -754,7 +755,6 @@
             maxIcon.style.display = 'block';
             minIcon.style.display = 'none';
         }
-        // Ajustar canvas al maximizar
         setTimeout(() => { if(signaturePadInstance) { window.dispatchEvent(new Event('resize')); } }, 300);
     }
 
@@ -768,10 +768,8 @@
         document.getElementById('eval-nivel').value = ticket.evaluacion_nivel || '';
         document.getElementById('eval-comentario').value = ticket.eval_comentario || '';
         
-        // Refrescar cargo por si acaso
         actualizarCargo();
 
-        // Estado de solo lectura
         const inputs = document.querySelectorAll('#modalEvaluacion .eval-input-control');
         inputs.forEach(input => {
             if (isReadOnly) { input.setAttribute('disabled', 'true'); } 
@@ -782,7 +780,7 @@
         
         if(signaturePadInstance) {
             signaturePadInstance.on(); 
-            if(isReadOnly) signaturePadInstance.off(); // Desactivar firma si es solo lectura
+            if(isReadOnly) signaturePadInstance.off();
             signaturePadInstance.clear();
         }
 
@@ -825,7 +823,6 @@
                 fecha_confirmacion: new Date().toISOString()
             });
 
-            // Actualizar arreglo local
             if(window.ticketsPendientes[folio]) {
                 window.ticketsPendientes[folio].estado_confirmacion = estadoFinal;
                 window.ticketsPendientes[folio].evaluacion_nivel = nivel;
