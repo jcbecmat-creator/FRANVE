@@ -67,7 +67,7 @@
         .btn-add:hover { opacity: 0.9; }
         
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; overflow-x: auto; }
-        .co-table { width: 100%; border-collapse: collapse; min-width: 1350px; }
+        .co-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         
         .co-table th, .co-table td, .co-table span, .co-table div, .co-table select {
             font-family: 'Inter', sans-serif !important;
@@ -93,8 +93,6 @@
         .btn-action-trigger:hover { opacity: 0.85; }
         .btn-action-trigger span { font-weight: 400 !important; text-transform: none !important; }
 
-        .badge-origin { background-color: #E0F2FE; color: #0369A1; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
-        .badge-type { background-color: #F3E8FF; color: #6B21A8; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; }
         .rechazo-motivo-badge { display: block; margin-top: 4px; font-size: 10px; color: #DC2626; font-weight: 600; text-transform: none !important; background: #FEE2E2; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
@@ -184,7 +182,6 @@
                             <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
                             <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
-                            <!-- SE ELIMINÓ LA LÍNEA DE APROBACIÓN GERENCIA AQUÍ -->
                             <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
@@ -233,7 +230,7 @@
                         </div>
                         <div class="filter-group style-search flex-grow">
                             <label class="filter-label">Buscar por Incidencia, Tienda o Trabajador</label>
-                            <input type="text" class="input-control" id="filtro-buscar" placeholder="Ej. 12323-00225, CP PUBLIC MARKET o JOSE ALFREDO...">
+                            <input type="text" class="input-control" id="filtro-buscar" placeholder="Ej. 12323-00225, DP PUBLIC MARKET o JOSE ALFREDO...">
                         </div>
                         <div class="filter-actions">
                             <button class="btn-search" type="button" onclick="filtrarIncidencias()">
@@ -257,7 +254,7 @@
                                     <th>Tienda</th>
                                     <th>Código Equipo</th>
                                     <th>Instalación</th>
-                                    <th>Origen / Tipo</th>
+                                    <!-- COLUMNA "Origen / Tipo" ELIMINADA DE AQUÍ -->
                                     <th>Fallo Reportado</th>
                                     <th>Observaciones</th>
                                     <th style="text-align: center;">Asignar Técnico / Usuario</th>
@@ -265,7 +262,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tabla-incidencias-body">
-                                <tr><td colspan="10" class="co-table-empty">Cargando incidencias desde Firebase...</td></tr>
+                                <tr><td colspan="9" class="co-table-empty">Cargando incidencias desde Firebase...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -295,16 +292,16 @@
                     <input type="text" id="add-tienda" class="form-input-modal" placeholder="Nombre del restaurante">
                 </div>
                 <div>
+                    <label class="form-label-modal">Dirección</label>
+                    <input type="text" id="add-direccion" class="form-input-modal" placeholder="Dirección del restaurante">
+                </div>
+                <div>
                     <label class="form-label-modal">Código Equipo</label>
                     <input type="text" id="add-codigo" class="form-input-modal" placeholder="Ej. AC-001">
                 </div>
                 <div>
                     <label class="form-label-modal">Instalación</label>
                     <input type="text" id="add-instalacion" class="form-input-modal" placeholder="Ej. Cocina">
-                </div>
-                <div>
-                    <label class="form-label-modal">Tipo</label>
-                    <input type="text" id="add-tipo" class="form-input-modal" placeholder="Ej. Anomalía">
                 </div>
                 <div class="modal-form-full">
                     <label class="form-label-modal">Fallo Reportado</label>
@@ -346,16 +343,16 @@
                     <input type="text" id="edit-tienda" class="form-input-modal">
                 </div>
                 <div>
+                    <label class="form-label-modal">Dirección</label>
+                    <input type="text" id="edit-direccion" class="form-input-modal">
+                </div>
+                <div>
                     <label class="form-label-modal">Código Equipo</label>
                     <input type="text" id="edit-codigo" class="form-input-modal">
                 </div>
                 <div>
                     <label class="form-label-modal">Instalación</label>
                     <input type="text" id="edit-instalacion" class="form-input-modal">
-                </div>
-                <div>
-                    <label class="form-label-modal">Tipo</label>
-                    <input type="text" id="edit-tipo" class="form-input-modal">
                 </div>
                 <div class="modal-form-full">
                     <label class="form-label-modal">Fallo Reportado</label>
@@ -524,7 +521,7 @@
 
     function cargarIncidenciasFirebase(traerTodoElHistorial = false) {
         const tbody = document.getElementById('tabla-incidencias-body');
-        tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty">Cargando incidencias...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="co-table-empty">Cargando incidencias...</td></tr>';
 
         let query = db.collection("incidencias");
         if (!traerTodoElHistorial) {
@@ -545,7 +542,7 @@
             ejecutarFiltradoLogico();
         }).catch((error) => {
             console.error("Error: ", error);
-            tbody.innerHTML = '<tr><td colspan="10" class="co-table-empty" style="color: #ef4444;">Error al conectar con Firebase.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="co-table-empty" style="color: #ef4444;">Error al conectar con Firebase.</td></tr>';
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
         });
     }
@@ -601,7 +598,7 @@
         tbody.innerHTML = '';
 
         if (listaIncidencias.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="co-table-empty"><div class="flex flex-col items-center gap-2"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1;"></i><span>No se encontraron incidencias en esta sección.</span></div></td></tr>`;
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
             return;
         }
@@ -611,13 +608,11 @@
             const codigoIncidencia = inc.incidencia || "—";
             const fechaRec = formatearFecha(inc.fechaRecepcion);
             
-            // CAMBIO SOLICITADO: Tomar nombre de DATOS DEL RESTAURANTE
+            // CAMBIO: Tomar nombre de DATOS DEL RESTAURANTE
             const tienda = inc.restaurante_nombre || inc.tienda || inc.usuario || "—";
             
             const codigoEq = inc.codigoEquipo || "—";
             const instalacion = inc.instalacion || "—";
-            const origen = inc.origen || "Correctiva";
-            const tipo = inc.tipo || "Anomalía";
             const fallos = inc.fallos || "—";
             const obs = inc.observaciones || "—";
             const asignadoActual = inc.usuario_assigned || inc.usuario_asignado || "";
@@ -659,12 +654,7 @@
                 <td style="text-align: left;">${tienda}</td>
                 <td><span class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">${codigoEq}</span></td>
                 <td>${instalacion}</td>
-                <td>
-                    <div class="flex flex-col gap-1 items-center">
-                        <span class="badge-origin">${origen}</span>
-                        <span class="badge-type">${tipo}</span>
-                    </div>
-                </td>
+                <!-- COLUMNA ORIGEN/TIPO ELIMINADA DE AQUÍ -->
                 <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
@@ -762,15 +752,66 @@
     }
 
     // ==========================================
+    // LÓGICA DE FILTRADO
+    // ==========================================
+    function filtrarIncidencias() {
+        ejecutarFiltradoLogico();
+    }
+
+    function ejecutarFiltradoLogico() {
+        const inicio = document.getElementById('filtro-inicio').value;
+        const fin = document.getElementById('filtro-fin').value;
+        const buscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
+
+        let listaFiltrada = incidenciasGlobales.filter(inc => {
+            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
+            const estAsignacion = inc.estado_asignacion || "";
+            
+            let perteneceTab = false;
+            if (tabActual === 'pendientes' && asignado === "") perteneceTab = true;
+            if (tabActual === 'enviados' && asignado !== "" && estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados" && estAsignacion !== "Rechazado Trabajador") perteneceTab = true;
+            if (tabActual === 'rechazados' && (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador")) perteneceTab = true;
+
+            if (!perteneceTab) return false;
+
+            const fechaInc = parsearFechaFirebase(inc.fechaRecepcion);
+            if (inicio) {
+                const fechaInicio = new Date(inicio); fechaInicio.setHours(0,0,0,0);
+                if (fechaInc < fechaInicio) return false;
+            }
+            if (fin) {
+                const fechaFin = new Date(fin); fechaFin.setHours(23,59,59,999);
+                if (fechaInc > fechaFin) return false;
+            }
+
+            if (buscar) {
+                const textoBusqueda = `${inc.incidencia || ""} ${inc.restaurante_nombre || inc.tienda || inc.usuario || ""} ${inc.usuario_assigned || inc.usuario_asignado || ""}`.toLowerCase();
+                if (!textoBusqueda.includes(buscar)) return false;
+            }
+
+            return true;
+        });
+
+        renderizarTabla(listaFiltrada);
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('filtro-inicio').value = '';
+        document.getElementById('filtro-fin').value = '';
+        document.getElementById('filtro-buscar').value = '';
+        filtrarIncidencias();
+    }
+
+    // ==========================================
     // LÓGICA DEL MODAL AGREGAR
     // ==========================================
     function abrirModalAgregar() {
         document.getElementById('add-incidencia').value = '';
         document.getElementById('add-fecha').value = toDatetimeLocal(new Date());
         document.getElementById('add-tienda').value = '';
+        document.getElementById('add-direccion').value = '';
         document.getElementById('add-codigo').value = '';
         document.getElementById('add-instalacion').value = '';
-        document.getElementById('add-tipo').value = 'Anomalía';
         document.getElementById('add-fallo').value = '';
         document.getElementById('add-obs').value = '';
         document.getElementById('modalAgregar').classList.add('active');
@@ -782,9 +823,9 @@
         const incidencia = document.getElementById('add-incidencia').value.trim();
         const fechaVal = document.getElementById('add-fecha').value;
         const tienda = document.getElementById('add-tienda').value.trim();
+        const direccion = document.getElementById('add-direccion').value.trim();
         const codigo = document.getElementById('add-codigo').value.trim();
         const instalacion = document.getElementById('add-instalacion').value.trim();
-        const tipo = document.getElementById('add-tipo').value.trim();
         const fallo = document.getElementById('add-fallo').value.trim();
         const obs = document.getElementById('add-obs').value.trim();
 
@@ -802,12 +843,13 @@
             const newDoc = {
                 incidencia: incidencia,
                 fechaRecepcion: fechaVal ? new Date(fechaVal) : new Date(),
-                restaurante_nombre: tienda, // Guardar como restaurante
+                restaurante_nombre: tienda,
                 tienda: tienda,
-                usuario: tienda, // Respaldo
+                usuario: tienda,
+                direccion: direccion,
                 codigoEquipo: codigo,
                 instalacion: instalacion,
-                tipo: tipo,
+                tipo: "Anomalía",
                 origen: "Manual",
                 fallos: fallo,
                 observaciones: obs,
@@ -838,14 +880,14 @@
         if(!inc) return;
 
         document.getElementById('edit-id-doc').value = inc.id_documento;
-        document.getElementById('edit-incidencia').value = inc.incidencia || "";
+        document.getElementById('edit-incidencia').value = inc.incidencia || '';
         document.getElementById('edit-fecha').value = toDatetimeLocal(inc.fechaRecepcion);
-        document.getElementById('edit-tienda').value = inc.restaurante_nombre || inc.tienda || inc.usuario || "";
-        document.getElementById('edit-codigo').value = inc.codigoEquipo || "";
-        document.getElementById('edit-instalacion').value = inc.instalacion || "";
-        document.getElementById('edit-tipo').value = inc.tipo || "";
-        document.getElementById('edit-fallo').value = inc.fallos || "";
-        document.getElementById('edit-obs').value = inc.observaciones || "";
+        document.getElementById('edit-tienda').value = inc.restaurante_nombre || inc.tienda || inc.usuario || '';
+        document.getElementById('edit-direccion').value = inc.direccion || '';
+        document.getElementById('edit-codigo').value = inc.codigoEquipo || '';
+        document.getElementById('edit-instalacion').value = inc.instalacion || '';
+        document.getElementById('edit-fallo').value = inc.fallos || '';
+        document.getElementById('edit-obs').value = inc.observaciones || '';
         
         document.getElementById('modalEditar').classList.add('active');
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
@@ -857,9 +899,9 @@
         const incidencia = document.getElementById('edit-incidencia').value.trim();
         const fechaVal = document.getElementById('edit-fecha').value;
         const tienda = document.getElementById('edit-tienda').value.trim();
+        const direccion = document.getElementById('edit-direccion').value.trim();
         const codigo = document.getElementById('edit-codigo').value.trim();
         const instalacion = document.getElementById('edit-instalacion').value.trim();
-        const tipo = document.getElementById('edit-tipo').value.trim();
         const fallo = document.getElementById('edit-fallo').value.trim();
         const obs = document.getElementById('edit-obs').value.trim();
 
@@ -880,27 +922,26 @@
                 restaurante_nombre: tienda,
                 tienda: tienda,
                 usuario: tienda,
+                direccion: direccion,
                 codigoEquipo: codigo,
                 instalacion: instalacion,
-                tipo: tipo,
                 fallos: fallo,
                 observaciones: obs
             };
-
+            
             await db.collection("incidencias").doc(idDoc).update(updateData);
-
+            
+            // Actualizar arreglo local también
             const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
             if (index !== -1) {
-                incidenciasGlobales[index] = { ...incidenciasGlobales[index], ...updateData };
+                Object.assign(incidenciasGlobales[index], updateData);
             }
 
             showCustomAlert("Éxito", "Incidencia actualizada correctamente.", true);
             cerrarModalEdicion();
-            
             incidenciaSeleccionadaId = null;
             gestionarBotonFlotante();
-            ejecutarFiltradoLogico();
-
+            ejecutarFiltradoLogico(); 
         } catch (error) {
             console.error("Error al actualizar:", error);
             showCustomAlert("Error", "No se pudo actualizar la incidencia.", false);
@@ -910,70 +951,7 @@
             try { if(window.lucide) lucide.createIcons(); } catch(e){}
         }
     }
-
-    // ==========================================
-    // FILTROS
-    // ==========================================
-    function filtrarIncidencias() {
-        const fInicio = document.getElementById('filtro-inicio').value;
-        const fFin = document.getElementById('filtro-fin').value;
-
-        if ((fInicio || fFin) && !historialCompletoCargado) {
-            cargarIncidenciasFirebase(true); 
-            return;
-        }
-        ejecutarFiltradoLogico();
-    }
-
-    function ejecutarFiltradoLogico() {
-        const fInicio = document.getElementById('filtro-inicio').value;
-        const fFin = document.getElementById('filtro-fin').value;
-        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
-
-        let filtrados = incidenciasGlobales.filter(inc => {
-            const asignado = inc.usuario_assigned || inc.usuario_asignado || "";
-            const estAsignacion = inc.estado_asignacion || "";
-
-            if (tabActual === 'pendientes') {
-                if (estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador" || asignado !== "") return false;
-            } else if (tabActual === 'enviados') {
-                if (asignado === "" || estAsignacion === "Rechazado" || estAsignacion === "Costos Rechazados" || estAsignacion === "Rechazado Trabajador") return false;
-            } else if (tabActual === 'rechazados') {
-                if (estAsignacion !== "Rechazado" && estAsignacion !== "Costos Rechazados" && estAsignacion !== "Rechazado Trabajador") return false;
-            }
-
-            if (fBuscar) {
-                const incidenciaCod = (inc.incidencia || "").toLowerCase();
-                const nombreTienda = (inc.restaurante_nombre || inc.tienda || inc.usuario || "").toLowerCase();
-                const trabajador = asignado.toLowerCase();
-                if (!incidenciaCod.includes(fBuscar) && !nombreTienda.includes(fBuscar) && !trabajador.includes(fBuscar)) {
-                    return false;
-                }
-            }
-
-            if (fInicio || fFin) {
-                const fechaDocObj = parsearFechaFirebase(inc.fechaRecepcion);
-                if (fInicio) {
-                    const dateInicioObj = new Date(fInicio + "T00:00:00");
-                    if (fechaDocObj < dateInicioObj) return false;
-                }
-                if (fFin) {
-                    const dateFinObj = new Date(fFin + "T23:59:59");
-                    if (fechaDocObj > dateFinObj) return false;
-                }
-            }
-            return true;
-        });
-
-        renderizarTabla(filtrados);
-    }
-
-    function limpiarFiltros() {
-        document.getElementById('filtro-inicio').value = '';
-        document.getElementById('filtro-fin').value = '';
-        document.getElementById('filtro-buscar').value = '';
-        cargarIncidenciasFirebase(false); 
-    }
 </script>
+
 </body>
 </html>
