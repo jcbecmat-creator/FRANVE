@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* Variables y Configuración General */
         :root { 
             --tm-primary: #81D0DC; 
             --tm-primary-dark: #5FAAB5;
@@ -120,6 +119,9 @@
 
     <div id="contenido-pdf">
         
+        <!-- ═══════════════════════════════════════ -->
+        <!-- HOJA 1 -->
+        <!-- ═══════════════════════════════════════ -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -134,7 +136,11 @@
                             <li><i class="custom-bullet"></i> Ciudad / C.P.: <span id="pdf-city" style="margin-left: 5px;"></span></li>
                             <li><i class="custom-bullet"></i> Horario de servicio: <span id="pdf-hor" style="margin-left: 5px;"></span></li>
                             <li><i class="custom-bullet"></i> Teléfono: <span id="pdf-tel" style="margin-left: 5px;"></span></li>
-                            <li><i class="custom-bullet"></i> Correo electrónico: <span id="pdf-mail" style="margin-left: 5px;"></span></li>
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- CAMBIO: "Correo electrónico" → "Correo proveedor" -->
+                            <!-- Ahora muestra prov_mail (Firebase) no suc_mail   -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <li><i class="custom-bullet"></i> Correo proveedor: <span id="pdf-mail" style="margin-left: 5px;"></span></li>
                         </ul>
                     </div>
                     <div class="header-right">
@@ -149,7 +155,10 @@
                     <div class="title-primary-centered">REPORTE DE RECEPCIÓN DE TRABAJOS</div>
                     <div class="title-primary-centered" style="font-weight: normal;">MANTENIMIENTO</div>
                     
-                    <div class="ticket-left">N° TICKET: <span id="pdf-ticket"></span></div>
+                    <!-- ═══════════════════════════════════════════════════ -->
+                    <!-- CAMBIO: "N° TICKET" → "INCIDENCIA"                -->
+                    <!-- ═══════════════════════════════════════════════════ -->
+                    <div class="ticket-left">INCIDENCIA: <span id="pdf-ticket"></span></div>
                     
                     <div class="ticket-right">
                         FECHA: <span id="pdf-fecha"></span>
@@ -222,6 +231,9 @@
             </div>
         </div>
 
+        <!-- ═══════════════════════════════════════ -->
+        <!-- HOJA 2 -->
+        <!-- ═══════════════════════════════════════ -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -236,7 +248,11 @@
                             <li><i class="custom-bullet"></i> Ciudad / C.P.: <span id="pdf-city-2" style="margin-left: 5px;"></span></li>
                             <li><i class="custom-bullet"></i> Horario de servicio: <span id="pdf-hor-2" style="margin-left: 5px;"></span></li>
                             <li><i class="custom-bullet"></i> Teléfono: <span id="pdf-tel-2" style="margin-left: 5px;"></span></li>
-                            <li><i class="custom-bullet"></i> Correo electrónico: <span id="pdf-mail-2" style="margin-left: 5px;"></span></li>
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- CAMBIO: "Correo electrónico" → "Correo proveedor" -->
+                            <!-- Ahora muestra prov_mail (Firebase) no suc_mail   -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <li><i class="custom-bullet"></i> Correo proveedor: <span id="pdf-mail-2" style="margin-left: 5px;"></span></li>
                         </ul>
                     </div>
                     <div class="header-right">
@@ -250,7 +266,12 @@
                     <div class="title-primary-centered">ATENCIÓN CORRECTIVA</div>
                     <div class="title-primary-centered">REPORTE DE RECEPCIÓN DE TRABAJOS</div>
                     <div class="title-primary-centered" style="font-weight: normal;">MANTENIMIENTO</div>
-                    <div class="ticket-left">N° TICKET: <span id="pdf-ticket-2"></span></div>
+                    
+                    <!-- ═══════════════════════════════════════════════════ -->
+                    <!-- CAMBIO: "N° TICKET" → "INCIDENCIA"                -->
+                    <!-- ═══════════════════════════════════════════════════ -->
+                    <div class="ticket-left">INCIDENCIA: <span id="pdf-ticket-2"></span></div>
+                    
                     <div class="ticket-right">
                         FECHA: <span id="pdf-fecha-2"></span>
                     </div>
@@ -337,7 +358,13 @@
             if(dataStr) {
                 const data = JSON.parse(dataStr);
                 
-                // Llenar encabezado - Hoja 1 (Con prevención de "undefined" y campos alternativos)
+                // ══════════════════════════════════════════════════════════════
+                // CAMBIO 1: Priorizar incidencia sobre id_ticket
+                // incidencia = "12323-00225"  |  ticket/id_ticket = "MC-0001"
+                // ══════════════════════════════════════════════════════════════
+                const incidenciaMostrar = data.incidencia || data.ticket || data.id_ticket || '';
+                
+                // Llenar encabezado - Hoja 1
                 document.getElementById('pdf-sucursal').innerText = data.sucursal || '';
                 document.getElementById('pdf-dir').innerText = data.suc_dir || data.direccion || '';
                 document.getElementById('pdf-col').innerText = data.suc_col || data.colonia || '';
@@ -347,12 +374,23 @@
                 
                 document.getElementById('pdf-hor').innerText = data.suc_hor || data.horario || '';
                 document.getElementById('pdf-tel').innerText = data.suc_tel || data.telefono || '';
-                document.getElementById('pdf-mail').innerText = data.suc_mail || data.correo || '';
-                document.getElementById('pdf-ticket').innerText = data.ticket || data.id_ticket || '';
+                
+                // ══════════════════════════════════════════════════════════════
+                // CAMBIO 2: Correo del proveedor (Firebase) en vez de sucursal
+                // Antes: data.suc_mail || data.correo
+                // Ahora: data.prov_mail (correo del proveedor guardado en Firebase)
+                // ══════════════════════════════════════════════════════════════
+                document.getElementById('pdf-mail').innerText = data.prov_mail || data.suc_mail || data.correo || '';
+                
+                // ══════════════════════════════════════════════════════════════
+                // CAMBIO 1: Mostrar INCIDENCIA en vez de MC-0001
+                // ══════════════════════════════════════════════════════════════
+                document.getElementById('pdf-ticket').innerText = incidenciaMostrar;
+                
                 document.getElementById('pdf-fecha').innerText = data.fecha_hora || data.fecha_creacion || '';
                 document.getElementById('pdf-area').innerText = data.area || '';
                 document.getElementById('pdf-subarea').innerText = data.subarea || '';
-                document.getElementById('pdf-desc-falla').innerText = data.desc_falla || data.incidencia || '';
+                document.getElementById('pdf-desc-falla').innerText = data.desc_falla || '';
                 document.getElementById('pdf-desc-sol').innerText = data.desc_solucion || '';
                 document.getElementById('pdf-tec-nom').innerText = data.tec_nombre || '';
                 document.getElementById('pdf-tec-cel').innerText = data.tec_celular || '';
@@ -366,8 +404,17 @@
                 document.getElementById('pdf-city-2').innerText = ciudadLimpia + " " + (data.suc_cp || data.codigo_postal || ''); 
                 document.getElementById('pdf-hor-2').innerText = data.suc_hor || data.horario || '';
                 document.getElementById('pdf-tel-2').innerText = data.suc_tel || data.telefono || '';
-                document.getElementById('pdf-mail-2').innerText = data.suc_mail || data.correo || '';
-                document.getElementById('pdf-ticket-2').innerText = data.ticket || data.id_ticket || '';
+                
+                // ══════════════════════════════════════════════════════════════
+                // CAMBIO 2: Correo del proveedor (Hoja 2 también)
+                // ══════════════════════════════════════════════════════════════
+                document.getElementById('pdf-mail-2').innerText = data.prov_mail || data.suc_mail || data.correo || '';
+                
+                // ══════════════════════════════════════════════════════════════
+                // CAMBIO 1: Mostrar INCIDENCIA en vez de MC-0001 (Hoja 2)
+                // ══════════════════════════════════════════════════════════════
+                document.getElementById('pdf-ticket-2').innerText = incidenciaMostrar;
+                
                 document.getElementById('pdf-fecha-2').innerText = data.fecha_hora || data.fecha_creacion || '';
                 
                 document.getElementById('pdf-prov-nombre').innerText = data.prov_nombre || data.proveedor || '';
@@ -420,14 +467,17 @@
                 p.style.height = '296.5mm'; 
             });
 
-            const sucursalRaw = document.getElementById('pdf-sucursal').innerText;
-            const sucursal = sucursalRaw.replace(/\s+/g, '_'); 
-            const fechaHoraRaw = document.getElementById('pdf-fecha').innerText;
-            const fechaHora = fechaHoraRaw.replace(/[\s\/:,]/g, '_'); 
+            // ══════════════════════════════════════════════════════════════
+            // CAMBIO 3: Nombre del archivo usa INCIDENCIA
+            // Antes: MTTO_CORR_DP_QUETZAL_2026-06-13.pdf
+            // Ahora: MTTO_CORR_12323-00225.pdf
+            // ══════════════════════════════════════════════════════════════
+            const incidenciaRaw = document.getElementById('pdf-ticket').innerText || 'SIN_INCIDENCIA';
+            const incidenciaLimpia = incidenciaRaw.replace(/[\s\/:,]/g, '_');
             
             const opciones = {
                 margin:       0,
-                filename:     `MTTO_CORR_${sucursal}_${fechaHora}.pdf`,
+                filename:     `MTTO_CORR_${incidenciaLimpia}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
