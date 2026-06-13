@@ -18,7 +18,6 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Librería necesaria para la firma -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
 
     <script>
@@ -38,26 +37,22 @@
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
 
-        /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
 
-        /* === ESTILOS DEL MENÚ === */
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
 
-        /* === CONFIRMACIÓN OPERATIVA STYLES === */
         .confirmacion-wrap { max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-16); }
         .page-header-section { margin-bottom: var(--space-6); padding-bottom: var(--space-4); border-bottom: 1px solid var(--gray-200); }
         .page-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-6); flex-wrap: wrap; }
         .page-header-content h1 { font-size: var(--text-2xl); font-weight: var(--weight-semibold); color: var(--gray-900); letter-spacing: var(--tracking-tight); margin: 0 0 var(--space-2) 0; }
         .page-header-content p { font-size: var(--text-sm); color: var(--gray-500); margin: 0; }
         
-        /* === ESTILOS DE PESTAÑAS (TABS) === */
         .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { background: #e5e7eb; }
@@ -65,7 +60,6 @@
         .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
         .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
 
-        /* === FILTROS === */
         .co-filters { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
         .co-filters-grid { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
         .co-filter-group { flex: 1; min-width: 160px; }
@@ -73,13 +67,15 @@
         .co-filter-input { height: 42px; width: 100%; padding: 0 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; color: #111827; box-sizing: border-box; }
         .btn-filtrar { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; }
 
-        /* === TABLA === */
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
         .co-table { width: 100%; border-collapse: collapse; }
-        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #E5E7EB; white-space: nowrap; }
+        .co-table th, .co-table td, .co-table span, .co-table div, .co-table select { font-family: 'Inter', sans-serif !important; font-weight: 400 !important; text-transform: none !important; }
+        .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700 !important; text-transform: uppercase !important; color: #6b7280; border-bottom: 1px solid #E5E7EB; white-space: nowrap; }
         .co-table td { padding: 16px 20px; text-align: center; font-size: 14px; color: #111827; border-bottom: 1px solid #f3f4f6; }
         .co-table-empty { text-align: center; padding: 40px 20px !important; color: #6b7280; font-size: 14px; }
         
+        .incidencia-bold { font-weight: 700 !important; color: #0F172A !important; text-transform: uppercase !important; }
+
         .btn-action-primary { height: 32px; background: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; }
         .btn-action-primary:hover { opacity: 0.85; }
         .btn-action-gray { height: 32px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; padding: 0 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background 0.2s; }
@@ -90,7 +86,6 @@
         .status-confirmado { background: #D1FAE5; color: #065F46; } 
         .status-rechazado { background: #fee2e2; color: #b91c1c; }
 
-        /* === MODAL STYLES === */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
         .modal-card { background: white; width: 100%; max-width: 600px; border-radius: 16px; display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
@@ -106,7 +101,6 @@
         
         .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        /* Botones del footer */
         .modal-footer { padding: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px; background: #f9fafb; border-radius: 0 0 16px 16px; position: sticky; bottom: 0; z-index: 100; }
         .modal-footer button { height: 44px; padding: 0 24px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; gap: 8px; transition: all 0.2s; }
         .btn-cancelar { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
@@ -115,7 +109,6 @@
         .btn-enviar:hover { opacity: 0.85; }
         .btn-enviar:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; } 
 
-        /* === PREGUNTAS Y RESPUESTAS === */
         .eval-field-group { width: 100%; display: flex; flex-direction: column; }
         .eval-label { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
         .eval-label i { color: #374151; width: 16px; height: 16px; flex-shrink: 0; }
@@ -151,11 +144,9 @@
         
         select.eval-input-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
 
-        /* === FIRMA === */
         .signature-pad-container { background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 8px; width: 100%; height: 150px; position: relative; cursor: crosshair; touch-action: none; overflow: hidden; }
         .firma-canvas { width: 100%; height: 100%; }
 
-        /* MODAL ALERTA CUSTOM */
         #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
@@ -273,7 +264,6 @@
                                 <input type="date" class="co-filter-input" id="filtro-fecha-fin">
                             </div>
                             <div class="co-filter-group" style="flex: 2;">
-                                <!-- TEXTO ACTUALIZADO AQUÍ -->
                                 <label class="co-filter-label">Buscar Incidencia / Sucursal</label>
                                 <input type="text" class="co-filter-input" id="filtro-buscar" placeholder="Ej. 12323-00225">
                             </div>
@@ -289,7 +279,6 @@
                         <table class="co-table">
                             <thead>
                                 <tr>
-                                    <!-- TEXTO ACTUALIZADO AQUÍ -->
                                     <th>Incidencia</th>
                                     <th>Sucursal</th>
                                     <th>Técnico / Proveedor</th>
@@ -329,11 +318,11 @@
             </div>
             
             <div class="modal-body">
+                <!-- Campo oculto con el FOLIO REAL para operaciones Firebase -->
                 <input type="hidden" id="eval-id-ticket">
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="eval-field-group">
-                        <!-- TEXTO ACTUALIZADO AQUÍ -->
                         <label class="eval-label"><i data-lucide="hash"></i>Incidencia</label>
                         <div class="eval-input-wrapper">
                             <input type="text" id="eval-folio" class="eval-input-control" readonly style="font-weight: 700;">
@@ -562,7 +551,11 @@
               });
 
               window.ticketsPendientes = {};
-              ticketsGlobales.forEach(t => { window.ticketsPendientes[t.id_ticket || t.doc_id] = t; });
+              ticketsGlobales.forEach(t => { 
+                  // La clave es el id_ticket (folio real) para buscar rápido
+                  const clave = t.id_ticket || t.doc_id;
+                  window.ticketsPendientes[clave] = t; 
+              });
 
               actualizarBadges();
               renderTablaConfirmacion();
@@ -608,7 +601,7 @@
         
         const fInicio = document.getElementById('filtro-fecha-inicio').value;
         const fFin = document.getElementById('filtro-fecha-fin').value;
-        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase();
+        const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase().trim();
 
         let ticketsFiltrados = ticketsGlobales.filter(t => {
             if (tabActual === 'En proceso') {
@@ -625,10 +618,13 @@
             if (fInicio && fDoc < fInicio) return false;
             if (fFin && fDoc > fFin) return false;
 
+            // ═══════════════════════════════════════════════
+            // CAMBIO CLAVE: Buscar por INCIDENCIA y SUCURSAL
+            // ═══════════════════════════════════════════════
             if (fBuscar) {
-                const folio = (t.id_ticket || "").toLowerCase();
+                const incidencia = (t.incidencia || "").toLowerCase();
                 const suc = (t.sucursal || "").toLowerCase();
-                if (!folio.includes(fBuscar) && !suc.includes(fBuscar)) return false;
+                if (!incidencia.includes(fBuscar) && !suc.includes(fBuscar)) return false;
             }
             return true;
         });
@@ -640,7 +636,11 @@
         }
 
         ticketsFiltrados.forEach(t => {
-            const folio = t.id_ticket || t.doc_id;
+            // ═══════════════════════════════════════════════════════════
+            // CAMBIO CLAVE: folio para Firebase, incidencia para mostrar
+            // ═══════════════════════════════════════════════════════════
+            const folio = t.id_ticket || t.doc_id;                          // Folio real para Firebase
+            const incidencia = t.incidencia || "S/I";                       // Incidencia que viene de orden_de_servicio
             const suc = t.sucursal || "N/A";
             const tec = t.tec_nombre || t.proveedor || "N/A";
             const fecha = t.fecha_creacion || "—";
@@ -661,7 +661,7 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${folio}</strong></td>
+                <td><span class="incidencia-bold">${incidencia}</span></td>
                 <td>${suc}</td>
                 <td>${tec}</td>
                 <td>${fecha}</td>
@@ -688,6 +688,7 @@
             suc_tel: ticketData.suc_tel || '',
             suc_mail: ticketData.suc_mail || '',
             ticket: ticketData.id_ticket || 'S/N',
+            incidencia: ticketData.incidencia || '',
             area: ticketData.area || '',
             subarea: ticketData.subarea || '',
             desc_falla: ticketData.desc_falla || '',
@@ -712,7 +713,10 @@
     }
 
     function verPDF() {
-        const folio = document.getElementById('eval-folio').value;
+        // ═══════════════════════════════════════════════════
+        // CAMBIO CLAVE: Usar el folio real del campo oculto
+        // ═══════════════════════════════════════════════════
+        const folio = document.getElementById('eval-id-ticket').value;
         const ticketData = window.ticketsPendientes[folio];
         if(!ticketData) { showCustomAlert("Error", "No se encontraron los datos del ticket.", false); return; }
         
@@ -762,7 +766,12 @@
         const ticket = window.ticketsPendientes[folio];
         if(!ticket) return;
 
-        document.getElementById('eval-folio').value = folio;
+        // ═══════════════════════════════════════════════════════════════
+        // CAMBIO CLAVE: Separar folio real (para Firebase) de incidencia (visible)
+        // ═══════════════════════════════════════════════════════════════
+        document.getElementById('eval-id-ticket').value = folio;                                    // Folio real → operaciones Firebase
+        document.getElementById('eval-folio').value = ticket.incidencia || folio;                   // Incidencia visible en el modal
+        
         document.getElementById('eval-nombre').value = ticket.eval_nombre || '';
         document.getElementById('eval-cargo').value = ticket.eval_cargo || '';
         document.getElementById('eval-nivel').value = ticket.evaluacion_nivel || '';
@@ -797,7 +806,10 @@
     // 9. ENVIAR EVALUACIÓN A FIREBASE
     // ==========================================
     async function enviarEvaluacion() {
-        const folio = document.getElementById('eval-folio').value;
+        // ═══════════════════════════════════════════════════════════════
+        // CAMBIO CLAVE: Usar el folio real del campo oculto, NO la incidencia
+        // ═══════════════════════════════════════════════════════════════
+        const folio = document.getElementById('eval-id-ticket').value;
         const nivel = document.getElementById('eval-nivel').value;
         const nombre = document.getElementById('eval-nombre').value;
         const cargo = document.getElementById('eval-cargo').value;
