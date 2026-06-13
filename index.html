@@ -142,15 +142,13 @@
         textarea.eval-input-control { height: auto; min-height: 80px; padding: 0.75rem 1rem; line-height: 1.5; resize: none; }
         .eval-input-control[readonly] { background-color: #e5e5e5; color: #4b5563; cursor: not-allowed; }
 
+        /* PANTALLA DE ESPERA PDF (CONTEO REGRESIVO) */
         #countdown-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(19, 21, 32, 0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; box-sizing: border-box; }
         #countdown-overlay.show { display: flex !important; }
         #countdown-number { font-size: 80px; font-weight: 900; color: #81D0DC; margin: 20px 0; line-height: 1; }
         #countdown-text { font-size: 18px; font-weight: 500; color: #cbd5e1; max-width: 400px; }
         .spinner-loader { border: 6px solid rgba(129, 208, 220, 0.2); border-top: 6px solid #81D0DC; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .checkbox-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; }
-        .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #81D0DC; cursor: pointer; }
 
         @media (max-width: 900px) {
             .upload-bottom-bar { flex-direction: column; gap: 12px; padding: 16px; bottom: -200px;}
@@ -479,6 +477,7 @@
         </div>
     </div>
 
+    <!-- OVERLAY DE CONTEO REGRESIVO -->
     <div id="countdown-overlay">
         <div class="spinner-loader"></div>
         <div id="countdown-number">13</div>
@@ -488,7 +487,7 @@
 
     <script>
         // ==========================================
-        // 1. CONFIGURACIÓN FIREBASE
+        // 1. CONFIGURACIÓN - TODO EN FRAVE
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
@@ -507,944 +506,346 @@
         const storage = firebase.storage();
         const dbIncidencias = firebase.firestore();
 
-        console.log("=== VERIFICACIÓN FIREBASE ===");
+        console.log("=== VERIFICACIÓN - TODO EN FRAVE ===");
         console.log("Firestore project:", db.app.options.projectId);
         console.log("Storage bucket:", storage.ref().bucket);
-        console.log("=============================");
+        console.log("=====================================");
 
         lucide.createIcons();
 
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGWGCHKQZFzMAZvaPjd7MXuW0n9hWLzg1-m7oXRzACeUGEzMl1s2ALDuvhIqcajQ/exec';
+        window.appData = null;
+
+        let incidenciasPendientes = [];
 
         // ==========================================
-        // 2. VARIABLES GLOBALES
+        // ALERTAS Y CONFIRMACIONES
         // ==========================================
-        let currentUser = null;
-        let currentCameraType = null;
-        let cameraStream = null;
-        let facingMode = 'environment';
-        let photoData = {
-            falla: [null, null, null],
-            solucion: [null, null, null],
-            selfie: [null],
-            soporte: [null]
-        };
-        let signaturePads = {};
-        let misOrdenesCache = [];
-        let selectedDrafts = new Set();
-        let tabActual = 'Nueva Orden';
-
-        // ==========================================
-        // 3. LOGIN
-        // ==========================================
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const alertMsg = document.getElementById('alertMessage');
-
-            if (!username || !password) {
-                alertMsg.style.display = 'block';
-                alertMsg.textContent = 'Completa todos los campos';
-                return;
-            }
-
-            try {
-                const docRef = db.collection('usuarios').doc(username);
-                const doc = await docRef.get();
-
-                if (doc.exists && doc.data().password === password) {
-                    const userData = doc.data();
-                    currentUser = {
-                        id: username,
-                        nombre: userData.nombre || username,
-                        rol: userData.rol || 'proveedor',
-                        proveedor: userData.proveedor || '',
-                        numeroEmpleado: userData.numeroEmpleado || '',
-                        cargo: userData.cargo || ''
-                    };
-                    sessionStorage.setItem('loginSession', JSON.stringify(currentUser));
-                    document.documentElement.classList.add('is-logged-in');
-                    alertMsg.style.display = 'none';
-                    inicializarApp();
-                } else {
-                    alertMsg.style.display = 'block';
-                    alertMsg.textContent = 'Verifica tu usuario o contraseña';
-                }
-            } catch (error) {
-                console.error('Error login:', error);
-                alertMsg.style.display = 'block';
-                alertMsg.textContent = 'Error de conexión. Intenta de nuevo.';
-            }
-        });
-
-        function togglePassword() {
-            const passInput = document.getElementById('password');
-            const icon = document.getElementById('toggleIcon');
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                icon.textContent = 'visibility';
-            } else {
-                passInput.type = 'password';
-                icon.textContent = 'visibility_off';
-            }
+        function showCustomAlert(title, message, isSuccess = true) {
+            const alertBox = document.getElementById('custom-alert');
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-msg').innerText = message;
+            const alertIcon = document.getElementById('alert-icon-container');
+            const alertBtn = document.getElementById('alert-btn');
+            if(isSuccess) { alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>'; alertBtn.style.background = '#16a34a'; alertBtn.style.color = '#FFFFFF'; }
+            else { alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>'; alertBtn.style.background = '#DC2626'; alertBtn.style.color = '#FFFFFF'; }
+            alertBox.style.display = 'flex'; lucide.createIcons();
         }
-
-        // ==========================================
-        // 4. INICIALIZACIÓN DE LA APP
-        // ==========================================
-        function inicializarApp() {
-            const session = JSON.parse(sessionStorage.getItem('loginSession'));
-            if (session) {
-                currentUser = session;
-                document.documentElement.classList.add('is-logged-in');
-
-                document.getElementById('user-initial-header').textContent = (currentUser.nombre || 'U').charAt(0).toUpperCase();
-                document.getElementById('user-dropdown-name').textContent = currentUser.nombre || 'Usuario';
-                document.getElementById('welcome-username-display').textContent = (currentUser.nombre || 'PROVEEDOR').toUpperCase();
-
-                cargarInfoProveedor();
-                cargarIncidencias();
-                cargarSucursales();
-                cargarTecnicos();
-                initSignaturePad('firma_tecnico');
-                actualizarContadores();
-            }
-        }
-
-        async function cargarInfoProveedor() {
-            if (!currentUser || !currentUser.proveedor) return;
-            try {
-                const doc = await db.collection('proveedores').doc(currentUser.proveedor).get();
-                if (doc.exists) {
-                    const p = doc.data();
-                    document.getElementById('prov-info-nombre').textContent = p.nombre || '-';
-                    document.getElementById('prov-info-rfc').textContent = p.rfc || '-';
-                    document.getElementById('prov-info-dir').textContent = p.direccion || '-';
-                    document.getElementById('prov-info-cont').textContent = p.contacto || '-';
-                    document.getElementById('prov-info-tel').textContent = p.telefono || '-';
-                    document.getElementById('prov-info-mail').textContent = p.correo || '-';
-                }
-            } catch (e) { console.error('Error proveedor:', e); }
-        }
-
-        // ==========================================
-        // 5. CARGAR DATASETS (Incidencias, Sucursales, Técnicos)
-        // ==========================================
-        let incidenciasCache = [];
-        let sucursalesCache = [];
-
-        async function cargarIncidencias() {
-            try {
-                const snap = await dbIncidencias.collection('incidencias').where('estatus', '==', 'Pendiente').get();
-                incidenciasCache = [];
-                const datalist = document.getElementById('incidencias-list');
-                datalist.innerHTML = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    incidenciasCache.push({ id: doc.id, ...d });
-                    const opt = document.createElement('option');
-                    opt.value = d.numeroIncidencia || d.folio || doc.id;
-                    opt.textContent = d.numeroIncidencia || d.folio || doc.id;
-                    datalist.appendChild(opt);
-                });
-            } catch (e) { console.error('Error incidencias:', e); }
-        }
-
-        async function cargarSucursales() {
-            try {
-                const snap = await db.collection('sucursales').get();
-                sucursalesCache = [];
-                const datalist = document.getElementById('sucursales-list');
-                datalist.innerHTML = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    sucursalesCache.push({ id: doc.id, ...d });
-                    const opt = document.createElement('option');
-                    opt.value = d.nombre || doc.id;
-                    datalist.appendChild(opt);
-                });
-            } catch (e) { console.error('Error sucursales:', e); }
-        }
-
-        async function cargarTecnicos() {
-            try {
-                const snap = await db.collection('tecnicos').get();
-                const datalist = document.getElementById('tecnicos-list');
-                datalist.innerHTML = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const opt = document.createElement('option');
-                    opt.value = d.nombre || doc.id;
-                    datalist.appendChild(opt);
-                });
-            } catch (e) { console.error('Error tecnicos:', e); }
-        }
-
-        // ==========================================
-        // 6. AUTOCOMPLETAR DESDE INCIDENCIA
-        // ==========================================
-        document.getElementById('incidencia-input').addEventListener('change', function() {
-            const val = this.value.trim();
-            const found = incidenciasCache.find(i => (i.numeroIncidencia || i.folio) === val);
-            if (found) {
-                document.getElementById('incidencia_doc_id').value = found.id;
-                if (found.sucursal) {
-                    document.getElementById('sucursal-input').value = found.sucursal;
-                    llenarDatosSucursal(found.sucursal);
-                }
-                if (found.area || found.instalacion) document.getElementById('area-input').value = found.area || found.instalacion || '';
-                if (found.subarea || found.fallo) document.getElementById('subarea-select').value = found.subarea || found.fallo || '';
-                if (found.descripcion) document.getElementById('desc_falla').value = found.descripcion || '';
-            }
-        });
-
-        document.getElementById('sucursal-input').addEventListener('change', function() {
-            llenarDatosSucursal(this.value.trim());
-        });
-
-        function llenarDatosSucursal(nombreSuc) {
-            const found = sucursalesCache.find(s => s.nombre === nombreSuc);
-            const details = document.getElementById('sucursal-details');
-            if (found) {
-                details.style.display = 'grid';
-                document.getElementById('suc-dir').textContent = found.direccion || '-';
-                document.getElementById('suc-col').textContent = found.colonia || '-';
-                document.getElementById('suc-city').textContent = found.ciudad || '-';
-                document.getElementById('suc-cp').textContent = found.cp || '-';
-                document.getElementById('suc-client').textContent = found.cliente || '-';
-                document.getElementById('suc-tel').textContent = found.telefono || '-';
-                document.getElementById('suc-mail').textContent = found.correo || '-';
-            } else {
-                details.style.display = 'none';
-            }
-        }
-
-        // ==========================================
-        // 7. FOTOS - CÁMARA Y ARCHIVO
-        // ==========================================
-        function triggerCamera(type) {
-            currentCameraType = type;
-            const maxSlots = type === 'falla' || type === 'solucion' ? 3 : 1;
-            const currentCount = photoData[type].filter(p => p !== null).length;
-            if (currentCount >= maxSlots) {
-                showCustomAlert('Límite alcanzado', 'Ya tienes el máximo de fotos para esta sección.', 'info');
-                return;
-            }
-            facingMode = 'environment';
-            openCamera();
-        }
-
-        function triggerFile(type) {
-            currentCameraType = type;
-            const maxSlots = type === 'falla' || type === 'solucion' ? 3 : 1;
-            const currentCount = photoData[type].filter(p => p !== null).length;
-            if (currentCount >= maxSlots) {
-                showCustomAlert('Límite alcanzado', 'Ya tienes el máximo de fotos para esta sección.', 'info');
-                return;
-            }
-            document.getElementById('fileInputGlobal').click();
-        }
-
-        async function openCamera() {
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 960 } },
-                    audio: false
-                });
-                document.getElementById('camera-video').srcObject = cameraStream;
-                document.getElementById('camera-overlay').classList.add('show');
-            } catch (err) {
-                console.error('Error cámara:', err);
-                showCustomAlert('Error', 'No se pudo acceder a la cámara. Verifica los permisos.', 'error');
-            }
-        }
-
-        function closeCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(t => t.stop());
-                cameraStream = null;
-            }
-            document.getElementById('camera-video').srcObject = null;
-            document.getElementById('camera-overlay').classList.remove('show');
-        }
-
-        async function switchCamera() {
-            facingMode = facingMode === 'environment' ? 'user' : 'environment';
-            closeCamera();
-            openCamera();
-        }
-
-        function captureFoto() {
-            const video = document.getElementById('camera-video');
-            const canvas = document.getElementById('tempCanvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            addPhotoToSlot(currentCameraType, dataUrl);
-            closeCamera();
-        }
-
-        function processFile(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                addPhotoToSlot(currentCameraType, e.target.result);
-            };
-            reader.readAsDataURL(file);
-            input.value = '';
-        }
-
-        function addPhotoToSlot(type, dataUrl) {
-            const maxSlots = type === 'falla' || type === 'solucion' ? 3 : 1;
-            for (let i = 0; i < maxSlots; i++) {
-                if (photoData[type][i] === null) {
-                    photoData[type][i] = dataUrl;
-                    renderPhotoSlot(type, i, dataUrl);
-                    return;
-                }
-            }
-        }
-
-        function renderPhotoSlot(type, index, dataUrl) {
-            const slot = document.getElementById(`slot-${type}-${index}`);
-            if (!slot) return;
-            slot.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = dataUrl;
-            img.onclick = function() { openPhotoModal(dataUrl); };
-            const removeBtn = document.createElement('div');
-            removeBtn.className = 'remove-photo';
-            removeBtn.textContent = '×';
-            removeBtn.onclick = function(e) {
-                e.stopPropagation();
-                removePhoto(type, index);
-            };
-            slot.appendChild(img);
-            slot.appendChild(removeBtn);
-        }
-
-        function removePhoto(type, index) {
-            photoData[type][index] = null;
-            const slot = document.getElementById(`slot-${type}-${index}`);
-            if (slot) {
-                slot.innerHTML = '<i data-lucide="image" class="slot-placeholder-icon"></i>';
-                lucide.createIcons();
-            }
-        }
-
-        function openPhotoModal(src) {
-            document.getElementById('imgFull').src = src;
-            document.getElementById('photoModal').classList.add('show');
-        }
-
-        function closePhotoModal() {
-            document.getElementById('photoModal').classList.remove('show');
-        }
-
-        // ==========================================
-        // 8. FIRMA TÁCTIL
-        // ==========================================
-        function initSignaturePad(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const container = canvas.parentElement;
-
-            function resizeCanvas() {
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = container.offsetWidth * ratio;
-                canvas.height = 200 * ratio;
-                canvas.style.width = container.offsetWidth + 'px';
-                canvas.style.height = '200px';
-                ctx.scale(ratio, ratio);
-                ctx.strokeStyle = '#1E293B';
-                ctx.lineWidth = 2;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-            }
-            resizeCanvas();
-
-            let drawing = false;
-            let lastX = 0, lastY = 0;
-
-            function getPos(e) {
-                const rect = canvas.getBoundingClientRect();
-                const touch = e.touches ? e.touches[0] : e;
-                return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-            }
-
-            function startDraw(e) {
-                e.preventDefault();
-                drawing = true;
-                const pos = getPos(e);
-                lastX = pos.x; lastY = pos.y;
-            }
-
-            function draw(e) {
-                e.preventDefault();
-                if (!drawing) return;
-                const pos = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
-                lastX = pos.x; lastY = pos.y;
-            }
-
-            function stopDraw(e) {
-                if (e) e.preventDefault();
-                drawing = false;
-                document.getElementById(canvasId + '_data').value = canvas.toDataURL('image/png');
-            }
-
-            canvas.addEventListener('mousedown', startDraw);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDraw);
-            canvas.addEventListener('mouseleave', stopDraw);
-            canvas.addEventListener('touchstart', startDraw, { passive: false });
-            canvas.addEventListener('touchmove', draw, { passive: false });
-            canvas.addEventListener('touchend', stopDraw, { passive: false });
-
-            signaturePads[canvasId] = { canvas, ctx, resizeCanvas };
-            window.addEventListener('resize', resizeCanvas);
-        }
-
-        function limpiarFirma(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.getElementById(canvasId + '_data').value = '';
-        }
-
-        // ==========================================
-        // 9. TABS
-        // ==========================================
-        function cambiarTabMtto(tabName) {
-            tabActual = tabName;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const tabBtn = document.getElementById('tab-' + tabName);
-            if (tabBtn) tabBtn.classList.add('active');
-
-            const form = document.getElementById('ordenMttoForm');
-            const dashboard = document.getElementById('dashboard-ordenes');
-
-            if (tabName === 'Nueva Orden') {
-                form.style.display = 'block';
-                dashboard.style.display = 'none';
-            } else {
-                form.style.display = 'none';
-                dashboard.style.display = 'block';
-                renderTablaMisOrdenes();
-            }
-        }
-
-        // ==========================================
-        // 10. CONTADORES Y TABLA DE ÓRDENES
-        // ==========================================
-        async function actualizarContadores() {
-            if (!currentUser) return;
-            try {
-                const snapBorrador = await db.collection('ordenes_mtto')
-                    .where('estatus', '==', 'Borrador')
-                    .where('proveedorId', '==', currentUser.id)
-                    .get();
-                const snapRealizado = await db.collection('ordenes_mtto')
-                    .where('estatus', '==', 'En proceso')
-                    .where('proveedorId', '==', currentUser.id)
-                    .get();
-
-                document.getElementById('badge-Borrador').textContent = snapBorrador.size;
-                document.getElementById('badge-Realizado').textContent = snapRealizado.size;
-            } catch (e) { console.error('Error contadores:', e); }
-        }
-
-        async function renderTablaMisOrdenes() {
-            if (!currentUser) return;
-            const tbody = document.getElementById('tabla-mis-ordenes');
-            const thead = tbody.parentElement.querySelector('thead');
-            const estatus = tabActual === 'Borrador' ? 'Borrador' : 'En proceso';
-
-            thead.innerHTML = `<tr>
-                ${estatus === 'Borrador' ? '<th style="padding:12px;"><input type="checkbox" id="checkAll" onchange="toggleAllChecks(this)"></th>' : ''}
-                <th style="padding:12px;">Folio</th>
-                <th style="padding:12px;">Incidencia</th>
-                <th style="padding:12px;">Sucursal</th>
-                <th style="padding:12px;">Fecha</th>
-                <th style="padding:12px;">Estatus</th>
-                <th style="padding:12px;">Acciones</th>
-            </tr>`;
-
-            try {
-                let query = db.collection('ordenes_mtto')
-                    .where('estatus', '==', estatus)
-                    .where('proveedorId', '==', currentUser.id);
-
-                const snap = await query.get();
-                misOrdenesCache = [];
-                snap.forEach(doc => { misOrdenesCache.push({ id: doc.id, ...doc.data() }); });
-
-                // Filtros
-                const fInicio = document.getElementById('filtro-inicio-mtto').value;
-                const fFin = document.getElementById('filtro-fin-mtto').value;
-                const fBuscar = document.getElementById('filtro-buscar-mtto').value.toLowerCase();
-
-                let filtradas = misOrdenesCache;
-                if (fInicio) filtradas = filtradas.filter(o => o.fecha >= fInicio);
-                if (fFin) filtradas = filtradas.filter(o => o.fecha <= fFin);
-                if (fBuscar) filtradas = filtradas.filter(o =>
-                    (o.incidencia || '').toLowerCase().includes(fBuscar) ||
-                    (o.sucursal || '').toLowerCase().includes(fBuscar) ||
-                    (o.folio || '').toLowerCase().includes(fBuscar)
-                );
-
-                if (filtradas.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="padding:30px; color:#6b7280;">No se encontraron órdenes</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = filtradas.map(o => `
-                    <tr style="border-bottom:1px solid #f1f5f9;">
-                        ${estatus === 'Borrador' ? `<td style="padding:12px;"><input type="checkbox" class="draft-check" data-id="${o.id}" data-folio="${o.folio || o.id}" onchange="updateDraftSelection()"></td>` : ''}
-                        <td style="padding:12px; font-weight:600;">${o.folio || '-'}</td>
-                        <td style="padding:12px;">${o.incidencia || '-'}</td>
-                        <td style="padding:12px;">${o.sucursal || '-'}</td>
-                        <td style="padding:12px;">${o.fecha || '-'}</td>
-                        <td style="padding:12px;"><span style="padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; background:${estatus === 'Borrador' ? '#FEF3C7' : '#D1FAE5'}; color:${estatus === 'Borrador' ? '#92400E' : '#065F46'};">${o.estatus}</span></td>
-                        <td style="padding:12px;">
-                            ${estatus === 'Borrador' ? `<button onclick="cargarBorrador('${o.id}')" style="padding:6px 12px; border-radius:6px; background:#81D0DC; color:#131520; border:none; font-weight:600; cursor:pointer; font-size:12px;">Editar</button>` : `<button onclick="verOrden('${o.id}')" style="padding:6px 12px; border-radius:6px; background:#f3f4f6; color:#374151; border:1px solid #d1d5db; font-weight:600; cursor:pointer; font-size:12px;">Ver</button>`}
-                        </td>
-                    </tr>
-                `).join('');
-
-            } catch (e) {
-                console.error('Error tabla:', e);
-                tbody.innerHTML = `<tr><td colspan="7" style="padding:30px; color:#DC2626;">Error al cargar órdenes</td></tr>`;
-            }
-        }
-
-        function updateDraftSelection() {
-            selectedDrafts = new Set();
-            document.querySelectorAll('.draft-check:checked').forEach(cb => {
-                selectedDrafts.add(cb.dataset.id);
-            });
-            const bar = document.getElementById('delete-draft-bar');
-            const count = selectedDrafts.size;
-            document.getElementById('lbl-draft-count').textContent = count + ' folios';
-            if (count > 0) {
-                bar.classList.add('show');
-            } else {
-                bar.classList.remove('show');
-            }
-        }
-
-        function toggleAllChecks(master) {
-            document.querySelectorAll('.draft-check').forEach(cb => { cb.checked = master.checked; });
-            updateDraftSelection();
-        }
-
-        function limpiarSeleccionBorradores() {
-            document.querySelectorAll('.draft-check').forEach(cb => { cb.checked = false; });
-            document.getElementById('checkAll').checked = false;
-            selectedDrafts.clear();
-            document.getElementById('delete-draft-bar').classList.remove('show');
-        }
-
-        async function borrarBorradoresSeleccionados() {
-            if (selectedDrafts.size === 0) return;
-            showCustomConfirm('Eliminar borradores', `¿Eliminar ${selectedDrafts.size} orden(es)?`, async function() {
-                for (const id of selectedDrafts) {
-                    try { await db.collection('ordenes_mtto').doc(id).delete(); } catch (e) { console.error(e); }
-                }
-                limpiarSeleccionBorradores();
-                renderTablaMisOrdenes();
-                actualizarContadores();
-                showCustomAlert('Éxito', 'Borradores eliminados', 'success');
-            });
-        }
-
-        async function cargarBorrador(docId) {
-            try {
-                const doc = await db.collection('ordenes_mtto').doc(docId).get();
-                if (!doc.exists) return;
-                const d = doc.data();
-
-                document.getElementById('doc_id_actual').value = docId;
-                document.getElementById('folio_mc').value = d.folio || '';
-                document.getElementById('incidencia-input').value = d.incidencia || '';
-                document.getElementById('incidencia_doc_id').value = d.incidenciaDocId || '';
-                document.getElementById('sucursal-input').value = d.sucursal || '';
-                document.getElementById('area-input').value = d.area || '';
-                document.getElementById('subarea-select').value = d.fallo || '';
-                document.getElementById('desc_falla').value = d.descFalla || '';
-                document.getElementById('desc_solucion').value = d.descSolucion || '';
-                document.getElementById('nombre_tecnico').value = d.tecnicoNombre || '';
-                document.getElementById('celular_tecnico').value = d.tecnicoCelular || '';
-                document.getElementById('comentario_salida').value = d.comentarioSalida || '';
-
-                if (d.sucursal) llenarDatosSucursal(d.sucursal);
-
-                cambiarTabMtto('Nueva Orden');
-            } catch (e) { console.error('Error cargar borrador:', e); }
-        }
-
-        function verOrden(docId) {
-            window.open('misordenes.html?id=' + docId, '_blank');
-        }
-
-        // ==========================================
-        // 11. PROCESAR ORDEN (CON INCIDENCIA)
-        // ==========================================
-        async function procesarOrden(estatus) {
-            if (!currentUser) {
-                showCustomAlert('Error', 'Debes iniciar sesión', 'error');
-                return;
-            }
-
-            // Validaciones mínimas para "En proceso"
-            if (estatus === 'En proceso') {
-                const incidencia = document.getElementById('incidencia-input').value.trim();
-                const sucursal = document.getElementById('sucursal-input').value.trim();
-                const area = document.getElementById('area-input').value.trim();
-                const fallo = document.getElementById('subarea-select').value.trim();
-                const tecnico = document.getElementById('nombre_tecnico').value.trim();
-                const celular = document.getElementById('celular_tecnico').value.trim();
-
-                if (!incidencia) { showCustomAlert('Campo requerido', 'Ingresa el número de incidencia', 'warning'); return; }
-                if (!sucursal) { showCustomAlert('Campo requerido', 'Selecciona una sucursal', 'warning'); return; }
-                if (!area) { showCustomAlert('Campo requerido', 'Ingresa la instalación', 'warning'); return; }
-                if (!fallo) { showCustomAlert('Campo requerido', 'Ingresa el fallo', 'warning'); return; }
-                if (!tecnico) { showCustomAlert('Campo requerido', 'Ingresa el nombre del técnico', 'warning'); return; }
-                if (!celular || celular.length < 10) { showCustomAlert('Campo requerido', 'Ingresa un celular válido (10 dígitos)', 'warning'); return; }
-            }
-
-            const btnGuardar = document.getElementById('btn-guardar-borrador');
-            const btnEnviar = document.getElementById('btn-enviar-orden');
-            btnGuardar.disabled = true;
-            btnEnviar.disabled = true;
-            btnGuardar.style.opacity = '0.5';
-            btnEnviar.style.opacity = '0.5';
-
-            try {
-                // Generar folio si es nuevo
-                const docIdActual = document.getElementById('doc_id_actual').value;
-                let folio = document.getElementById('folio_mc').value;
-
-                if (!folio) {
-                    const counterRef = db.collection('contadores').doc('ordenes_mtto');
-                    const counterDoc = await counterRef.get();
-                    let nextNum = 1;
-                    if (counterDoc.exists) {
-                        nextNum = (counterDoc.data().ultimo || 0) + 1;
-                    }
-                    folio = 'MC-' + String(nextNum).padStart(4, '0');
-                    await counterRef.set({ ultimo: nextNum }, { merge: true });
-                    document.getElementById('folio_mc').value = folio;
-                }
-
-                // Recopilar datos del formulario
-                const incidenciaValor = document.getElementById('incidencia-input').value.trim();
-                const sucursalValor = document.getElementById('sucursal-input').value.trim();
-                const areaValor = document.getElementById('area-input').value.trim();
-                const falloValor = document.getElementById('subarea-select').value.trim();
-                const descFalla = document.getElementById('desc_falla').value.trim();
-                const descSolucion = document.getElementById('desc_solucion').value.trim();
-                const tecnicoNombre = document.getElementById('nombre_tecnico').value.trim();
-                const tecnicoCelular = document.getElementById('celular_tecnico').value.trim();
-                const comentarioSalida = document.getElementById('comentario_salida').value.trim();
-                const firmaData = document.getElementById('firma_tecnico_data').value;
-
-                // Subir fotos a Firebase Storage
-                const fotosUrls = { falla: [], solucion: [], selfie: [], soporte: [] };
-
-                for (const type of ['falla', 'solucion', 'selfie', 'soporte']) {
-                    for (let i = 0; i < photoData[type].length; i++) {
-                        if (photoData[type][i] !== null) {
-                            const base64 = photoData[type][i];
-                            const ref = storage.ref(`ordenes_mtto/${folio}/${type}_${i}_${Date.now()}.jpg`);
-                            await ref.putString(base64, 'data_url');
-                            const url = await ref.getDownloadURL();
-                            fotosUrls[type].push(url);
-                        }
-                    }
-                }
-
-                // Subir firma si existe
-                let firmaUrl = '';
-                if (firmaData) {
-                    const firmaRef = storage.ref(`ordenes_mtto/${folio}/firma_${Date.now()}.png`);
-                    await firmaRef.putString(firmaData, 'data_url');
-                    firmaUrl = await firmaRef.getDownloadURL();
-                }
-
-                // Datos de sucursal
-                const sucDir = document.getElementById('suc-dir').textContent;
-                const sucCol = document.getElementById('suc-col').textContent;
-                const sucCity = document.getElementById('suc-city').textContent;
-                const sucCp = document.getElementById('suc-cp').textContent;
-                const sucClient = document.getElementById('suc-client').textContent;
-                const sucTel = document.getElementById('suc-tel').textContent;
-                const sucMail = document.getElementById('suc-mail').textContent;
-
-                // =============================================
-                // CAMBIO 1: GUARDAR incidencia EN FIREBASE
-                // =============================================
-                const ordenData = {
-                    folio: folio,
-                    incidencia: incidenciaValor,   // ← INCIDENCIA GUARDADA EN FIREBASE
-                    incidenciaDocId: document.getElementById('incidencia_doc_id').value,
-                    sucursal: sucursalValor,
-                    sucursalDireccion: sucDir !== '-' ? sucDir : '',
-                    sucursalColonia: sucCol !== '-' ? sucCol : '',
-                    sucursalCiudad: sucCity !== '-' ? sucCity : '',
-                    sucursalCp: sucCp !== '-' ? sucCp : '',
-                    sucursalCliente: sucClient !== '-' ? sucClient : '',
-                    sucursalTelefono: sucTel !== '-' ? sucTel : '',
-                    sucursalCorreo: sucMail !== '-' ? sucMail : '',
-                    area: areaValor,
-                    fallo: falloValor,
-                    descFalla: descFalla,
-                    descSolucion: descSolucion,
-                    tecnicoNombre: tecnicoNombre,
-                    tecnicoCelular: tecnicoCelular,
-                    comentarioSalida: comentarioSalida,
-                    firmaUrl: firmaUrl,
-                    fotosFalla: fotosUrls.falla,
-                    fotosSolucion: fotosUrls.solucion,
-                    fotosSelfie: fotosUrls.selfie,
-                    fotosSoporte: fotosUrls.soporte,
-                    estatus: estatus,
-                    proveedorId: currentUser.id,
-                    proveedorNombre: currentUser.proveedor || '',
-                    fecha: new Date().toISOString().split('T')[0],
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                };
-
-                if (docIdActual) {
-                    await db.collection('ordenes_mtto').doc(docIdActual).set(ordenData, { merge: true });
-                } else {
-                    const newDoc = await db.collection('ordenes_mtto').add(ordenData);
-                    document.getElementById('doc_id_actual').value = newDoc.id;
-                }
-
-                // Si es Borrador, mostrar confirmación y salir
-                if (estatus === 'Borrador') {
-                    showCustomAlert('Guardado', `Orden ${folio} guardada como borrador`, 'success');
-                    btnGuardar.disabled = false;
-                    btnEnviar.disabled = false;
-                    btnGuardar.style.opacity = '1';
-                    btnEnviar.style.opacity = '1';
-                    actualizarContadores();
-                    return;
-                }
-
-                // =============================================
-                // CAMBIO 2: GUARDAR incidencia PARA EL PDF
-                // =============================================
-                const pdfPayload = {
-                    folio: folio,
-                    incidencia: incidenciaValor,   // ← INCIDENCIA GUARDADA PARA PDF
-                    sucursal: sucursalValor,
-                    sucursalDireccion: sucDir !== '-' ? sucDir : '',
-                    sucursalColonia: sucCol !== '-' ? sucCol : '',
-                    sucursalCiudad: sucCity !== '-' ? sucCity : '',
-                    sucursalCp: sucCp !== '-' ? sucCp : '',
-                    sucursalCliente: sucClient !== '-' ? sucClient : '',
-                    sucursalTelefono: sucTel !== '-' ? sucTel : '',
-                    sucursalCorreo: sucMail !== '-' ? sucMail : '',
-                    area: areaValor,
-                    fallo: falloValor,
-                    descFalla: descFalla,
-                    descSolucion: descSolucion,
-                    tecnicoNombre: tecnicoNombre,
-                    tecnicoCelular: tecnicoCelular,
-                    comentarioSalida: comentarioSalida,
-                    firmaUrl: firmaUrl,
-                    fotosFalla: fotosUrls.falla,
-                    fotosSolucion: fotosUrls.solucion,
-                    fotosSelfie: fotosUrls.selfie,
-                    fotosSoporte: fotosUrls.soporte,
-                    proveedorNombre: currentUser.proveedor || '',
-                    fecha: ordenData.fecha
-                };
-
-                // Guardar en sessionStorage para el generador de PDF
-                sessionStorage.setItem('pdfData', JSON.stringify(pdfPayload));
-
-                // Mostrar countdown
-                mostrarCountdown(() => {
-                    // Abrir generador de PDF
-                    window.open('generar_pdf.html', '_blank');
-                    // Limpiar formulario
-                    limpiarFormulario();
-                    actualizarContadores();
-                });
-
-            } catch (error) {
-                console.error('Error procesarOrden:', error);
-                showCustomAlert('Error', 'Ocurrió un error al procesar la orden: ' + error.message, 'error');
-                btnGuardar.disabled = false;
-                btnEnviar.disabled = false;
-                btnGuardar.style.opacity = '1';
-                btnEnviar.style.opacity = '1';
-            }
-        }
-
-        // ==========================================
-        // 12. COUNTDOWN OVERLAY
-        // ==========================================
-        function mostrarCountdown(callback) {
-            const overlay = document.getElementById('countdown-overlay');
-            const numberEl = document.getElementById('countdown-number');
-            overlay.classList.add('show');
-            let count = 13;
-            numberEl.textContent = count;
-
-            const interval = setInterval(() => {
-                count--;
-                numberEl.textContent = count;
-                if (count <= 0) {
-                    clearInterval(interval);
-                    overlay.classList.remove('show');
-                    if (callback) callback();
-                }
-            }, 1000);
-        }
-
-        // ==========================================
-        // 13. LIMPIAR FORMULARIO
-        // ==========================================
-        function limpiarFormulario() {
-            document.getElementById('ordenMttoForm').reset();
-            document.getElementById('doc_id_actual').value = '';
-            document.getElementById('folio_mc').value = '';
-            document.getElementById('incidencia_doc_id').value = '';
-            document.getElementById('sucursal-details').style.display = 'none';
-
-            photoData = {
-                falla: [null, null, null],
-                solucion: [null, null, null],
-                selfie: [null],
-                soporte: [null]
-            };
-
-            ['falla', 'solucion'].forEach(type => {
-                for (let i = 0; i < 3; i++) {
-                    const slot = document.getElementById(`slot-${type}-${i}`);
-                    if (slot) slot.innerHTML = '<i data-lucide="image" class="slot-placeholder-icon"></i>';
-                }
-            });
-            ['selfie', 'soporte'].forEach(type => {
-                const slot = document.getElementById(`slot-${type}-0`);
-                if (slot) slot.innerHTML = '<i data-lucide="image" class="slot-placeholder-icon"></i>';
-            });
-
-            limpiarFirma('firma_tecnico');
-            lucide.createIcons();
-        }
-
-        // ==========================================
-        // 14. EXPORTAR CSV
-        // ==========================================
-        function exportarMisOrdenesCSV() {
-            if (misOrdenesCache.length === 0) {
-                showCustomAlert('Sin datos', 'No hay órdenes para exportar', 'info');
-                return;
-            }
-            const headers = ['Folio', 'Incidencia', 'Sucursal', 'Area', 'Fallo', 'Tecnico', 'Fecha', 'Estatus'];
-            const rows = misOrdenesCache.map(o => [
-                o.folio || '', o.incidencia || '', o.sucursal || '', o.area || '',
-                o.fallo || '', o.tecnicoNombre || '', o.fecha || '', o.estatus || ''
-            ]);
-            let csv = headers.join(',') + '\n';
-            rows.forEach(r => { csv += r.map(c => `"${c}"`).join(',') + '\n'; });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `ordenes_${tabActual}_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
-
-        // ==========================================
-        // 15. MODALES Y ALERTAS
-        // ==========================================
-        function showCustomAlert(title, msg, type) {
-            document.getElementById('alert-title').textContent = title;
-            document.getElementById('alert-msg').textContent = msg;
-            const iconContainer = document.getElementById('alert-icon-container');
-            const colors = { success: '#16a34a', error: '#DC2626', warning: '#F59E0B', info: '#3B82F6' };
-            const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-            iconContainer.innerHTML = `<div style="width:50px;height:50px;border-radius:50%;background:${colors[type] || colors.info};color:white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;">${icons[type] || icons.info}</div>`;
-            document.getElementById('custom-alert').style.display = 'flex';
-        }
-
-        function closeCustomAlert() {
-            document.getElementById('custom-alert').style.display = 'none';
-        }
+        function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
         let confirmCallback = null;
-        function showCustomConfirm(title, msg, callback) {
-            document.getElementById('confirm-title').textContent = title;
-            document.getElementById('confirm-msg').textContent = msg;
-            confirmCallback = callback;
-            document.getElementById('custom-confirm').style.display = 'flex';
-            document.getElementById('confirm-btn-action').onclick = function() {
-                closeConfirm();
-                if (confirmCallback) confirmCallback();
-            };
+        function showConfirm(title, msg, callback) {
+            document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('custom-confirm').style.display = 'flex'; lucide.createIcons();
         }
-
-        function closeConfirm() {
-            document.getElementById('custom-confirm').style.display = 'none';
-        }
-
-        function cerrarModalCP() {
-            document.getElementById('modalLecturaCP').classList.remove('show-modal');
-        }
+        function closeConfirm() { document.getElementById('custom-confirm').style.display = 'none'; }
+        document.getElementById('confirm-btn-action').addEventListener('click', function() { closeConfirm(); if(confirmCallback) confirmCallback(); });
 
         // ==========================================
-        // 16. SIDEBAR Y USER DROPDOWN
+        // LÓGICA DE INCIDENCIAS
         // ==========================================
-        document.querySelector('[data-sidebar-toggle]')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebar-backdrop').classList.toggle('active');
+        function cargarIncidenciasPendientes() {
+            if (!window.appData || !window.appData.nombreUsuario) { console.log("No hay usuario para buscar incidencias"); return; }
+            dbIncidencias.collection("incidencias").where("usuario_assigned", "==", window.appData.nombreUsuario).get().then((querySnapshot) => {
+                incidenciasPendientes = [];
+                const listaInc = document.getElementById('incidencias-list');
+                listaInc.innerHTML = '';
+                querySnapshot.forEach((doc) => { const inc = doc.data(); inc.id_documento = doc.id; incidenciasPendientes.push(inc); let opt = document.createElement('option'); opt.value = inc.incidencia || doc.id; listaInc.appendChild(opt); });
+            }).catch(err => console.error("Error al cargar incidencias", err));
+        }
+
+        document.getElementById('incidencia-input').addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            let inc = incidenciasPendientes.find(i => i.incidencia === val);
+            if (!inc) { inc = incidenciasPendientes.find(i => (i.incidencia || '').toLowerCase() === val.toLowerCase()); }
+            if (inc) {
+                document.getElementById('incidencia_doc_id').value = inc.id_documento;
+                document.getElementById('area-input').value = inc.instalacion || '';
+                document.getElementById('subarea-select').value = inc.fallos || '';
+                document.getElementById('desc_falla').value = inc.observaciones || inc.fallos || '';
+                const sucursalName = inc.usuario || '';
+                document.getElementById('sucursal-input').value = sucursalName;
+                document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
+            } else { document.getElementById('incidencia_doc_id').value = ''; }
         });
 
-        document.querySelector('[data-sidebar-close]')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebar-backdrop').classList.remove('active');
-        });
+        // ==========================================
+        // DASHBOARD Y TABS
+        // ==========================================
+        let misOrdenes = [];
+        let tabMttoActual = 'Nueva Orden';
 
-        document.getElementById('sidebar-backdrop')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.remove('open');
-            this.classList.remove('active');
-        });
+        function cargarMisOrdenes() {
+            if (!window.appData) return;
+            db.collection("tickets_mantenimiento").where("proveedor", "==", window.appData.nombreProveedor).get().then((querySnapshot) => {
+                misOrdenes = []; querySnapshot.forEach((doc) => { misOrdenes.push({ id_doc: doc.id, ...doc.data() }); });
+                // Ordenar de la más reciente a la más antigua
+                misOrdenes.sort((a, b) => (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""));
+                actualizarBadgesMtto(); if(tabMttoActual !== 'Nueva Orden') renderTablaMisOrdenes();
+            }).catch(err => console.error("Error al cargar órdenes", err));
+        }
 
-        document.querySelector('[data-user-trigger]')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.querySelector('[data-user-dropdown]').classList.toggle('show');
-        });
+        function actualizarBadgesMtto() {
+            let b = 0, r = 0;
+            misOrdenes.forEach(o => { if (o.estado_confirmacion === 'Borrador') b++; else if (o.estado_confirmacion === 'En proceso') r++; });
+            document.getElementById('badge-Borrador').innerText = b; document.getElementById('badge-Realizado').innerText = r;
+        }
 
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('[data-user-menu]')) {
-                document.querySelector('[data-user-dropdown]')?.classList.remove('show');
+        function cambiarTabMtto(estado, isEdit = false) {
+            tabMttoActual = estado;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const btnActivo = document.getElementById(`tab-${estado}`); if(btnActivo) btnActivo.classList.add('active');
+            document.getElementById('delete-draft-bar').classList.remove('show'); limpiarSeleccionBorradores();
+            if (estado === 'Nueva Orden') { document.getElementById('dashboard-ordenes').style.display = 'none'; document.getElementById('ordenMttoForm').style.display = 'block'; if (!isEdit) mostrarFormularioNuevaOrden(); }
+            else { document.getElementById('ordenMttoForm').style.display = 'none'; document.getElementById('dashboard-ordenes').style.display = 'block'; document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); renderTablaMisOrdenes(); }
+        }
+
+        function renderTablaMisOrdenes() {
+            const tbody = document.getElementById('tabla-mis-ordenes'); const thead = document.querySelector('#dashboard-ordenes thead'); tbody.innerHTML = '';
+            // Cambio: Encabezado ahora dice "Incidencia" en vez de "Folio"
+            if (tabMttoActual === 'Borrador') { thead.innerHTML = `<tr><th style="padding: 15px; width: 40px;"><input type="checkbox" id="chk-all-drafts" onchange="toggleAllDrafts(this.checked)" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></th><th>Incidencia</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
+            else { thead.innerHTML = `<tr><th>Incidencia</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
+            const fInicio = document.getElementById('filtro-inicio-mtto').value; const fFin = document.getElementById('filtro-fin-mtto').value; const fBuscar = document.getElementById('filtro-buscar-mtto').value.toLowerCase();
+            let filtrados = misOrdenes.filter(o => { if(tabMttoActual === 'Borrador' && o.estado_confirmacion !== 'Borrador') return false; if(tabMttoActual === 'Realizado' && o.estado_confirmacion !== 'En proceso') return false; const fDoc = o.fecha_creacion || ""; if(fInicio && fDoc < fInicio) return false; if(fFin && fDoc > fFin) return false; if(fBuscar) { const inc = (o.id_incidencia || o.id_ticket || "").toLowerCase(); const suc = (o.sucursal || "").toLowerCase(); if(!inc.includes(fBuscar) && !suc.includes(fBuscar)) return false; } return true; });
+            if(filtrados.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="padding: 40px; color: #6b7280;">Sin órdenes</td></tr>`; return; }
+            filtrados.forEach(o => { 
+                let btnAccion = o.estado_confirmacion === 'Borrador' ? `<button type="button" onclick="cargarBorrador('${o.id_doc}')" style="background:#14A981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="edit-2" style="width:14px;"></i> Editar</button>` : `<button type="button" onclick="verPDFOrden('${o.id_doc}')" style="background:#81D0DC; color:#131520; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="file-text" style="width:14px;"></i> PDF</button>`; 
+                const tr = document.createElement('tr'); 
+                // Cambio: Celdas ahora muestran Incidencia
+                if (tabMttoActual === 'Borrador') { tr.innerHTML = `<td><input type="checkbox" class="chk-draft" value="${o.id_doc}" onchange="actualizarBarraBorradores()" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></td><td style="padding: 15px; font-weight: bold;">${o.id_incidencia || o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } 
+                else { tr.innerHTML = `<td style="padding: 15px; font-weight: bold;">${o.id_incidencia || o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } 
+                tbody.appendChild(tr); 
+            }); lucide.createIcons();
+        }
+
+        function exportarMisOrdenesCSV() { if(misOrdenes.length === 0) return; let csvContent = "data:text/csv;charset=utf-8,Incidencia,Sucursal,Fecha\n"; misOrdenes.forEach(row => { csvContent += `${row.id_incidencia || row.id_ticket || "S/N"},"${row.sucursal || ""}",${row.fecha_creacion || ""}\n`; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `Ordenes.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+
+        function toggleAllDrafts(checked) { document.querySelectorAll('.chk-draft').forEach(cb => cb.checked = checked); actualizarBarraBorradores(); }
+        function actualizarBarraBorradores() { const checkboxes = document.querySelectorAll('.chk-draft:checked'); const count = checkboxes.length; const bar = document.getElementById('delete-draft-bar'); if (count > 0) { document.getElementById('lbl-draft-count').innerText = `${count} incidencia${count !== 1 ? 's' : ''}`; bar.classList.add('show'); } else { bar.classList.remove('show'); } }
+        function limpiarSeleccionBorradores() { document.querySelectorAll('.chk-draft').forEach(cb => cb.checked = false); const c = document.getElementById('chk-all-drafts'); if(c) c.checked = false; actualizarBarraBorradores(); }
+        function borrarBorradoresSeleccionados() { const checkboxes = document.querySelectorAll('.chk-draft:checked'); if(checkboxes.length === 0) return; showConfirm("Borrar", `¿Eliminar ${checkboxes.length}?`, async () => { try { const batch = db.batch(); checkboxes.forEach(cb => { batch.delete(db.collection('tickets_mantenimiento').doc(cb.value)); }); await batch.commit(); cargarMisOrdenes(); limpiarSeleccionBorradores(); } catch(e) {} }); }
+
+        async function obtenerFolioGlobal() { const contadorRef = db.collection('metadata').doc('contadores'); return await db.runTransaction(async (transaction) => { const doc = await transaction.get(contadorRef); let nuevoNumero = (doc.exists && doc.data().mc_folio) ? doc.data().mc_folio + 1 : 1; transaction.set(contadorRef, { mc_folio: nuevoNumero }, { merge: true }); return `MC-${nuevoNumero.toString().padStart(4, '0')}`; }); }
+
+        // ==========================================
+        // FORMULARIO
+        // ==========================================
+        let fotos = { falla: [null, null, null], solucion: [null, null, null], soporte: [null], selfie: [null] };
+
+        function mostrarFormularioNuevaOrden() {
+            document.getElementById('ordenMttoForm').reset(); document.getElementById('doc_id_actual').value = ''; document.getElementById('folio_mc').value = ''; document.getElementById('incidencia_doc_id').value = ''; document.getElementById('sucursal-details').style.display = 'none';
+            fotos = { falla: [null, null, null], solucion: [null, null, null], soporte: [null], selfie: [null] }; renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie'); limpiarFirma('firma_tecnico');
+            if(window.appData) { document.getElementById('nombre_tecnico').value = window.appData.nombreUsuario || ''; document.getElementById('celular_tecnico').value = window.appData.telefonoUsuario || ''; }
+        }
+
+        function cargarBorrador(id_doc) {
+            const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; cambiarTabMtto('Nueva Orden', true); 
+            document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="edit-2" style="width: 16px;"></i> Editando`; lucide.createIcons();
+            document.getElementById('doc_id_actual').value = o.id_doc; document.getElementById('folio_mc').value = o.id_ticket || ''; document.getElementById('incidencia-input').value = o.id_incidencia || ''; document.getElementById('incidencia_doc_id').value = o.id_incidencia_doc || '';
+            document.getElementById('sucursal-input').value = o.sucursal || ''; document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
+            document.getElementById('area-input').value = o.area || ''; document.getElementById('subarea-select').value = o.subarea || ''; document.getElementById('desc_falla').value = o.desc_falla || '';
+            document.getElementById('desc_solucion').value = o.desc_solucion || ''; document.getElementById('nombre_tecnico').value = o.tec_nombre || ''; document.getElementById('celular_tecnico').value = o.tec_celular || ''; document.getElementById('comentario_salida').value = o.comentario || '';
+            fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null]; fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
+            while(fotos.falla.length < 3) fotos.falla.push(null); while(fotos.solucion.length < 3) fotos.solucion.push(null);
+            renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie');
+            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
+        }
+
+        async function procesarOrden(estadoFinal) {
+            const btnGuardar = document.getElementById('btn-guardar-borrador'); 
+            const btnEnviar = document.getElementById('btn-enviar-orden'); 
+            let folioActual = document.getElementById('folio_mc').value;
+            const canvasFirmaReal = document.getElementById('firma_tecnico'); 
+            const firmaVacia = document.createElement('canvas'); 
+            firmaVacia.width = canvasFirmaReal.width; 
+            firmaVacia.height = canvasFirmaReal.height;
+            
+            if (estadoFinal === 'En proceso') { 
+                const suc = document.getElementById('sucursal-input').value; 
+                const area = document.getElementById('area-input').value; 
+                const descF = document.getElementById('desc_falla').value; 
+                const tecNom = document.getElementById('nombre_tecnico').value; 
+                const inc = document.getElementById('incidencia-input').value; 
+                if(!inc || !suc || !area || !descF || !tecNom) { showCustomAlert("Atención", "Completa Incidencia, Ubicación, Instalación, Falla y Técnico.", false); return; }
+                const firmaData = document.getElementById('firma_tecnico_data').value;
+                let canvasTieneFirma = false;
+                try { canvasTieneFirma = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma = false; }
+                if(!canvasTieneFirma && !firmaData) { showCustomAlert("Atención", "Firma obligatoria.", false); return; } 
+            }
+            
+            try { 
+                let canvasTieneFirma2 = false;
+                try { canvasTieneFirma2 = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma2 = false; }
+                if (canvasTieneFirma2) { 
+                    try { document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); } catch(e) { console.warn("Canvas tainted, usando URL guardada"); }
+                } 
+            } catch(e) { console.error("Error en firma:", e); }
+            
+            btnGuardar.disabled = true; btnEnviar.disabled = true; 
+            btnGuardar.innerHTML = 'Procesando...'; btnEnviar.innerHTML = 'Procesando...';
+            
+            try {
+                if (!folioActual) { folioActual = await obtenerFolioGlobal(); document.getElementById('folio_mc').value = folioActual; }
+                
+                let urlsFalla = [], urlsSolucion = []; 
+                let urlSoporte = null, urlSelfie = null, urlFirma = null;
+                
+                const checkAndUpload = async (fileData, path) => { 
+                    if (fileData && fileData.startsWith('data:image')) { 
+                        const ref = storage.ref(path); 
+                        await ref.put(dataURItoBlob(fileData)); 
+                        return await ref.getDownloadURL(); 
+                    } 
+                    return fileData; 
+                };
+                
+                for(let i=0; i<fotos.falla.length; i++) { if(fotos.falla[i]) urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`)); }
+                for(let i=0; i<fotos.solucion.length; i++) { if(fotos.solucion[i]) urlsSolucion.push(await checkAndUpload(fotos.solucion[i], `ordenes/${folioActual}/solucion_${i}_${Date.now()}.jpg`)); }
+                urlSoporte = await checkAndUpload(fotos.soporte[0], `ordenes/${folioActual}/soporte_${Date.now()}.jpg`); 
+                urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`); 
+                urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
+                
+                const docId = document.getElementById('doc_id_actual').value || folioActual;
+                const ordenData = { 
+                    id_ticket: folioActual, 
+                    id_incidencia: document.getElementById('incidencia-input').value || '', 
+                    id_incidencia_doc: document.getElementById('incidencia_doc_id').value || '', 
+                    sucursal: document.getElementById('sucursal-input').value || '', 
+                    suc_dir: document.getElementById('suc-dir').innerText || '', 
+                    suc_col: document.getElementById('suc-col').innerText || '', 
+                    suc_city: document.getElementById('suc-city').innerText || '', 
+                    suc_cp: document.getElementById('suc-cp').innerText || '', 
+                    suc_tel: document.getElementById('suc-tel').innerText || '', 
+                    suc_mail: document.getElementById('suc-mail').innerText || '', 
+                    proveedor: window.appData.nombreProveedor, 
+                    prov_nombre: document.getElementById('prov-info-nombre').innerText || '', 
+                    prov_rfc: document.getElementById('prov-info-rfc').innerText || '', 
+                    prov_dir: document.getElementById('prov-info-dir').innerText || '', 
+                    prov_cont: document.getElementById('prov-info-cont').innerText || '', 
+                    prov_tel: document.getElementById('prov-info-tel').innerText || '', 
+                    prov_mail: document.getElementById('prov-info-mail').innerText || '', 
+                    tipo: "Correctivo", 
+                    area: document.getElementById('area-input').value || '', 
+                    subarea: document.getElementById('subarea-select').value || '', 
+                    desc_falla: document.getElementById('desc_falla').value || '', 
+                    desc_solucion: document.getElementById('desc_solucion').value || '', 
+                    tec_nombre: document.getElementById('nombre_tecnico').value || '', 
+                    tec_celular: document.getElementById('celular_tecnico').value || '', 
+                    comentario: document.getElementById('comentario_salida').value || '', 
+                    fecha_creacion: new Date().toISOString().split('T')[0], 
+                    fecha_hora_completa: new Date().toISOString(), 
+                    estado_confirmacion: estadoFinal, 
+                    urls_falla: urlsFalla, 
+                    urls_solucion: urlsSolucion, 
+                    url_soporte: urlSoporte, 
+                    url_selfie: urlSelfie, 
+                    url_firma: urlFirma 
+                };
+                
+                await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
+                
+                if (estadoFinal === 'En proceso') { 
+                    // INICIA CONTEO REGRESIVO
+                    const overlay = document.getElementById('countdown-overlay');
+                    overlay.classList.add('show');
+                    
+                    let timeLeft = 13;
+                    const countdownElement = document.getElementById('countdown-number');
+                    
+                    const timerInterval = setInterval(() => {
+                        timeLeft--;
+                        countdownElement.innerText = timeLeft;
+                        
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                            overlay.classList.remove('show');
+                            // Redirigir al submenu Realizados
+                            cargarMisOrdenes();
+                            cambiarTabMtto('Realizado');
+                            mostrarFormularioNuevaOrden();
+                        }
+                    }, 1000);
+                } else { 
+                    showCustomAlert("Éxito", "Orden Guardada Correctamente.", true);
+                    document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); 
+                }
+            } catch (err) { 
+                console.error("Error:", err);
+                showCustomAlert("Error", err.message || "Ocurrió un error.", false); 
+            } finally { 
+                btnGuardar.disabled = false; btnEnviar.disabled = false; 
+                btnGuardar.innerHTML = '<i data-lucide="save"></i> Guardar Orden'; 
+                btnEnviar.innerHTML = '<i data-lucide="send"></i> Enviar Orden'; 
+                lucide.createIcons(); 
+            }
+        }
+
+        function verPDFOrden(id_doc) { const t = misOrdenes.find(x => x.id_doc === id_doc); if(!t) return; const datosParaPDF = { sucursal: t.sucursal, suc_dir: t.suc_dir, suc_col: t.suc_col, suc_city: t.suc_city, suc_cp: t.suc_cp, suc_tel: t.suc_tel, suc_mail: t.suc_mail, ticket: t.id_ticket, area: t.area, subarea: t.subarea, desc_falla: t.desc_falla, fotos_falla: t.urls_falla, desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, prov_nombre: t.prov_nombre, prov_rfc: t.prov_rfc, prov_dir: t.prov_dir, prov_cont: t.prov_cont, prov_tel: t.prov_tel, prov_mail: t.prov_mail, tec_nombre: t.tec_nombre, tec_celular: t.tec_celular, comentario: t.comentario, firma: t.url_firma, foto_soporte: t.url_soporte, foto_selfie: t.url_selfie, fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '') }; sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF)); window.open('index2.html', '_blank'); }
+
+        function abrirModalLecturaCP(id_doc) { const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; document.getElementById('cp-nombre').value = o.evaluacion_nombre || 'N/A'; document.getElementById('cp-numero').value = o.evaluacion_numero || 'N/A'; document.getElementById('cp-cargo').value = o.evaluacion_cargo || 'N/A'; document.getElementById('cp-nivel').value = o.evaluacion_nivel || 'N/A'; document.getElementById('cp-comentario').value = o.evaluacion_comentario || 'N/A'; document.getElementById('modalLecturaCP').classList.add('show-modal'); lucide.createIcons(); }
+        function cerrarModalCP() { document.getElementById('modalLecturaCP').classList.remove('show-modal'); }
+
+        // ==========================================
+        // LOGIN Y MENÚ
+        // ==========================================
+        function togglePassword() { const p = document.getElementById('password'); const i = document.getElementById('toggleIcon'); if (p.type === 'password') { p.type = 'text'; i.textContent = 'visibility'; } else { p.type = 'password'; i.textContent = 'visibility_off'; } }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            const savedSession = sessionStorage.getItem('loginSession'); const savedUser = sessionStorage.getItem('loginUser');
+            if (savedSession && savedUser) {
+                window.appData = JSON.parse(savedSession); const inicial = savedUser.charAt(0).toUpperCase();
+                document.getElementById('user-initial-header').innerText = inicial; document.getElementById('welcome-username-display').innerText = window.appData.nombreUsuario || '-'; document.getElementById('user-dropdown-name').innerText = window.appData.nombreUsuario || savedUser;
+                document.getElementById('prov-info-nombre').innerText = window.appData.nombreProveedor || '-'; document.getElementById('prov-info-rfc').innerText = window.appData.proveedorInfo?.rfc || 'N/A'; document.getElementById('prov-info-dir').innerText = window.appData.proveedorInfo?.direccion || 'N/A'; document.getElementById('prov-info-cont').innerText = window.appData.proveedorInfo?.contacto || 'N/A'; document.getElementById('prov-info-tel').innerText = window.appData.proveedorInfo?.telefono || 'N/A'; document.getElementById('prov-info-mail').innerText = window.appData.proveedorInfo?.correo || 'N/A'; 
+                const listaSuc = document.getElementById('sucursales-list'); listaSuc.innerHTML = ''; if(window.appData.sucursales) window.appData.sucursales.forEach(s => { let opt = document.createElement('option'); opt.value = s.nombre; listaSuc.appendChild(opt); });
+                const listaTec = document.getElementById('tecnicos-list'); listaTec.innerHTML = ''; if(window.appData.tecnicos) window.appData.tecnicos.forEach(t => { let opt = document.createElement('option'); opt.value = t; listaTec.appendChild(opt); });
+                document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'block'; lucide.createIcons();
+                if(window.appData.privilegio == 2 || window.appData.privilegio == "2") { document.getElementById('nav-preventivo').style.display = 'none'; document.getElementById('nav-seccion-admin').style.display = 'none'; document.getElementById('nav-seccion-reportes').style.display = 'none'; }
+                inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
             }
         });
 
+        document.getElementById('loginForm').addEventListener('submit', function(e) { e.preventDefault(); const btn = document.getElementById('submitBtn'); const alertMsg = document.getElementById('alertMessage'); const user = document.getElementById('username').value.trim(); const pass = document.getElementById('password').value.trim(); alertMsg.style.display = 'none'; btn.innerText = 'Verificando...'; btn.disabled = true; fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ username: user, password: pass }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }).then(res => res.json()).then(data => { if (data.valido) { sessionStorage.setItem('loginSession', JSON.stringify(data)); sessionStorage.setItem('loginUser', user); window.location.reload(); } else { alertMsg.style.display = 'block'; btn.innerText = 'Iniciar Sesión'; btn.disabled = false; } }).catch(error => { alertMsg.style.display = 'block'; btn.innerText = 'Iniciar Sesión'; btn.disabled = false; }); });
+
+        document.getElementById('sucursal-input').addEventListener('input', function(e) { const val = e.target.value; const container = document.getElementById('sucursal-details'); if(!window.appData || !window.appData.sucursales) return; const suc = window.appData.sucursales.find(s => s.nombre === val); if(suc) { document.getElementById('suc-dir').innerText = suc.direccion || ''; document.getElementById('suc-col').innerText = suc.colonia || ''; document.getElementById('suc-city').innerText = suc.ciudad || ''; document.getElementById('suc-cp').innerText = suc.cp || ''; document.getElementById('suc-client').innerText = suc.cliente || ''; document.getElementById('suc-tel').innerText = suc.telefono || ''; document.getElementById('suc-mail').innerText = suc.correo || ''; container.style.display = 'grid'; } else { container.style.display = 'none'; } });
+        document.getElementById('celular_tecnico').addEventListener('input', function(e) { e.target.value = e.target.value.replace(/[^0-9]/g, ''); if (e.target.value.length > 10) e.target.value = e.target.value.slice(0, 10); });
+
+        function cambiarVista(event, idVista) {
+            if(event) event.preventDefault();
+            document.querySelectorAll('.modulo-vista').forEach(v => v.classList.remove('activa'));
+            if(event) { document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('activa')); event.currentTarget.classList.add('activa'); }
+            document.getElementById(idVista).classList.add('activa');
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 1024 && sidebar && sidebar.classList.contains('open')) sidebar.classList.remove('open');
+        }
+        
+        const togglesSidebar = document.querySelectorAll('[data-sidebar-toggle]');
+        togglesSidebar.forEach(t => t.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open')));
+        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
+        document.getElementById('sidebar-backdrop').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
+        
+        const userMenu = document.querySelector('[data-user-menu]');
+        if (userMenu) { const trigger = userMenu.querySelector('[data-user-trigger]'); const dropdown = userMenu.querySelector('[data-user-dropdown]'); trigger.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('show'); }); document.addEventListener('click', (event) => { if (!userMenu.contains(event.target)) dropdown.classList.remove('show'); }); }
+
         // ==========================================
-        // 17. VERIFICAR SESIÓN AL CARGAR
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const session = sessionStorage.getItem('loginSession');
-            if (session) {
-                inicializarApp();
-            }
-        });
+        // CÁMARA, FOTOS Y FIRMA
+        let activeTarget = 'falla'; let currentFacingMode = 'environment';
+        function triggerFile(target) { activeTarget = target; if(fotos[target].filter(f => f !== null).length < fotos[target].length) document.getElementById('fileInputGlobal').click(); else window.alert("Límite alcanzado."); }
+        function processFile(input) { if (!input.files || input.files.length === 0) return; const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; const maxDim = 800; if(w > maxDim || h > maxDim) { if(w > h) { h = (h/w)*maxDim; w = maxDim; } else { w = (w/h)*maxDim; h = maxDim; } } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); const fotoComprimida = canvas.toDataURL('image/jpeg', 0.7); const slotVacio = fotos[activeTarget].findIndex(f => f === null); if(slotVacio > -1) { fotos[activeTarget][slotVacio] = fotoComprimida; renderSlots(activeTarget); } input.value = ''; }; img.src = e.target.result; }; reader.readAsDataURL(input.files[0]); }
+        let currentStream;
+        async function triggerCamera(target) { activeTarget = target; if(fotos[target].filter(f => f !== null).length >= fotos[target].length) { window.alert("Límite alcanzado."); return; } currentFacingMode = (target === 'selfie') ? 'user' : 'environment'; await startCamera(); }
+        async function startCamera() { if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); } try { currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } }); document.getElementById('camera-video').srcObject = currentStream; document.getElementById('camera-overlay').classList.add('show'); } catch (err) { window.alert("Cámara no disponible."); } }
+        function switchCamera() { currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment'; startCamera(); }
+        function closeCamera() { if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); } document.getElementById('camera-overlay').classList.remove('show'); }
+        function captureFoto() { const canvasT = document.getElementById('tempCanvas'); const video = document.getElementById('camera-video'); canvasT.width = video.videoWidth; canvasT.height = video.videoHeight; const ctx = canvasT.getContext('2d'); if (currentFacingMode === 'user') { ctx.translate(canvasT.width, 0); ctx.scale(-1, 1); } ctx.drawImage(video, 0, 0, canvasT.width, canvasT.height); ctx.setTransform(1, 0, 0, 1, 0, 0); const slotVacio = fotos[activeTarget].findIndex(f => f === null); if(slotVacio > -1) { fotos[activeTarget][slotVacio] = canvasT.toDataURL('image/jpeg', 0.8); renderSlots(activeTarget); } closeCamera(); }
+        function removeFoto(target, index) { fotos[target][index] = null; renderSlots(target); }
+        function enlargePhoto(src) { document.getElementById('imgFull').src = src; document.getElementById('photoModal').classList.add('show'); }
+        function closePhotoModal() { document.getElementById('photoModal').classList.remove('show'); }
+        function renderSlots(target) { for (let i = 0; i < fotos[target].length; i++) { const slot = document.getElementById(`slot-${target}-${i}`); if(!slot) continue; if (fotos[target][i]) { slot.innerHTML = `<img src="${fotos[target][i]}" onclick="enlargePhoto(this.src)" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in; border-radius:12px;"><span class="remove-photo" onclick="removeFoto('${target}', ${i})">&times;</span>`; slot.style.border = "1px solid #e5e7eb"; } else { slot.innerHTML = `<i data-lucide="image" class="slot-placeholder-icon"></i>`; slot.style.border = "2px dashed #d1d5db"; } } lucide.createIcons(); }
+        let canvasFirma, ctxFirma;
+        function inicializarFirma() { canvasFirma = document.getElementById('firma_tecnico'); if(!canvasFirma) return; ctxFirma = canvasFirma.getContext('2d'); canvasFirma.width = 600; canvasFirma.height = 200; ctxFirma.lineWidth = 3; ctxFirma.lineCap = 'round'; ctxFirma.strokeStyle = '#000000'; let isDrawing = false; function getCoordinates(e) { const rect = canvasFirma.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - rect.left) * (canvasFirma.width / rect.width), y: (cy - rect.top) * (canvasFirma.height / rect.height) }; } canvasFirma.addEventListener('mousedown', (e) => { isDrawing = true; const p = getCoordinates(e); ctxFirma.beginPath(); ctxFirma.moveTo(p.x, p.y); }); canvasFirma.addEventListener('mousemove', (e) => { if (isDrawing) { const p = getCoordinates(e); ctxFirma.lineTo(p.x, p.y); ctxFirma.stroke(); } }); window.addEventListener('mouseup', () => { if(isDrawing) { isDrawing = false; document.getElementById('firma_tecnico_data').value = canvasFirma.toDataURL(); } }); canvasFirma.addEventListener('touchstart', (e) => { e.preventDefault(); isDrawing = true; const p = getCoordinates(e); ctxFirma.beginPath(); ctxFirma.moveTo(p.x, p.y); }, {passive: false}); canvasFirma.addEventListener('touchmove', (e) => { e.preventDefault(); if (isDrawing) { const p = getCoordinates(e); ctxFirma.lineTo(p.x, p.y); ctxFirma.stroke(); } }, {passive: false}); window.addEventListener('touchend', () => { if(isDrawing) { isDrawing = false; document.getElementById('firma_tecnico_data').value = canvasFirma.toDataURL(); } }); }
+        function limpiarFirma(id) { if(ctxFirma) ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); document.getElementById(id+'_data').value = ''; }
+        function dataURItoBlob(dataURI) { if(!dataURI) return null; const byteString = atob(dataURI.split(',')[1]); const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); return new Blob([ab], {type: mimeString}); }
+        function cerrarSesionGlobal() { showConfirm("Cerrar Sesión", "¿Seguro que quieres cerrar sesión?", function() { sessionStorage.clear(); window.location.reload(); }); }
     </script>
 </body>
 </html>
