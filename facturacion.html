@@ -46,12 +46,10 @@
         
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { color: #81D0DC !important; }
-        
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
 
         .facturacion-wrap { max-width: 100%; margin: 0 auto; padding: 24px; }
-
         .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
         .metric-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; flex-direction: column; justify-content: center; }
         .metric-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px;}
@@ -70,7 +68,6 @@
         .data-table thead th { background: #f8fafc; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; padding: 16px 12px; text-align: center; border-bottom: 1px solid #E5E7EB; white-space: nowrap;}
         .data-table tbody td { padding: 12px 10px; border-bottom: 1px solid #f3f4f6; font-size: 12px; color: #111827; vertical-align: middle; text-align: center; background: white; }
         .data-table tbody tr:hover td { background: #f1f5f9; } 
-        
         .co-table-empty { text-align: center; padding: 60px 20px !important; color: #6b7280; font-size: 14px; }
 
         .chk-custom { width: 18px; height: 18px; cursor: pointer; accent-color: #81D0DC; }
@@ -78,47 +75,33 @@
         .btn-download-primary { height: 28px; background: #81D0DC; color: #131520; border: none; padding: 0 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: opacity 0.2s; }
         .btn-download-primary:hover { opacity: 0.85; }
         .btn-download-disabled { height: 28px; background: #e5e7eb; color: #9ca3af; border: none; padding: 0 12px; border-radius: 6px; font-weight: 600; font-size: 11px; cursor: not-allowed; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-
         .btn-delete-red { height: 28px; background: #DC2626; color: white; border: none; padding: 0 12px; border-radius: 6px; font-weight: 600; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; white-space: nowrap; }
         .btn-delete-red:hover { background: #b91c1c; }
 
         .status-badge { height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0 12px; border-radius: 14px; font-size: 11px; font-weight: 700; white-space: nowrap; text-transform: none !important; }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        
         .bg-yellow { background: #fef3c7; color: #92400e; } .dot-yellow { background-color: #f59e0b; }
         .bg-blue { background: #dbeafe; color: #1e40af; } .dot-blue { background-color: #2563eb; }
         .bg-green { background: #dcfce7; color: #166534; } .dot-green { background-color: #16a34a; }
 
-        .upload-bottom-bar { 
-            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); 
-            background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 0 1px #e5e7eb; 
-            padding: 16px 24px; display: flex; align-items: center; gap: 24px; z-index: 50; 
-            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 90%; max-width: 1000px; 
-        }
+        .upload-bottom-bar { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 0 0 1px #e5e7eb; padding: 16px 24px; display: flex; align-items: center; gap: 24px; z-index: 50; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 90%; max-width: 1000px; }
         .upload-bottom-bar.show { bottom: 24px; }
         .up-info { flex-grow: 1; font-size: 14px; color: #6b7280; display: flex; align-items: center; gap: 12px; }
         .up-info strong { color: #111827; font-weight: 800; font-size: 15px; }
-        
         .btn-limpiar { background: white; color: #6b7280; border: 1px solid #e5e7eb; height: 40px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;}
         .btn-limpiar:hover { background: #f3f4f6; color: #111827; }
         .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s;}
         .btn-adjuntar:hover { opacity: 0.85; }
 
-        .fab-download {
-            position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none;
-            border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: flex; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s;
-        }
+        .fab-download { position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: flex; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s; }
         .fab-download:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
-        
         .modal-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .modal-header-card { margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
         .modal-header-card h2 { margin: 0; font-size: 20px; color: #111827; font-weight: 800; }
         .modal-header-card p { margin: 4px 0 0 0; font-size: 13px; color: #6b7280; }
-        
         .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
@@ -134,9 +117,7 @@
             .fab-download { padding: 12px; border-radius: 50%; right: 15px; bottom: 15px; }
             .fab-download span { display: none; }
         }
-        @media (max-width: 600px) {
-            .metrics-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 600px) { .metrics-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="has-sidebar">
@@ -144,9 +125,7 @@
     <div id="app-screen" style="display: block;">
         <header class="main-header">
             <div class="header-left">
-                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle>
-                    <span class="hamburger"></span>
-                </button>
+                <button class="header-hamburger" type="button" data-sidebar-toggle><span class="hamburger"></span></button>
                 <a href="inicio.html">
                     <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px;">
                 </a>
@@ -158,17 +137,8 @@
                         <span class="user-circle-initial" id="user-initial-header">U</span>
                     </button>
                     <div class="user-dropdown" data-user-dropdown>
-                        <div class="user-card">
-                            <div class="user-circle-avatar user-circle-initial">U</div>
-                            <div class="user-meta">
-                                <div class="user-name">Cargando...</div>
-                            </div>
-                        </div>
-                        <div class="user-actions">
-                            <a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();">
-                                <i data-lucide="log-out"></i> Cerrar sesión
-                            </a>
-                        </div>
+                        <div class="user-card"><div class="user-circle-avatar user-circle-initial">U</div><div class="user-meta"><div class="user-name">Cargando...</div></div></div>
+                        <div class="user-actions"><a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();"><i data-lucide="log-out"></i> Cerrar sesión</a></div>
                     </div>
                 </div>
             </div>
@@ -191,7 +161,6 @@
                             <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
                             <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
                             <a class="sidebar-link" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
-                            <!-- SE ELIMINÓ LA LÍNEA DE APROBACIÓN GERENCIA AQUÍ -->
                             <a class="sidebar-link activa" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
@@ -204,47 +173,27 @@
             <div class="sidebar-backdrop" data-sidebar-backdrop></div>
 
             <main class="main-content app-content">
-                
                 <div id="global-welcome-section" style="text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white;">
                     <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: 700;">Bienvenido</h1>
                     <h2 id="welcome-username-display" style="margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2;">CARGANDO...</h2>
                 </div>
 
                 <div class="facturacion-wrap">
-                    
                     <header style="border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 24px;">
                         <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px; color: #111827;">Facturación y Pagos</h1>
                         <p style="color: #6b7280; margin: 0;">Carga de comprobantes fiscales y seguimiento de pagos de órdenes aprobadas</p>
                     </header>
 
                     <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-title">FOLIOS PENDIENTES</div>
-                            <div class="metric-value" id="met-pendientes">0 - $0.00</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">FOLIOS POR PAGAR</div>
-                            <div class="metric-value" id="met-facturados" style="color: #2563eb;">0 - $0.00</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">FOLIOS PAGADOS</div>
-                            <div class="metric-value" id="met-pagados" style="color: #16a34a;">0 - $0.00</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-title">TOTAL GENERAL</div>
-                            <div class="metric-value" id="met-total">0 - $0.00</div>
-                        </div>
+                        <div class="metric-card"><div class="metric-title">FOLIOS PENDIENTES</div><div class="metric-value" id="met-pendientes">0 - $0.00</div></div>
+                        <div class="metric-card"><div class="metric-title">FOLIOS POR PAGAR</div><div class="metric-value" id="met-facturados" style="color: #2563eb;">0 - $0.00</div></div>
+                        <div class="metric-card"><div class="metric-title">FOLIOS PAGADOS</div><div class="metric-value" id="met-pagados" style="color: #16a34a;">0 - $0.00</div></div>
+                        <div class="metric-card"><div class="metric-title">TOTAL GENERAL</div><div class="metric-value" id="met-total">0 - $0.00</div></div>
                     </div>
 
                     <form class="filters-bar">
-                        <div class="filter-group">
-                            <label class="filter-label">Fecha inicio</label>
-                            <input type="date" class="input" id="filtro-inicio">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Fecha fin</label>
-                            <input type="date" class="input" id="filtro-fin">
-                        </div>
+                        <div class="filter-group"><label class="filter-label">Fecha inicio</label><input type="date" class="input" id="filtro-inicio"></div>
+                        <div class="filter-group"><label class="filter-label">Fecha fin</label><input type="date" class="input" id="filtro-fin"></div>
                         <div class="filter-group">
                             <label class="filter-label">Estado</label>
                             <select class="input" id="filtro-estado">
@@ -256,12 +205,10 @@
                         </div>
                         <div class="filter-group flex-grow" style="flex: 2;">
                             <label class="filter-label">Buscar</label>
-                            <input type="text" class="input" id="filtro-buscar" placeholder="Folio o sucursal...">
+                            <input type="text" class="input" id="filtro-buscar" placeholder="Incidencia o sucursal...">
                         </div>
                         <div class="filter-actions">
-                            <button class="btn-secondary" type="button" onclick="renderTablaActual()">
-                                <i data-lucide="search" style="width: 16px;"></i> Buscar
-                            </button>
+                            <button class="btn-secondary" type="button" onclick="renderTablaActual()"><i data-lucide="search" style="width: 16px;"></i> Buscar</button>
                         </div>
                     </form>
 
@@ -270,7 +217,7 @@
                             <thead>
                                 <tr>
                                     <th title="Seleccionar para adjuntar facturas">SEL.</th>
-                                    <th>FOLIO (ORDEN)</th>
+                                    <th>INCIDENCIA</th>
                                     <th>SUCURSAL</th>
                                     <th>FECHA ORDEN</th>
                                     <th>FECHA DE ENVÍO</th>
@@ -309,15 +256,9 @@
                 <strong id="lbl-sel-sum" style="color: #16a34a;">$0.00</strong> aprobados
             </span>
         </div>
-        <button class="btn-limpiar" onclick="limpiarSeleccion()">
-            <i data-lucide="x-circle" style="width: 16px;"></i> Limpiar
-        </button>
-        <button class="btn-adjuntar" onclick="triggerUpload('pdf')">
-            <i data-lucide="file-plus" style="width: 16px;"></i> Adjuntar PDF
-        </button>
-        <button class="btn-adjuntar" onclick="triggerUpload('xml')">
-            <i data-lucide="file-code" style="width: 16px;"></i> Adjuntar XML
-        </button>
+        <button class="btn-limpiar" onclick="limpiarSeleccion()"><i data-lucide="x-circle" style="width: 16px;"></i> Limpiar</button>
+        <button class="btn-adjuntar" onclick="triggerUpload('pdf')"><i data-lucide="file-plus" style="width: 16px;"></i> Adjuntar PDF</button>
+        <button class="btn-adjuntar" onclick="triggerUpload('xml')"><i data-lucide="file-code" style="width: 16px;"></i> Adjuntar XML</button>
     </div>
 
     <input type="file" id="file-pdf" accept=".pdf" style="display:none" onchange="handleUpload(event, 'pdf')">
@@ -329,27 +270,19 @@
                 <h2>Descargar Facturas</h2>
                 <p>Genera un archivo ZIP con la estructura de carpetas.</p>
             </div>
-            
             <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
                 <div class="filter-group">
                     <label class="filter-label" style="display:block; margin-bottom:6px;">Semana a descargar</label>
-                    <select id="descarga-semana" class="input" onchange="actualizarProveedoresDescarga(this.value)">
-                        <option value="">— Seleccionar semana —</option>
-                    </select>
+                    <select id="descarga-semana" class="input" onchange="actualizarProveedoresDescarga(this.value)"><option value="">— Seleccionar semana —</option></select>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label" style="display:block; margin-bottom:6px;">Proveedor</label>
-                    <select id="descarga-prov" class="input">
-                        <option value="todos">Todos los proveedores</option>
-                    </select>
+                    <select id="descarga-prov" class="input"><option value="todos">Todos los proveedores</option></select>
                 </div>
             </div>
-
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button type="button" class="btn-secondary" onclick="cerrarModalDescarga()" style="height: 40px; padding: 0 16px;">Cancelar</button>
-                <button type="button" class="btn-adjuntar" id="btn-ejecutar-descarga" onclick="descargarZip()" style="height: 40px;">
-                    <i data-lucide="download" style="width:16px;"></i> Descargar
-                </button>
+                <button type="button" class="btn-adjuntar" id="btn-ejecutar-descarga" onclick="descargarZip()" style="height: 40px;"><i data-lucide="download" style="width:16px;"></i> Descargar</button>
             </div>
         </div>
     </div>
@@ -364,14 +297,14 @@
     </div>
 
 <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
-            authDomain: "frave-4fbbf.firebaseapp.com",
-            projectId: "frave-4fbbf",
-            storageBucket: "frave-4fbbf.firebasestorage.app",
-            messagingSenderId: "687825589857",
-            appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
+        authDomain: "frave-4fbbf.firebaseapp.com",
+        projectId: "frave-4fbbf",
+        storageBucket: "frave-4fbbf.firebasestorage.app",
+        messagingSenderId: "687825589857",
+        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
+    };
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
     const storage = firebase.storage();
@@ -380,7 +313,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) { lucide.createIcons(); }
-        
         const savedUser = sessionStorage.getItem('loginUser');
         if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
 
@@ -402,26 +334,21 @@
 
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
-        const alertTitle = document.getElementById('alert-title');
-        const alertMsg = document.getElementById('alert-msg');
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = message;
         const alertIcon = document.getElementById('alert-icon-container');
         const alertBtn = document.getElementById('alert-btn');
-
-        alertTitle.innerText = title;
-        alertMsg.innerText = message;
 
         if(isSuccess) {
             alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
         } else {
             alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
         }
-
         alertBox.style.display = 'flex';
         lucide.createIcons();
     }
     
     function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
-    
     function formateaMoneda(valor) { return "$" + parseFloat(valor || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
 
     function getWeekNumber(dStr) {
@@ -444,17 +371,9 @@
         let dayNum = d.getUTCDay() || 7;
         d.setUTCDate(d.getUTCDate() + 4 - dayNum);
         let weekTime = d.getTime() + (weekNo - 1) * 604800000;
-        
-        let start = new Date(weekTime);
-        start.setUTCDate(start.getUTCDate() - 3); 
-        let end = new Date(weekTime);
-        end.setUTCDate(end.getUTCDate() + 3); 
-        
-        const fmt = (date) => {
-            let dd = date.getUTCDate().toString().padStart(2, '0');
-            let mm = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-            return `${dd}/${mm}/${date.getUTCFullYear()}`;
-        }
+        let start = new Date(weekTime); start.setUTCDate(start.getUTCDate() - 3); 
+        let end = new Date(weekTime); end.setUTCDate(end.getUTCDate() + 3); 
+        const fmt = (date) => { let dd = date.getUTCDate().toString().padStart(2, '0'); let mm = (date.getUTCMonth() + 1).toString().padStart(2, '0'); return `${dd}/${mm}/${date.getUTCFullYear()}`; }
         return `${fmt(start)} al ${fmt(end)}`;
     }
 
@@ -466,24 +385,12 @@
               facturasGlobales = [];
               querySnapshot.forEach((doc) => { 
                   let data = doc.data();
-                  
-                  if (data.estado_pago === 'Pagado') {
-                      data._estado_factura = 'Pagado';
-                  } else if (data.url_factura_xml) {
-                      data._estado_factura = 'Por pagar';
-                  } else {
-                      data._estado_factura = 'Pendiente';
-                  }
-                  
+                  if (data.estado_pago === 'Pagado') { data._estado_factura = 'Pagado'; }
+                  else if (data.url_factura_xml) { data._estado_factura = 'Por pagar'; }
+                  else { data._estado_factura = 'Pendiente'; }
                   facturasGlobales.push(data); 
               });
-              
-              facturasGlobales.sort((a, b) => {
-                  let fA = a.fecha_aprobacion_costos || "";
-                  let fB = b.fecha_aprobacion_costos || "";
-                  return fA.localeCompare(fB);
-              });
-
+              facturasGlobales.sort((a, b) => { let fA = a.fecha_aprobacion_costos || ""; let fB = b.fecha_aprobacion_costos || ""; return fA.localeCompare(fB); });
               actualizarMetricas();
               renderTablaActual();
           })
@@ -494,20 +401,14 @@
     }
 
     function actualizarMetricas() {
-        let cPend = 0, sumPend = 0;
-        let cFact = 0, sumFact = 0;
-        let cPag = 0, sumPag = 0;
-        let cTot = 0, sumTot = 0;
-
+        let cPend = 0, sumPend = 0, cFact = 0, sumFact = 0, cPag = 0, sumPag = 0, cTot = 0, sumTot = 0;
         facturasGlobales.forEach(t => {
             const val = parseFloat(t.costo_total_aprobado) || 0;
             cTot++; sumTot += val;
-            
             if (t._estado_factura === 'Pendiente') { cPend++; sumPend += val; }
             else if (t._estado_factura === 'Por pagar') { cFact++; sumFact += val; }
             else if (t._estado_factura === 'Pagado') { cPag++; sumPag += val; }
         });
-
         document.getElementById('met-pendientes').innerText = `${cPend} - ${formateaMoneda(sumPend)}`;
         document.getElementById('met-facturados').innerText = `${cFact} - ${formateaMoneda(sumFact)}`;
         document.getElementById('met-pagados').innerText = `${cPag} - ${formateaMoneda(sumPag)}`;
@@ -522,6 +423,7 @@
             sucursal: t.sucursal || '', suc_dir: t.suc_dir || '', suc_col: t.suc_col || '',
             suc_city: t.suc_city || '', suc_cp: t.suc_cp || '', suc_hor: t.suc_hor || '',
             suc_tel: t.suc_tel || '', suc_mail: t.suc_mail || '', ticket: t.id_ticket || 'S/N',
+            incidencia: t.id_incidencia || t.incidencia || '',
             area: t.area || '', subarea: t.subarea || '', desc_falla: t.desc_falla || '',
             fotos_falla: t.urls_falla || [null, null, null], desc_solucion: t.desc_solucion || '',
             fotos_solucion: t.urls_solucion || [null, null, null], prov_nombre: t.prov_nombre || t.proveedor || '',
@@ -531,7 +433,6 @@
             foto_soporte: t.url_soporte || null, foto_selfie: t.url_selfie || null,
             fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '')
         };
-
         sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF));
         window.open('index2.html?from=facturacion', '_blank');
     }
@@ -539,7 +440,6 @@
     function renderTablaActual() {
         const tbody = document.getElementById('tabla-facturas-body');
         tbody.innerHTML = '';
-        
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase();
@@ -547,60 +447,46 @@
 
         let filtrados = facturasGlobales.filter(t => {
             if(fEstado !== 'todos' && t._estado_factura !== fEstado) return false;
-
             const fDoc = t.fecha_aprobacion_costos ? t.fecha_aprobacion_costos.split('T')[0] : "";
             if(fInicio && fDoc < fInicio) return false;
             if(fFin && fDoc > fFin) return false;
-
             if(fBuscar) {
                 const folio = (t.id_ticket || "").toLowerCase();
+                const incidencia = (t.id_incidencia || t.incidencia || "").toLowerCase();
                 const suc = (t.sucursal || "").toLowerCase();
-                if(!folio.includes(fBuscar) && !suc.includes(fBuscar)) return false;
+                if(!folio.includes(fBuscar) && !incidencia.includes(fBuscar) && !suc.includes(fBuscar)) return false;
             }
             return true;
         });
 
         if(filtrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="15" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay folios que coincidan con la búsqueda.</span></div></td></tr>`;
-            lucide.createIcons();
-            limpiarSeleccion();
-            return;
+            tbody.innerHTML = `<tr><td colspan="15" class="co-table-empty"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><i data-lucide="inbox" style="width:48px;height:48px;color:#d1d5db;"></i><span>No hay folios que coincidan con la búsqueda.</span></div></td></tr>`;
+            lucide.createIcons(); limpiarSeleccion(); return;
         }
 
         filtrados.forEach(t => {
             const folio = t.id_ticket;
+            const incidencia = t.id_incidencia || t.incidencia || "S/I";
             const suc = t.sucursal || "N/A";
             const fechaOrden = t.fecha_creacion ? new Date(t.fecha_creacion).toLocaleDateString('es-MX') : "—";
             const fechaEnvio = t.fecha_aprobacion_costos ? new Date(t.fecha_aprobacion_costos).toLocaleDateString('es-MX') : "—";
-            
             const totalVal = parseFloat(t.costo_total_aprobado) || 0;
             const totalTxt = formateaMoneda(totalVal);
             
-            const btnVerOrden = `<button class="btn-download-primary" style="min-width: 105px; white-space: nowrap;" onclick="verPDFOrden('${folio}')" title="Ver Orden Original"><i data-lucide="search" style="width:12px; height:12px;"></i> Ver Orden</button>`;
-
-            const btnPdf = t.url_factura_pdf 
-                ? `<button class="btn-download-primary" onclick="window.open('${t.url_factura_pdf}', '_blank')"><i data-lucide="file-text" style="width:12px;"></i> PDF</button>` 
-                : `<button class="btn-download-disabled" disabled><i data-lucide="minus" style="width:12px;"></i> PDF</button>`;
-            
-            const btnXml = t.url_factura_xml 
-                ? `<button class="btn-download-primary" onclick="window.open('${t.url_factura_xml}', '_blank')"><i data-lucide="file-code" style="width:12px;"></i> XML</button>` 
-                : `<button class="btn-download-disabled" disabled><i data-lucide="minus" style="width:12px;"></i> XML</button>`;
+            const btnVerOrden = `<button class="btn-download-primary" style="min-width:105px;white-space:nowrap;" onclick="verPDFOrden('${folio}')"><i data-lucide="search" style="width:12px;height:12px;"></i> Ver Orden</button>`;
+            const btnPdf = t.url_factura_pdf ? `<button class="btn-download-primary" onclick="window.open('${t.url_factura_pdf}', '_blank')"><i data-lucide="file-text" style="width:12px;"></i> PDF</button>` : `<button class="btn-download-disabled" disabled><i data-lucide="minus" style="width:12px;"></i> PDF</button>`;
+            const btnXml = t.url_factura_xml ? `<button class="btn-download-primary" onclick="window.open('${t.url_factura_xml}', '_blank')"><i data-lucide="file-code" style="width:12px;"></i> XML</button>` : `<button class="btn-download-disabled" disabled><i data-lucide="minus" style="width:12px;"></i> XML</button>`;
 
             const numFact = t.factura_numero || "—";
             const fechaFact = t.factura_fecha ? new Date(t.factura_fecha).toLocaleDateString('es-MX') : "—";
             const semFact = t.factura_semana || "—";
             const impFact = t.factura_importe ? formateaMoneda(t.factura_importe) : "—";
-
-            const btnEliminar = `<button class="btn-delete-red" onclick="eliminarFactura('${folio}')" title="Borrar factura y reiniciar"><i data-lucide="trash-2" style="width:14px; color:white;"></i> Factura</button>`;
+            const btnEliminar = `<button class="btn-delete-red" onclick="eliminarFactura('${folio}')"><i data-lucide="trash-2" style="width:14px;color:white;"></i> Factura</button>`;
 
             let estadoHtml = "";
-            if (t._estado_factura === 'Pendiente') {
-                estadoHtml = `<span class="status-badge bg-yellow"><i class="status-dot dot-yellow"></i> Pendiente</span>`;
-            } else if (t._estado_factura === 'Por pagar') {
-                estadoHtml = `<span class="status-badge bg-blue"><i class="status-dot dot-blue"></i> Por pagar</span>`;
-            } else if (t._estado_factura === 'Pagado') {
-                estadoHtml = `<span class="status-badge bg-green"><i class="status-dot dot-green"></i> Pagado</span>`;
-            }
+            if (t._estado_factura === 'Pendiente') estadoHtml = `<span class="status-badge bg-yellow"><i class="status-dot dot-yellow"></i> Pendiente</span>`;
+            else if (t._estado_factura === 'Por pagar') estadoHtml = `<span class="status-badge bg-blue"><i class="status-dot dot-blue"></i> Por pagar</span>`;
+            else if (t._estado_factura === 'Pagado') estadoHtml = `<span class="status-badge bg-green"><i class="status-dot dot-green"></i> Pagado</span>`;
 
             const isPagado = (t._estado_factura === 'Pagado');
             const canPay = (t._estado_factura === 'Por pagar' || isPagado);
@@ -609,29 +495,14 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><input type="checkbox" class="chk-custom chk-row-upload" value="${folio}" data-total="${totalVal}" onchange="actualizarBarraFlotante()"></td>
-                <td><strong>${folio}</strong></td>
-                <td>${suc}</td>
-                <td>${fechaOrden}</td>
-                <td>${fechaEnvio}</td>
-                <td style="text-align: right; font-weight: 600; color: #81D0DC;">${totalTxt}</td>
-                <td>${btnVerOrden}</td>
-                
-                <td>${btnPdf}</td>
-                <td>${btnXml}</td>
-                <td>${numFact}</td>
-                <td>${fechaFact}</td>
-                <td>${semFact}</td>
-                <td style="text-align: right; font-weight: 600;">${impFact}</td>
-                
+                <td><strong>${incidencia}</strong></td>
+                <td>${suc}</td><td>${fechaOrden}</td><td>${fechaEnvio}</td>
+                <td style="text-align:right;font-weight:600;color:#81D0DC;">${totalTxt}</td>
+                <td>${btnVerOrden}</td><td>${btnPdf}</td><td>${btnXml}</td>
+                <td>${numFact}</td><td>${fechaFact}</td><td>${semFact}</td>
+                <td style="text-align:right;font-weight:600;">${impFact}</td>
                 <td>${estadoHtml}</td>
-                <td>
-                    <div style="display:flex; gap:8px; align-items:center; justify-content:center;">
-                        <label style="display:flex; align-items:center; gap:4px; cursor:pointer;" title="Marcar como pagado">
-                            ${chkPago} <span style="font-size:11px; color:#4b5563;">Pagado</span>
-                        </label>
-                        ${btnEliminar}
-                    </div>
-                </td>
+                <td><div style="display:flex;gap:8px;align-items:center;justify-content:center;"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;">${chkPago} <span style="font-size:11px;color:#4b5563;">Pagado</span></label>${btnEliminar}</div></td>
             `;
             tbody.appendChild(tr);
         });
@@ -640,19 +511,12 @@
 
     function actualizarBarraFlotante() {
         const checkboxes = document.querySelectorAll('.chk-row-upload:checked');
-        let count = 0; let sum = 0;
-        
-        checkboxes.forEach(cb => {
-            count++;
-            sum += parseFloat(cb.getAttribute('data-total')) || 0;
-        });
-
+        let count = 0, sum = 0;
+        checkboxes.forEach(cb => { count++; sum += parseFloat(cb.getAttribute('data-total')) || 0; });
         document.getElementById('lbl-sel-count').innerText = `${count} folio${count !== 1 ? 's' : ''}`;
         document.getElementById('lbl-sel-sum').innerText = formateaMoneda(sum);
-
         const bar = document.getElementById('upload-bar');
-        if (count > 0) bar.classList.add('show');
-        else bar.classList.remove('show');
+        if (count > 0) bar.classList.add('show'); else bar.classList.remove('show');
     }
 
     function limpiarSeleccion() {
@@ -662,21 +526,14 @@
         document.getElementById('file-xml').value = "";
     }
 
-    function triggerUpload(tipo) {
-        if(tipo === 'pdf') document.getElementById('file-pdf').click();
-        if(tipo === 'xml') document.getElementById('file-xml').click();
-    }
+    function triggerUpload(tipo) { if(tipo === 'pdf') document.getElementById('file-pdf').click(); if(tipo === 'xml') document.getElementById('file-xml').click(); }
 
     async function handleUpload(event, tipo) {
-        const file = event.target.files[0];
-        if(!file) return;
-
+        const file = event.target.files[0]; if(!file) return;
         const checkboxes = document.querySelectorAll('.chk-row-upload:checked');
         if(checkboxes.length === 0) return;
-
         const selectedFolios = Array.from(checkboxes).map(cb => cb.value);
         const sumSelected = parseFloat(document.getElementById('lbl-sel-sum').innerText.replace(/[^0-9.-]+/g,""));
-
         let updateData = {};
 
         if (tipo === 'xml') {
@@ -685,70 +542,38 @@
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(text, "text/xml");
                 const comprobante = xmlDoc.getElementsByTagName("cfdi:Comprobante")[0] || xmlDoc.getElementsByTagName("Comprobante")[0];
-
-                if (!comprobante) {
-                    showCustomAlert("Error", "El archivo XML no es un formato CFDI válido.", false);
-                    document.getElementById('file-xml').value = "";
-                    return;
-                }
-
+                if (!comprobante) { showCustomAlert("Error", "El archivo XML no es un formato CFDI válido.", false); document.getElementById('file-xml').value = ""; return; }
                 const totalXML = parseFloat(comprobante.getAttribute("Total") || comprobante.getAttribute("total") || 0);
                 const fechaXMLStr = comprobante.getAttribute("Fecha") || comprobante.getAttribute("fecha") || "";
                 const fechaXML = fechaXMLStr.split('T')[0];
                 const folioXML = comprobante.getAttribute("Folio") || comprobante.getAttribute("folio") || "";
                 const serieXML = comprobante.getAttribute("Serie") || comprobante.getAttribute("serie") || "";
                 const numFactura = (serieXML + folioXML) || "S/N";
-
-                if (Math.abs(totalXML - sumSelected) > 1) {
-                    showCustomAlert("Total Incorrecto", `El total del XML (${formateaMoneda(totalXML)}) no coincide con las órdenes seleccionadas (${formateaMoneda(sumSelected)}). La carga ha sido bloqueada.`, false);
-                    document.getElementById('file-xml').value = "";
-                    return;
-                }
-
-                updateData.factura_numero = numFactura;
-                updateData.factura_fecha = fechaXML;
-                updateData.factura_semana = getWeekNumber(fechaXML);
-                updateData.factura_importe = totalXML;
-                updateData.factura_fecha_tentativa = add90Days(fechaXML);
-                updateData.estado_pago = "Por Pagar"; 
-
-            } catch (err) {
-                console.error(err);
-                showCustomAlert("Error", "Ocurrió un error al leer el archivo XML. Asegúrate de que sea un CFDI válido.", false);
-                document.getElementById('file-xml').value = "";
-                return;
-            }
+                if (Math.abs(totalXML - sumSelected) > 1) { showCustomAlert("Total Incorrecto", `El total del XML (${formateaMoneda(totalXML)}) no coincide con las órdenes seleccionadas (${formateaMoneda(sumSelected)}). La carga ha sido bloqueada.`, false); document.getElementById('file-xml').value = ""; return; }
+                updateData.factura_numero = numFactura; updateData.factura_fecha = fechaXML; updateData.factura_semana = getWeekNumber(fechaXML);
+                updateData.factura_importe = totalXML; updateData.factura_fecha_tentativa = add90Days(fechaXML); updateData.estado_pago = "Por Pagar"; 
+            } catch (err) { console.error(err); showCustomAlert("Error", "Ocurrió un error al leer el archivo XML.", false); document.getElementById('file-xml').value = ""; return; }
         }
 
-        const alertBtn = document.getElementById('alert-btn');
-        alertBtn.style.display = 'none'; 
+        const alertBtn = document.getElementById('alert-btn'); alertBtn.style.display = 'none'; 
         showCustomAlert("Procesando", `Subiendo y validando ${tipo.toUpperCase()}...`, true);
 
         try {
             const ext = file.name.split('.').pop();
             const filePath = `facturas/${Date.now()}_bloque.${ext}`;
             const ref = storage.ref(filePath);
-            
             const snapshot = await ref.put(file);
             const downloadURL = await snapshot.ref.getDownloadURL();
-
             if (tipo === 'pdf') updateData.url_factura_pdf = downloadURL;
             if (tipo === 'xml') updateData.url_factura_xml = downloadURL;
 
             const batch = db.batch();
-            selectedFolios.forEach(folio => {
-                const docRef = db.collection('tickets_mantenimiento').doc(folio);
-                batch.update(docRef, updateData);
-            });
-
+            selectedFolios.forEach(folio => { const docRef = db.collection('tickets_mantenimiento').doc(folio); batch.update(docRef, updateData); });
             await batch.commit();
 
             alertBtn.style.display = 'block'; 
             showCustomAlert("¡Éxito!", `Archivo ${tipo.toUpperCase()} vinculado correctamente.`, true);
-            
-            limpiarSeleccion();
-            cargarDatosFacturacion(); 
-
+            limpiarSeleccion(); cargarDatosFacturacion(); 
         } catch (error) {
             console.error("Error al subir:", error);
             alertBtn.style.display = 'block'; 
@@ -759,115 +584,63 @@
     async function marcarComoPagado(folio, isChecked) {
         const nuevoEstado = isChecked ? 'Pagado' : 'Por Pagar'; 
         const fechaPago = isChecked ? new Date().toISOString() : null;
-
-        try {
-            await db.collection("tickets_mantenimiento").doc(folio).update({
-                estado_pago: nuevoEstado,
-                fecha_pago: fechaPago
-            });
-            cargarDatosFacturacion(); 
-        } catch (error) {
-            console.error("Error actualizando pago:", error);
-            showCustomAlert("Error", "No se pudo actualizar el estado de pago.", false);
-            cargarDatosFacturacion(); 
-        }
+        try { await db.collection("tickets_mantenimiento").doc(folio).update({ estado_pago: nuevoEstado, fecha_pago: fechaPago }); cargarDatosFacturacion(); } 
+        catch (error) { console.error("Error actualizando pago:", error); showCustomAlert("Error", "No se pudo actualizar el estado de pago.", false); cargarDatosFacturacion(); }
     }
 
     async function eliminarFactura(folio) {
-        if(!confirm(`¿Estás completamente seguro de borrar la factura del folio ${folio}?\nSe eliminarán archivos PDF, XML, datos de factura, SAAS, indicativos y el estatus volverá a 'Pendiente'.`)) return;
-
+        if(!confirm(`¿Estás completamente seguro de borrar la factura del folio ${folio}?\nSe eliminarán archivos y el estatus volverá a 'Pendiente'.`)) return;
         try {
             await db.collection("tickets_mantenimiento").doc(folio).update({
-                url_factura_pdf: firebase.firestore.FieldValue.delete(),
-                url_factura_xml: firebase.firestore.FieldValue.delete(),
-                factura_numero: firebase.firestore.FieldValue.delete(),
-                factura_fecha: firebase.firestore.FieldValue.delete(),
-                factura_semana: firebase.firestore.FieldValue.delete(),
-                factura_importe: firebase.firestore.FieldValue.delete(),
-                factura_fecha_tentativa: firebase.firestore.FieldValue.delete(),
-                saas_codigo: firebase.firestore.FieldValue.delete(),
-                saas_fecha: firebase.firestore.FieldValue.delete(),
-                saas_semana: firebase.firestore.FieldValue.delete(),
-                estado_pago: firebase.firestore.FieldValue.delete(), 
-                fecha_pago: firebase.firestore.FieldValue.delete(),
-                indicativo_gasto: firebase.firestore.FieldValue.delete(),
-                calificacion_capex_opex: firebase.firestore.FieldValue.delete(),
+                url_factura_pdf: firebase.firestore.FieldValue.delete(), url_factura_xml: firebase.firestore.FieldValue.delete(),
+                factura_numero: firebase.firestore.FieldValue.delete(), factura_fecha: firebase.firestore.FieldValue.delete(),
+                factura_semana: firebase.firestore.FieldValue.delete(), factura_importe: firebase.firestore.FieldValue.delete(),
+                factura_fecha_tentativa: firebase.firestore.FieldValue.delete(), saas_codigo: firebase.firestore.FieldValue.delete(),
+                saas_fecha: firebase.firestore.FieldValue.delete(), saas_semana: firebase.firestore.FieldValue.delete(),
+                estado_pago: firebase.firestore.FieldValue.delete(), fecha_pago: firebase.firestore.FieldValue.delete(),
+                indicativo_gasto: firebase.firestore.FieldValue.delete(), calificacion_capex_opex: firebase.firestore.FieldValue.delete(),
                 tipificacion_gasto: firebase.firestore.FieldValue.delete()
             });
-
             showCustomAlert("Eliminado", "La factura ha sido borrada exitosamente y la orden regresó a 'Pendiente'.", true);
             cargarDatosFacturacion();
-        } catch (error) {
-            console.error(error);
-            showCustomAlert("Error", "Ocurrió un error al intentar eliminar la factura.", false);
-        }
+        } catch (error) { console.error(error); showCustomAlert("Error", "Ocurrió un error al intentar eliminar la factura.", false); }
     }
 
     function abrirModalDescarga() {
         const selectSemana = document.getElementById('descarga-semana');
         const selectProv = document.getElementById('descarga-prov');
-        
         selectSemana.innerHTML = '';
-        
-        const hoy = new Date();
-        const currentYear = hoy.getFullYear();
-        const currentWeek = getWeekNumber(hoy.toISOString());
-        
+        const hoy = new Date(); const currentYear = hoy.getFullYear(); const currentWeek = getWeekNumber(hoy.toISOString());
         const currentRange = getWeekDateRange(currentYear, currentWeek);
         selectSemana.innerHTML += `<option value="${currentWeek}">Semana ${currentWeek} (${currentRange}) - Actual</option>`;
-        
-        for(let i=1; i<=52; i++) {
-            if(i !== currentWeek) {
-                let range = getWeekDateRange(currentYear, i);
-                selectSemana.innerHTML += `<option value="${i}">Semana ${i} (${range})</option>`;
-            }
-        }
-
+        for(let i=1; i<=52; i++) { if(i !== currentWeek) { let range = getWeekDateRange(currentYear, i); selectSemana.innerHTML += `<option value="${i}">Semana ${i} (${range})</option>`; } }
         selectProv.innerHTML = '<option value="todos">Todos los proveedores</option>';
         document.getElementById('modalDescargaFacturas').classList.add('active');
-        
-        actualizarProveedoresDescarga(currentWeek);
-        lucide.createIcons();
+        actualizarProveedoresDescarga(currentWeek); lucide.createIcons();
     }
 
-    function cerrarModalDescarga() {
-        document.getElementById('modalDescargaFacturas').classList.remove('active');
-    }
+    function cerrarModalDescarga() { document.getElementById('modalDescargaFacturas').classList.remove('active'); }
 
     function actualizarProveedoresDescarga(semanaSeleccionada) {
         const selectProv = document.getElementById('descarga-prov');
         selectProv.innerHTML = '<option value="todos">Todos los proveedores</option>';
-        
         if(!semanaSeleccionada) return;
-
         const facturasSemana = facturasGlobales.filter(t => t.factura_semana == semanaSeleccionada && (t.url_factura_pdf || t.url_factura_xml));
         const provsUnicos = [...new Set(facturasSemana.map(t => t.proveedor || t.prov_nombre || 'Sin Proveedor'))].sort();
-
-        provsUnicos.forEach(p => {
-            selectProv.innerHTML += `<option value="${p}">${p}</option>`;
-        });
+        provsUnicos.forEach(p => { selectProv.innerHTML += `<option value="${p}">${p}</option>`; });
     }
 
     async function descargarZip() {
         const semana = document.getElementById('descarga-semana').value;
         const proveedorSel = document.getElementById('descarga-prov').value;
-
-        if(!semana) {
-            showCustomAlert("Atención", "Por favor, selecciona una semana para descargar.", false);
-            return;
-        }
-
+        if(!semana) { showCustomAlert("Atención", "Por favor, selecciona una semana para descargar.", false); return; }
         const facturasDescargar = facturasGlobales.filter(t => {
             if (t.factura_semana != semana) return false;
             if (proveedorSel !== 'todos' && (t.proveedor || t.prov_nombre || 'Sin Proveedor') !== proveedorSel) return false;
             if (!t.url_factura_pdf && !t.url_factura_xml) return false;
             return true;
         });
-
-        if(facturasDescargar.length === 0) {
-            showCustomAlert("Aviso", "No hay facturas cargadas para la semana y proveedor indicados.", false);
-            return;
-        }
+        if(facturasDescargar.length === 0) { showCustomAlert("Aviso", "No hay facturas cargadas para la semana y proveedor indicados.", false); return; }
 
         const btn = document.getElementById('btn-ejecutar-descarga');
         btn.disabled = true;
@@ -879,41 +652,36 @@
             const carpetaPrincipal = zip.folder(`SEMANA ${semana}`);
 
             for(let f of facturasDescargar) {
-                const nombreProv = f.proveedor || f.prov_nombre || "Sin Proveedor";
-                const numFact = f.factura_numero || f.id_ticket; 
-                
+                const nombreProv = (f.proveedor || f.prov_nombre || "Sin Proveedor").replace(/[\/\\:*?"<>|]/g, '');
                 const carpetaProv = carpetaPrincipal.folder(nombreProv);
-                const carpetaFact = carpetaProv.folder(numFact);
-
-                const fetchArchivo = async (url) => {
-                    const res = await fetch(url);
-                    return await res.blob();
-                };
-
-                if (f.url_factura_pdf) {
+                const incidencia = (f.id_incidencia || f.incidencia || f.id_ticket || "SIN_FOLIO").replace(/[\/\\:*?"<>|]/g, '');
+                
+                if(f.url_factura_pdf) {
                     try {
-                        const blobPdf = await fetchArchivo(f.url_factura_pdf);
-                        carpetaFact.file(`${numFact}.pdf`, blobPdf);
-                    } catch(e) { console.error(`No se pudo descargar PDF de ${numFact}`, e); }
+                        const responsePdf = await fetch(f.url_factura_pdf);
+                        const blobPdf = await responsePdf.blob();
+                        carpetaProv.file(`${incidencia}_FACTURA.pdf`, blobPdf);
+                    } catch(e) { console.error("Error descargando PDF para", incidencia, e); }
                 }
-
-                if (f.url_factura_xml) {
+                
+                if(f.url_factura_xml) {
                     try {
-                        const blobXml = await fetchArchivo(f.url_factura_xml);
-                        carpetaFact.file(`${numFact}.xml`, blobXml);
-                    } catch(e) { console.error(`No se pudo descargar XML de ${numFact}`, e); }
+                        const responseXml = await fetch(f.url_factura_xml);
+                        const blobXml = await responseXml.blob();
+                        carpetaProv.file(`${incidencia}_FACTURA.xml`, blobXml);
+                    } catch(e) { console.error("Error descargando XML para", incidencia, e); }
                 }
             }
-
-            const zipContent = await zip.generateAsync({ type: "blob" });
-            saveAs(zipContent, `Facturas_Semana_${semana}.zip`);
+            
+            const content = await zip.generateAsync({ type: "blob" });
+            saveAs(content, `Facturas_Semana_${semana}.zip`);
             
             cerrarModalDescarga();
-            showCustomAlert("¡Descarga completada!", "El archivo ZIP se ha generado y descargado correctamente.", true);
-
-        } catch (error) {
-            console.error("Error al generar ZIP:", error);
-            showCustomAlert("Error", "Ocurrió un error al generar el archivo. Verifica los permisos de red.", false);
+            showCustomAlert("¡Descarga Completa!", "El archivo ZIP con las facturas se ha generado correctamente.", true);
+            
+        } catch(error) {
+            console.error("Error generando ZIP:", error);
+            showCustomAlert("Error", "Ocurrió un error al generar el archivo ZIP.", false);
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="download" style="width:16px;"></i> Descargar';
