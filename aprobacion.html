@@ -35,24 +35,20 @@
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
         html.is-logged-in #app-screen { display: block !important; }
         
-        /* OVERRIDES DE BRANDING FRANVE */
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
         .user-circle-initial { background-color: #81D0DC !important; color: #131520 !important; font-weight: bold; }
 
-        /* ESTILO DEL MENÚ ACTIVO TIPO PASTILLA CON CURVA */
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i { color: #81D0DC !important; }
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
 
-        /* Estilos de la página Aprobación */
         .aprobacion-wrap { max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-16); }
         .page-header-content h1 { font-size: 24px; font-weight: bold; margin: 0 0 5px 0; padding: 0; color: #111827; line-height: 1; }
         .page-header-content p { color: #6b7280; margin: 0; padding: 0; line-height: 1.5; }
 
-        /* === ESTILOS DE PESTAÑAS === */
         .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { background: #e5e7eb; }
@@ -65,10 +61,8 @@
         .filter-label { font-size: 11px; font-weight: var(--weight-semibold); text-transform: uppercase; color: var(--gray-500); }
         .input { padding: var(--space-3) var(--space-4); border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); font-size: var(--text-sm); color: var(--gray-900); width: 100%; box-sizing: border-box; }
         .filter-actions { display: flex; gap: var(--space-2); }
-        
         .btn-secondary { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; }
         
-        /* === TABLA HOMOLOGADA EXACTA A COSTOS DE REPARACIÓN === */
         .co-table-container { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
         .co-table { width: 100%; border-collapse: collapse; }
         .co-table th { padding: 16px 20px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #E5E7EB; white-space: nowrap; }
@@ -77,16 +71,13 @@
 
         .btn-action-primary { height: 32px; background: #81D0DC; color: #131520; border: none; padding: 0 16px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: opacity 0.2s; }
         .btn-action-primary:hover { opacity: 0.85; }
-        .btn-action-disabled { height: 32px; background: #e5e7eb; color: #9ca3af; border: none; padding: 0 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: not-allowed; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; }
         
         .status-badge { height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; border-radius: 16px; font-size: 12px; font-weight: 700; text-transform: none !important; }
-        
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .status-dot.yellow { background-color: #f59e0b; }
         .status-dot.green { background-color: #10b981; }
         .status-dot.red { background-color: #ef4444; }
 
-        /* === MODAL STYLES === */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-overlay.active { display: flex; }
         .modal-card { background: white; width: 100%; max-width: 1200px; border-radius: 16px; display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden; position: relative; }
@@ -107,38 +98,18 @@
         
         .modal-close { background: none; border: none; font-size: 26px; cursor: pointer; color: #6b7280; position: absolute; top: 15px; right: 20px; }
         .modal-close:hover { color: #111827; }
-        
         .modal-body { padding: 24px; overflow-y: auto; background: #fff; }
         
-        /* Tabla Modal */
         .captura-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
         .captura-table th { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; padding-bottom: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; }
         .captura-table td { padding: 8px 4px; vertical-align: top; }
         
-        /* Cajas Grises de Solo Lectura Redondeadas y Grises */
-        .cap-input { 
-            width: 100% !important; 
-            padding: 0 1rem !important; 
-            line-height: 42px !important; 
-            font-size: 14px !important; 
-            color: #111827 !important; 
-            background-color: #f3f4f6 !important; 
-            border-radius: 0.5rem !important; 
-            border: 1px solid #d1d5db !important; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; 
-            box-sizing: border-box !important; 
-            font-family: inherit !important; 
-            height: 42px !important; 
-            display: block !important;
-            transition: all 0.2s ease !important; 
-        }
+        .cap-input { width: 100% !important; padding: 0 1rem !important; line-height: 42px !important; font-size: 14px !important; color: #111827 !important; background-color: #f3f4f6 !important; border-radius: 0.5rem !important; border: 1px solid #d1d5db !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; box-sizing: border-box !important; font-family: inherit !important; height: 42px !important; display: block !important; transition: all 0.2s ease !important; }
         .cap-input.money { text-align: right; }
         .cap-input[readonly] { background-color: #e5e7eb !important; color: #374151 !important; font-weight: 600; cursor: not-allowed !important; border-color: #d1d5db !important; box-shadow: none !important; }
         
-        /* Controles de Aprobación por fila */
         .row-evaluacion { background: #f8fafc; }
         .row-evaluacion td { padding: 12px 4px; border-bottom: 2px solid #e5e7eb; border-radius: 0 0 8px 8px; }
-        
         .eval-controls-container { display: grid; grid-template-columns: 80% 20%; align-items: center; }
         .eval-left-wrap { display: flex; align-items: center; gap: 12px; padding-right: 4px; }
         
@@ -152,18 +123,13 @@
         .btn-rechazar.active { background: #b91c1c; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3); }
         .btn-rechazar.inactive { opacity: 0.5; }
 
-        .motivo-input { 
-            flex-grow: 1; height: 36px !important; padding: 0 12px !important; border-radius: 8px !important; border: 1px solid #d1d5db !important; font-size: 13px !important; color: #111827 !important; background-color: #f3f4f6 !important; box-sizing: border-box !important; transition: all 0.2s ease !important; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
+        .motivo-input { flex-grow: 1; height: 36px !important; padding: 0 12px !important; border-radius: 8px !important; border: 1px solid #d1d5db !important; font-size: 13px !important; color: #111827 !important; background-color: #f3f4f6 !important; box-sizing: border-box !important; transition: all 0.2s ease !important; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); }
         .motivo-input:focus { outline: none; background: white !important; border-color: #81D0DC !important; box-shadow: 0 0 0 2px rgba(129, 208, 220, 0.2) !important; }
         .motivo-input[readonly] { background-color: #e5e7eb !important; color: #6b7280 !important; font-weight: 600; cursor: not-allowed !important; border-color: #d1d5db !important; box-shadow: none !important; }
-        
         .eval-timestamp { font-size: 13px; font-weight: 600; text-align: center; width: 100%; display: flex; justify-content: center; align-items: center; }
 
-        /* Footer del modal */
         .modal-footer { padding: 20px 24px; background: #fff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
         .footer-counters-group { display: flex; gap: 24px; align-items: center; }
-
         .botones-accion-group { display: flex; gap: 12px; }
         .btn-cancelar-modal { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 220px; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
         .btn-cancelar-modal:hover { background: #e2e8f0; }
@@ -171,13 +137,11 @@
         .btn-enviar-modal:hover { background: #15803d; }
         .btn-enviar-modal:disabled { background: #86efac; cursor: not-allowed; }
 
-        /* === ESTILOS DEL MODAL DE ALERTA PERSONALIZADO === */
         #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
         #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
         #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
-        #alert-btn:hover { opacity: 0.9; }
 
         @media (max-width: 900px) {
             .header-left-group { flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -198,31 +162,24 @@
     <div id="app-screen" style="display: block;">
         <header class="main-header">
             <div class="header-left">
-                <button class="header-hamburger" type="button" aria-label="Abrir navegación" data-sidebar-toggle>
-                    <span class="hamburger"></span>
-                </button>
-                <a href="index.html">
+                <button class="header-hamburger" type="button" data-sidebar-toggle><span class="hamburger"></span></button>
+                <a href="inicio.html">
                     <img src="https://i.ibb.co/fzJ9T4Xd/LOGOTIPO-1.png" alt="FRANVE Logo" class="header-logo" style="max-height: 40px;">
                 </a>
                 <h1 class="system-title">Ordenes de Servicio</h1>
             </div>
             <div class="header-right">
                 <div class="user-menu" data-user-menu>
-                    <button class="user-circle-btn" type="button" aria-label="Abrir menú de usuario" data-user-trigger>
+                    <button class="user-circle-btn" type="button" data-user-trigger>
                         <span class="user-circle-initial" id="user-initial-header">U</span>
                     </button>
                     <div class="user-dropdown" data-user-dropdown>
                         <div class="user-card">
                             <div class="user-circle-avatar user-circle-initial">U</div>
-                            <div class="user-meta">
-                                <div class="user-name">Cargando...</div>
-                            </div>
+                            <div class="user-meta"><div class="user-name">Cargando...</div></div>
                         </div>
                         <div class="user-actions">
-                            <a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();">
-                                <i data-lucide="log-out"></i>
-                                Cerrar sesión
-                            </a>
+                            <a href="index.html" class="dropdown-link destructive" onclick="sessionStorage.clear();"><i data-lucide="log-out"></i> Cerrar sesión</a>
                         </div>
                     </div>
                 </div>
@@ -231,45 +188,26 @@
 
         <div class="main-layout">
             <aside class="sidebar app-sidebar" id="sidebar" data-app-sidebar>
-                <button class="sidebar-close" type="button" aria-label="Cerrar navegación" data-sidebar-close>
-                    <span class="close-icon">X</span>
-                </button>
+                <button class="sidebar-close" type="button" data-sidebar-close><span class="close-icon">X</span></button>
                 <div class="sidebar-content">
                     <nav class="sidebar-nav">
-                        <a class="sidebar-link" href="inicio.html">
-                            <i data-lucide="home"></i> Inicio
-                        </a>
+                        <a class="sidebar-link" href="inicio.html"><i data-lucide="home"></i> Inicio</a>
                         <div class="sidebar-section">
                             <div class="sidebar-section-title">Formas</div>
-                            <a class="sidebar-link" href="index.html">
-                                <i data-lucide="wrench"></i> Mantenimiento correctivo
-                            </a>
-                            <a class="sidebar-link" href="orden_de_servicio.html">
-                                <i data-lucide="calendar-check"></i> Ordenes de servicio
-                            </a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="wrench"></i> Mantenimiento correctivo</a>
+                            <a class="sidebar-link" href="orden_de_servicio.html"><i data-lucide="calendar-check"></i> Ordenes de servicio</a>
                             <a class="sidebar-link" href="misordenes.html"><i data-lucide="clipboard-check"></i> Mis Órdenes</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-admin">
                             <div class="sidebar-section-title">Administración</div>
-                            <a class="sidebar-link" href="confirmacion.html">
-                                <i data-lucide="check-circle-2"></i> Confirmación operativa
-                            </a>
-                            <a class="sidebar-link" href="costos.html">
-                                <i data-lucide="calculator"></i> Costos de reparación
-                            </a>
-                            <a class="sidebar-link activa" href="aprobacion.html">
-                                <i data-lucide="badge-check"></i> Aprobación de costos
-                            </a>
-                            <!-- ENLACE DE APROBACIÓN GERENCIA ELIMINADO -->
-                            <a class="sidebar-link" href="facturacion.html">
-                                <i data-lucide="file-text"></i> Facturación
-                            </a>
+                            <a class="sidebar-link" href="confirmacion.html"><i data-lucide="check-circle-2"></i> Confirmación operativa</a>
+                            <a class="sidebar-link" href="costos.html"><i data-lucide="calculator"></i> Costos de reparación</a>
+                            <a class="sidebar-link activa" href="aprobacion.html"><i data-lucide="badge-check"></i> Aprobación de costos</a>
+                            <a class="sidebar-link" href="facturacion.html"><i data-lucide="file-text"></i> Facturación</a>
                         </div>
                         <div class="sidebar-section" id="nav-seccion-reportes">
                             <div class="sidebar-section-title">Reportes</div>
-                            <a class="sidebar-link" href="index.html">
-                                <i data-lucide="bar-chart-3"></i> Reportes
-                            </a>
+                            <a class="sidebar-link" href="index.html"><i data-lucide="bar-chart-3"></i> Reportes</a>
                         </div>
                     </nav>
                 </div>
@@ -277,7 +215,6 @@
             <div class="sidebar-backdrop" id="sidebar-backdrop" data-sidebar-backdrop></div>
 
             <main class="main-content app-content">
-                
                 <div id="global-welcome-section" style="text-align: center; padding-top: 10px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb; margin-bottom: 25px; background: white;">
                     <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: 700;">Bienvenido</h1>
                     <h2 id="welcome-username-display" style="margin: 5px 0 0 0; font-size: 30px; color: #81D0DC; font-weight: 800; text-transform: uppercase; line-height: 1.2;">CARGANDO...</h2>
@@ -290,15 +227,9 @@
                             <p style="color: #6b7280; margin: 0;">Evalúa y autoriza los conceptos cargados por los proveedores</p>
                         </div>
                         <div class="tabs-container" style="margin-bottom: 0; padding-bottom: 0;">
-                            <button class="tab-btn active" onclick="cambiarTab('pendientes')" id="tab-pendientes">
-                                Pendientes <span class="tab-badge" id="badge-pendientes">0</span>
-                            </button>
-                            <button class="tab-btn" onclick="cambiarTab('aprobados')" id="tab-aprobados">
-                                Aprobados <span class="tab-badge" id="badge-aprobados">0</span>
-                            </button>
-                            <button class="tab-btn" onclick="cambiarTab('rechazados')" id="tab-rechazados">
-                                Rechazados <span class="tab-badge" id="badge-rechazados">0</span>
-                            </button>
+                            <button class="tab-btn active" onclick="cambiarTab('pendientes')" id="tab-pendientes">Pendientes <span class="tab-badge" id="badge-pendientes">0</span></button>
+                            <button class="tab-btn" onclick="cambiarTab('aprobados')" id="tab-aprobados">Aprobados <span class="tab-badge" id="badge-aprobados">0</span></button>
+                            <button class="tab-btn" onclick="cambiarTab('rechazados')" id="tab-rechazados">Rechazados <span class="tab-badge" id="badge-rechazados">0</span></button>
                         </div>
                     </header>
 
@@ -313,12 +244,10 @@
                         </div>
                         <div class="filter-group flex-grow">
                             <label class="filter-label">Buscar</label>
-                            <input type="text" class="input" id="filtro-buscar" placeholder="Folio o sucursal...">
+                            <input type="text" class="input" id="filtro-buscar" placeholder="Incidencia o sucursal...">
                         </div>
                         <div class="filter-actions">
-                            <button class="btn-secondary" type="button" onclick="renderTablaActual()">
-                                <i data-lucide="search" style="width: 16px;"></i> Buscar
-                            </button>
+                            <button class="btn-secondary" type="button" onclick="renderTablaActual()"><i data-lucide="search" style="width: 16px;"></i> Buscar</button>
                         </div>
                     </form>
 
@@ -326,7 +255,7 @@
                         <table class="co-table">
                             <thead>
                                 <tr>
-                                    <th>Folio</th>
+                                    <th>Incidencia</th>
                                     <th>Sucursal</th>
                                     <th>Fecha envío</th>
                                     <th style="text-align: right;">Total</th>
@@ -355,7 +284,7 @@
                         <p>Evalúa los conceptos cargados para esta orden</p>
                     </div>
                     <div class="header-folio-group">
-                        <span style="font-size: 16px; color: #111827; font-weight: 700;">Folio: <strong id="modal-folio-lbl" style="color: #81D0DC;"></strong></span>
+                        <span style="font-size: 16px; color: #111827; font-weight: 700;">Incidencia: <strong id="modal-folio-lbl" style="color: #81D0DC;"></strong></span>
                         <button type="button" class="btn-ver-pdf" onclick="verPDFDesdeModal()"><i data-lucide="file-text" style="width:16px;"></i> Ver PDF</button>
                     </div>
                 </div>
@@ -387,8 +316,7 @@
                             <th style="width: 20%;">Observación</th>
                         </tr>
                     </thead>
-                    <tbody id="conceptos-body">
-                        </tbody>
+                    <tbody id="conceptos-body"></tbody>
                 </table>
             </div>
 
@@ -398,14 +326,9 @@
                     <div>Aprobados: <span id="modal-count-aprobados">0</span></div>
                     <div>Rechazados: <span id="modal-count-rechazados">0</span></div>
                 </div>
-
                 <div class="botones-accion-group">
-                    <button type="button" class="btn-cancelar-modal" onclick="cerrarModal()">
-                        <i data-lucide="x-circle" style="width:18px;"></i> Cancelar
-                    </button>
-                    <button type="button" class="btn-enviar-modal" id="btn-guardar-evaluacion" onclick="enviarEvaluacion()">
-                        <i data-lucide="send" style="width:18px;"></i> Enviar Evaluación
-                    </button>
+                    <button type="button" class="btn-cancelar-modal" onclick="cerrarModal()"><i data-lucide="x-circle" style="width:18px;"></i> Cancelar</button>
+                    <button type="button" class="btn-enviar-modal" id="btn-guardar-evaluacion" onclick="enviarEvaluacion()"><i data-lucide="send" style="width:18px;"></i> Enviar Evaluación</button>
                 </div>
             </div>
         </div>
@@ -421,15 +344,14 @@
     </div>
 
 <script>
-    // Inicialización de Firebase con los nuevos datos de FRANVE
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
-            authDomain: "frave-4fbbf.firebaseapp.com",
-            projectId: "frave-4fbbf",
-            storageBucket: "frave-4fbbf.firebasestorage.app",
-            messagingSenderId: "687825589857",
-            appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
+        authDomain: "frave-4fbbf.firebaseapp.com",
+        projectId: "frave-4fbbf",
+        storageBucket: "frave-4fbbf.firebasestorage.app",
+        messagingSenderId: "687825589857",
+        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
+    };
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
 
@@ -439,7 +361,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) { lucide.createIcons(); }
-        
         const savedUser = sessionStorage.getItem('loginUser');
         if(savedUser) document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
 
@@ -470,13 +391,10 @@
 
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
-        const alertTitle = document.getElementById('alert-title');
-        const alertMsg = document.getElementById('alert-msg');
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = message;
         const alertIcon = document.getElementById('alert-icon-container');
         const alertBtn = document.getElementById('alert-btn');
-
-        alertTitle.innerText = title;
-        alertMsg.innerText = message;
 
         if(isSuccess) {
             alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
@@ -485,14 +403,11 @@
             alertIcon.innerHTML = '<i data-lucide="alert-triangle" style="width:48px; height:48px; color: #DC2626;"></i>';
             alertBtn.style.background = '#DC2626';
         }
-
         alertBox.style.display = 'flex';
         lucide.createIcons();
     }
 
-    function closeCustomAlert() {
-        document.getElementById('custom-alert').style.display = 'none';
-    }
+    function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
     function cargarTodosLosTickets() {
         db.collection("tickets_mantenimiento")
@@ -501,13 +416,11 @@
           .then((querySnapshot) => {
               ticketsGlobales = [];
               querySnapshot.forEach((doc) => { ticketsGlobales.push(doc.data()); });
-              
               ticketsGlobales.sort((a, b) => {
                   let fA = a.fecha_captura_costos || a.fecha_creacion || "";
                   let fB = b.fecha_captura_costos || b.fecha_creacion || "";
                   return fA.localeCompare(fB);
               });
-
               actualizarBadges();
               renderTablaActual();
           })
@@ -518,13 +431,9 @@
     }
 
     function actualizarBadges() {
-        const pend = ticketsGlobales.filter(t => t.estado_confirmacion === 'Pendiente de Aprobación').length;
-        const apr = ticketsGlobales.filter(t => t.estado_confirmacion === 'Costos Aprobados').length;
-        const rech = ticketsGlobales.filter(t => t.estado_confirmacion === 'Costos Rechazados').length;
-        
-        document.getElementById('badge-pendientes').innerText = pend;
-        document.getElementById('badge-aprobados').innerText = apr;
-        document.getElementById('badge-rechazados').innerText = rech;
+        document.getElementById('badge-pendientes').innerText = ticketsGlobales.filter(t => t.estado_confirmacion === 'Pendiente de Aprobación').length;
+        document.getElementById('badge-aprobados').innerText = ticketsGlobales.filter(t => t.estado_confirmacion === 'Costos Aprobados').length;
+        document.getElementById('badge-rechazados').innerText = ticketsGlobales.filter(t => t.estado_confirmacion === 'Costos Rechazados').length;
     }
 
     function cambiarTab(tab) {
@@ -537,7 +446,6 @@
     function renderTablaActual() {
         const tbody = document.getElementById('tabla-aprobacion-body');
         tbody.innerHTML = '';
-        
         const fInicio = document.getElementById('filtro-inicio').value;
         const fFin = document.getElementById('filtro-fin').value;
         const fBuscar = document.getElementById('filtro-buscar').value.toLowerCase();
@@ -553,20 +461,21 @@
 
             if(fBuscar) {
                 const folio = (t.id_ticket || "").toLowerCase();
+                const incidencia = (t.id_incidencia || t.incidencia || "").toLowerCase();
                 const suc = (t.sucursal || "").toLowerCase();
-                if(!folio.includes(fBuscar) && !suc.includes(fBuscar)) return false;
+                if(!folio.includes(fBuscar) && !incidencia.includes(fBuscar) && !suc.includes(fBuscar)) return false;
             }
             return true;
         });
 
         if(ticketsFiltrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="co-table-empty"><div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"><i data-lucide="inbox" style="width: 48px; height: 48px; color: #d1d5db;"></i><span>No hay costos pendientes de aprobación en este momento.</span></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="co-table-empty"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><i data-lucide="inbox" style="width:48px;height:48px;color:#d1d5db;"></i><span>No hay costos pendientes de aprobación en este momento.</span></div></td></tr>`;
             lucide.createIcons();
             return;
         }
 
         ticketsFiltrados.forEach(t => {
-            const folio = t.id_ticket;
+            const incidencia = t.id_incidencia || t.incidencia || "S/I";
             const suc = (t.sucursal || "N/A").toUpperCase();
             const fecha = t.fecha_captura_costos ? new Date(t.fecha_captura_costos).toLocaleDateString('es-MX') : (t.fecha_creacion ? new Date(t.fecha_creacion).toLocaleDateString('es-MX') : "—");
             const totalTxt = formateaMoneda(t.costo_total || 0);
@@ -576,18 +485,18 @@
 
             if(tabActual === 'pendientes') {
                 estadoHtml = `<span class="status-badge" style="background:#FEF3C7; color:#92400E;"><i class="status-dot yellow"></i> Pendiente</span>`;
-                accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${folio}', false)"><i data-lucide="check-square" style="width:14px;"></i> Evaluar Costos</button>`;
+                accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${t.id_ticket}', false)"><i data-lucide="check-square" style="width:14px;"></i> Evaluar</button>`;
             } else if (tabActual === 'aprobados') {
                 estadoHtml = `<span class="status-badge" style="background:#D1FAE5; color:#065F46;"><i class="status-dot green"></i> Aprobado</span>`;
-                accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${folio}', true)"><i data-lucide="eye" style="width:14px;"></i> Ver Detalles</button>`;
+                accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${t.id_ticket}', true)"><i data-lucide="eye" style="width:14px;"></i> Ver</button>`;
             } else if (tabActual === 'rechazados') {
                 estadoHtml = `<span class="status-badge" style="background:#FEE2E2; color:#B91C1C;"><i class="status-dot red"></i> Rechazado</span>`;
-                accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${folio}', true)"><i data-lucide="eye" style="width:14px;"></i> Ver Detalles</button>`;
+                accionHtml = `<button class="btn-action-primary" onclick="abrirModal('${t.id_ticket}', true)"><i data-lucide="eye" style="width:14px;"></i> Ver</button>`;
             }
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="text-align: center;"><strong>${folio}</strong></td>
+                <td style="text-align: center;"><strong>${incidencia}</strong></td>
                 <td style="text-align: center;">${suc}</td>
                 <td style="text-align: center;">${fecha}</td>
                 <td style="text-align: right; font-weight: 600;">${totalTxt}</td>
@@ -602,13 +511,9 @@
     function formateaMoneda(valor) { return "$" + valor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
 
     function actualizarContadoresModal() {
-        let total = estadoEvaluaciones.length;
-        let aprobados = estadoEvaluaciones.filter(e => e.estado === 'aprobado').length;
-        let rechazados = estadoEvaluaciones.filter(e => e.estado === 'rechazado').length;
-        
-        document.getElementById('modal-count-total').innerText = total;
-        document.getElementById('modal-count-aprobados').innerText = aprobados;
-        document.getElementById('modal-count-rechazados').innerText = rechazados;
+        document.getElementById('modal-count-total').innerText = estadoEvaluaciones.length;
+        document.getElementById('modal-count-aprobados').innerText = estadoEvaluaciones.filter(e => e.estado === 'aprobado').length;
+        document.getElementById('modal-count-rechazados').innerText = estadoEvaluaciones.filter(e => e.estado === 'rechazado').length;
     }
 
     function calcularTotalesAprobados() {
@@ -635,19 +540,14 @@
         const ticket = ticketsGlobales.find(t => t.id_ticket === folio);
         if(!ticket) return;
 
-        document.getElementById('modal-folio-lbl').innerText = folio;
+        document.getElementById('modal-folio-lbl').innerText = ticket.id_incidencia || ticket.incidencia || folio;
         document.getElementById('modal-folio-hidden').value = folio;
         
         document.getElementById('modal-importe-top').innerText = formateaMoneda(ticket.costo_subtotal || 0);
         document.getElementById('modal-iva-top').innerText = formateaMoneda(ticket.costo_iva || 0);
         document.getElementById('modal-suma-total').innerText = formateaMoneda(ticket.costo_total || 0);
         
-        const btnGuardar = document.getElementById('btn-guardar-evaluacion');
-        if(isReadOnly) {
-            btnGuardar.style.display = 'none';
-        } else {
-            btnGuardar.style.display = 'inline-flex';
-        }
+        document.getElementById('btn-guardar-evaluacion').style.display = isReadOnly ? 'none' : 'inline-flex';
 
         const tbody = document.getElementById('conceptos-body');
         tbody.innerHTML = '';
@@ -680,30 +580,19 @@
                 const btnRechActive = estPrevio === 'rechazado' ? 'active' : '';
                 const btnAprInactive = estPrevio === 'rechazado' ? 'inactive' : '';
                 const btnRechInactive = estPrevio === 'aprobado' ? 'inactive' : '';
-                
                 const disabledProp = isReadOnly ? 'disabled' : '';
                 const readonlyProp = isReadOnly ? 'readonly' : '';
                 
-                let textFecha = "Pendiente";
-                let colorFecha = "#6b7280"; 
-                if(estPrevio === 'aprobado') {
-                    textFecha = fecPrevio ? 'Aprobado el: ' + fecPrevio : 'Aprobado';
-                    colorFecha = "#16a34a"; 
-                } else if (estPrevio === 'rechazado') {
-                    textFecha = fecPrevio ? 'Rechazado el: ' + fecPrevio : 'Rechazado';
-                    colorFecha = "#DC2626"; 
-                }
+                let textFecha = "Pendiente", colorFecha = "#6b7280"; 
+                if(estPrevio === 'aprobado') { textFecha = fecPrevio ? 'Aprobado el: ' + fecPrevio : 'Aprobado'; colorFecha = "#16a34a"; }
+                else if (estPrevio === 'rechazado') { textFecha = fecPrevio ? 'Rechazado el: ' + fecPrevio : 'Rechazado'; colorFecha = "#DC2626"; }
                 
                 trEval.innerHTML = `
                     <td colspan="7">
                         <div class="eval-controls-container">
                             <div class="eval-left-wrap">
-                                <button type="button" class="btn-aprobar ${btnAprActive} ${btnAprInactive}" id="btn-apr-${index}" onclick="marcarEvaluacion(${index}, 'aprobado')" ${disabledProp}>
-                                    <i data-lucide="check-circle" style="width:16px;"></i> Aprobar
-                                </button>
-                                <button type="button" class="btn-rechazar ${btnRechActive} ${btnRechInactive}" id="btn-rech-${index}" onclick="marcarEvaluacion(${index}, 'rechazado')" ${disabledProp}>
-                                    <i data-lucide="x-circle" style="width:16px;"></i> Rechazar
-                                </button>
+                                <button type="button" class="btn-aprobar ${btnAprActive} ${btnAprInactive}" id="btn-apr-${index}" onclick="marcarEvaluacion(${index}, 'aprobado')" ${disabledProp}><i data-lucide="check-circle" style="width:16px;"></i> Aprobar</button>
+                                <button type="button" class="btn-rechazar ${btnRechActive} ${btnRechInactive}" id="btn-rech-${index}" onclick="marcarEvaluacion(${index}, 'rechazado')" ${disabledProp}><i data-lucide="x-circle" style="width:16px;"></i> Rechazar</button>
                                 <input type="text" class="motivo-input" id="motivo-${index}" placeholder="Motivo del rechazo..." value="${motPrevio}" oninput="actualizarMotivo(${index}, this.value)" ${readonlyProp}>
                             </div>
                             <span class="eval-timestamp" id="fecha-${index}" style="color: ${colorFecha};">${textFecha}</span>
@@ -754,10 +643,30 @@
         calcularTotalesAprobados();
     }
 
-    function actualizarMotivo(index, valor) {
-        estadoEvaluaciones[index].motivo = valor;
+    function actualizarMotivo(index, valor) { estadoEvaluaciones[index].motivo = valor; }
+
+    // === FUNCIÓN PARA VER PDF (AGREGADA) ===
+    function verPDFDesdeModal() {
+        const folio = document.getElementById('modal-folio-hidden').value;
+        const ticketData = ticketsGlobales.find(t => t.id_ticket === folio);
+        if(!ticketData) { showCustomAlert("Error", "No se encontraron los datos del ticket.", false); return; }
+        
+        const datosPDF = {
+            sucursal: ticketData.sucursal || '',
+            suc_dir: ticketData.suc_dir || '', suc_col: ticketData.suc_col || '', suc_city: ticketData.suc_city || '', suc_cp: ticketData.suc_cp || '', suc_hor: ticketData.suc_hor || '', suc_tel: ticketData.suc_tel || '', suc_mail: ticketData.suc_mail || '',
+            ticket: ticketData.id_ticket || 'S/N',
+            incidencia: ticketData.id_incidencia || ticketData.incidencia || '',
+            area: ticketData.area || '', subarea: ticketData.subarea || '', desc_falla: ticketData.desc_falla || '', fotos_falla: ticketData.urls_falla || [null, null, null],
+            desc_solucion: ticketData.desc_solucion || '', fotos_solucion: ticketData.urls_solucion || [null, null, null],
+            prov_nombre: ticketData.prov_nombre || ticketData.proveedor || '', prov_rfc: ticketData.prov_rfc || '', prov_dir: ticketData.prov_dir || '', prov_cont: ticketData.prov_cont || '', prov_tel: ticketData.prov_tel || '', prov_mail: ticketData.prov_mail || '',
+            tec_nombre: ticketData.tec_nombre || '', tec_celular: ticketData.tec_celular || '', comentario: ticketData.comentario || '', firma: ticketData.url_firma || '', foto_soporte: ticketData.url_soporte || null,
+            fecha_hora: ticketData.fecha_hora_completa ? new Date(ticketData.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (ticketData.fecha_creacion || '')
+        };
+        sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosPDF));
+        window.open('index2.html', '_blank');
     }
 
+    // === FUNCIÓN DE GUARDADO COMPLETADA ===
     async function enviarEvaluacion() {
         const folio = document.getElementById('modal-folio-hidden').value;
         const ticket = ticketsGlobales.find(t => t.id_ticket === folio);
@@ -766,15 +675,15 @@
         let algunRechazado = false;
 
         for (let i = 0; i < estadoEvaluaciones.length; i++) {
-            const eval = estadoEvaluaciones[i];
-            if (!eval.estado) {
+            const evalItem = estadoEvaluaciones[i];
+            if (!evalItem.estado) {
                 showCustomAlert("Atención", `Falta evaluar el concepto #${i + 1}.`, false);
                 validacionExitosa = false;
                 break;
             }
-            if (eval.estado === 'rechazado') {
+            if (evalItem.estado === 'rechazado') {
                 algunRechazado = true;
-                if (eval.motivo.trim() === '') {
+                if (evalItem.motivo.trim() === '') {
                     showCustomAlert("Atención", `Debes proporcionar un motivo de rechazo para el concepto #${i + 1}.`, false);
                     document.getElementById(`motivo-${i}`).focus();
                     validacionExitosa = false;
@@ -798,59 +707,46 @@
                 conceptosActualizados[i].fecha_evaluacion = estadoEvaluaciones[i].fecha;
             }
 
-            // CAMBIO CLAVE: Si aprueba, va directo a "Costos Aprobados" (Facturación). Si rechaza, a "Costos Rechazados".
             const nuevoEstado = algunRechazado ? "Costos Rechazados" : "Costos Aprobados";
 
-            const subtotalAprobadoNum = parseFloat(document.getElementById('modal-importe-aprobado').innerText.replace(/[^0-9.-]+/g,""));
-            const ivaAprobadoNum = parseFloat(document.getElementById('modal-iva-aprobado').innerText.replace(/[^0-9.-]+/g,""));
-            const totalAprobadoNum = parseFloat(document.getElementById('modal-total-aprobado').innerText.replace(/[^0-9.-]+/g,""));
+            let sumaAprobados = 0;
+            conceptosActualizados.forEach(c => {
+                if(c.estado_evaluacion === 'aprobado') {
+                    sumaAprobados += parseFloat(c.importe) || 0;
+                }
+            });
+            const ivaAprobadoNum = sumaAprobados * 0.16;
+            const totalAprobadoNum = sumaAprobados + ivaAprobadoNum;
 
-            await db.collection("tickets_mantenimiento").doc(folio).update({
+            const updateData = {
                 conceptos_costos: conceptosActualizados,
                 estado_confirmacion: nuevoEstado,
-                costo_subtotal_aprobado: subtotalAprobadoNum,
+                costo_subtotal_aprobado: sumaAprobados,
                 costo_iva_aprobado: ivaAprobadoNum,
                 costo_total_aprobado: totalAprobadoNum,
                 fecha_aprobacion_costos: new Date().toISOString()
-            });
+            };
 
-            showCustomAlert("¡Éxito!", `Evaluación guardada exitosamente. El ticket pasó a ${nuevoEstado}.`, true);
+            await db.collection("tickets_mantenimiento").doc(folio).update(updateData);
+
+            const index = ticketsGlobales.findIndex(t => t.id_ticket === folio);
+            if(index !== -1) {
+                ticketsGlobales[index] = { ...ticketsGlobales[index], ...updateData };
+            }
+
+            actualizarBadges();
+            renderTablaActual();
             cerrarModal();
-            cargarTodosLosTickets(); 
-        } catch(err) {
-            console.error(err);
-            showCustomAlert("Error", "Error al guardar la evaluación. Revisa tu conexión.", false);
+            showCustomAlert("¡Evaluación Guardada!", `Los costos han sido marcados como ${nuevoEstado === 'Costos Aprobados' ? 'Aprobados' : 'Rechazados'}.`, true);
+
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            showCustomAlert("Error", "No se pudo guardar la evaluación en Firebase.", false);
         } finally {
             btnGuardar.disabled = false;
             btnGuardar.innerHTML = '<i data-lucide="send" style="width:18px;"></i> Enviar Evaluación';
             lucide.createIcons();
         }
-    }
-
-    function verPDFDesdeModal() {
-        const folio = document.getElementById('modal-folio-hidden').value;
-        const t = ticketsGlobales.find(tk => tk.id_ticket === folio);
-        if(!t) { showCustomAlert("Error", "Error al cargar datos del ticket.", false); return; }
-
-        const datosParaPDF = {
-            sucursal: t.sucursal || '', suc_dir: t.suc_dir || '', suc_col: t.suc_col || '',
-            suc_city: t.suc_city || '', suc_cp: t.suc_cp || '', suc_hor: t.suc_hor || '',
-            suc_tel: t.suc_tel || '', suc_mail: t.suc_mail || '', ticket: t.id_ticket || 'S/N',
-            area: t.area || '', subarea: t.subarea || '', desc_falla: t.desc_falla || '',
-            fotos_falla: t.urls_falla || [null, null, null], desc_solucion: t.desc_solucion || '',
-            fotos_solucion: t.urls_solucion || [null, null, null],
-            prov_nombre: t.prov_nombre || t.proveedor || '', prov_rfc: t.prov_rfc || '',
-            prov_dir: t.prov_dir || '', prov_cont: t.prov_cont || '', prov_tel: t.prov_tel || '',
-            prov_mail: t.prov_mail || '', tec_nombre: t.tec_nombre || '', tec_celular: t.tec_celular || '',
-            comentario: t.comentario || '', firma: t.url_firma || '', foto_soporte: t.url_soporte || null,
-            foto_selfie: t.url_selfie || null,
-            fecha_hora: t.fecha_hora_completa 
-                ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
-                : (t.fecha_creacion || '')
-        };
-
-        sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF));
-        window.open('index2.html?from=aprobacion', '_blank');
     }
 </script>
 </body>
