@@ -552,7 +552,6 @@
 
               window.ticketsPendientes = {};
               ticketsGlobales.forEach(t => { 
-                  // La clave es el id_ticket (folio real) para buscar rápido
                   const clave = t.id_ticket || t.doc_id;
                   window.ticketsPendientes[clave] = t; 
               });
@@ -619,10 +618,10 @@
             if (fFin && fDoc > fFin) return false;
 
             // ═══════════════════════════════════════════════
-            // CAMBIO CLAVE: Buscar por INCIDENCIA y SUCURSAL
+            // CAMBIO 2: Buscar por id_incidencia y sucursal
             // ═══════════════════════════════════════════════
             if (fBuscar) {
-                const incidencia = (t.incidencia || "").toLowerCase();
+                const incidencia = (t.id_incidencia || t.incidencia || "").toLowerCase();
                 const suc = (t.sucursal || "").toLowerCase();
                 if (!incidencia.includes(fBuscar) && !suc.includes(fBuscar)) return false;
             }
@@ -636,11 +635,11 @@
         }
 
         ticketsFiltrados.forEach(t => {
-            // ═══════════════════════════════════════════════════════════
-            // CAMBIO CLAVE: folio para Firebase, incidencia para mostrar
-            // ═══════════════════════════════════════════════════════════
-            const folio = t.id_ticket || t.doc_id;                          // Folio real para Firebase
-            const incidencia = t.incidencia || "S/I";                       // Incidencia que viene de orden_de_servicio
+            const folio = t.id_ticket || t.doc_id;
+            // ═══════════════════════════════════════════════
+            // CAMBIO 1: Priorizar id_incidencia
+            // ═══════════════════════════════════════════════
+            const incidencia = t.id_incidencia || t.incidencia || "S/I";
             const suc = t.sucursal || "N/A";
             const tec = t.tec_nombre || t.proveedor || "N/A";
             const fecha = t.fecha_creacion || "—";
@@ -688,7 +687,10 @@
             suc_tel: ticketData.suc_tel || '',
             suc_mail: ticketData.suc_mail || '',
             ticket: ticketData.id_ticket || 'S/N',
-            incidencia: ticketData.incidencia || '',
+            // ═══════════════════════════════════════════════
+            // CAMBIO 4: Priorizar id_incidencia en PDF
+            // ═══════════════════════════════════════════════
+            incidencia: ticketData.id_incidencia || ticketData.incidencia || '',
             area: ticketData.area || '',
             subarea: ticketData.subarea || '',
             desc_falla: ticketData.desc_falla || '',
@@ -713,9 +715,6 @@
     }
 
     function verPDF() {
-        // ═══════════════════════════════════════════════════
-        // CAMBIO CLAVE: Usar el folio real del campo oculto
-        // ═══════════════════════════════════════════════════
         const folio = document.getElementById('eval-id-ticket').value;
         const ticketData = window.ticketsPendientes[folio];
         if(!ticketData) { showCustomAlert("Error", "No se encontraron los datos del ticket.", false); return; }
@@ -766,11 +765,11 @@
         const ticket = window.ticketsPendientes[folio];
         if(!ticket) return;
 
-        // ═══════════════════════════════════════════════════════════════
-        // CAMBIO CLAVE: Separar folio real (para Firebase) de incidencia (visible)
-        // ═══════════════════════════════════════════════════════════════
-        document.getElementById('eval-id-ticket').value = folio;                                    // Folio real → operaciones Firebase
-        document.getElementById('eval-folio').value = ticket.incidencia || folio;                   // Incidencia visible en el modal
+        // ═══════════════════════════════════════════════
+        // CAMBIO 3: Priorizar id_incidencia en Modal
+        // ═══════════════════════════════════════════════
+        document.getElementById('eval-id-ticket').value = folio;
+        document.getElementById('eval-folio').value = ticket.id_incidencia || ticket.incidencia || folio;
         
         document.getElementById('eval-nombre').value = ticket.eval_nombre || '';
         document.getElementById('eval-cargo').value = ticket.eval_cargo || '';
@@ -806,9 +805,6 @@
     // 9. ENVIAR EVALUACIÓN A FIREBASE
     // ==========================================
     async function enviarEvaluacion() {
-        // ═══════════════════════════════════════════════════════════════
-        // CAMBIO CLAVE: Usar el folio real del campo oculto, NO la incidencia
-        // ═══════════════════════════════════════════════════════════════
         const folio = document.getElementById('eval-id-ticket').value;
         const nivel = document.getElementById('eval-nivel').value;
         const nombre = document.getElementById('eval-nombre').value;
@@ -821,35 +817,50 @@
         const btnEnviar = document.getElementById('btn-enviar-eval');
         btnEnviar.disabled = true;
         btnEnviar.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:18px;height:18px;"></i> Guardando...';
-        lucide.createIcons();
-
-        let estadoFinal = nivel === 'Aceptado' ? 'Confirmado' : 'Rechazado';
 
         try {
-            await db.collection("tickets_mantenimiento").doc(folio).update({
-                estado_confirmacion: estadoFinal,
+            const firmaDataUrl = signaturePadInstance.isEmpty() ? null : signaturePadInstance.toDataURL();
+            let urlFirma = ticket.eval_firma_url || null;
+
+            if (firmaDataUrl) {
+                const storageRef = storage.ref();
+                const firmaRef = storageRef.child(`firmas_evaluacion/${folio}_${Date.now()}.png`);
+                const snapshot = await firmaRef.putString(firmaDataUrl, 'data_url');
+                urlFirma = await snapshot.ref.getDownloadURL();
+            }
+
+            const updateData = {
+                estado_confirmacion: nivel === 'No Aceptado' ? 'Rechazado' : 'Confirmado',
                 evaluacion_nivel: nivel,
                 eval_nombre: nombre,
                 eval_cargo: cargo,
                 eval_comentario: comentario,
-                fecha_confirmacion: new Date().toISOString()
-            });
+                fecha_evaluacion: new Date().toISOString()
+            };
 
-            if(window.ticketsPendientes[folio]) {
-                window.ticketsPendientes[folio].estado_confirmacion = estadoFinal;
-                window.ticketsPendientes[folio].evaluacion_nivel = nivel;
-                window.ticketsPendientes[folio].eval_nombre = nombre;
-                window.ticketsPendientes[folio].eval_cargo = cargo;
-                window.ticketsPendientes[folio].eval_comentario = comentario;
+            if (urlFirma) {
+                updateData.eval_firma_url = urlFirma;
             }
 
-            showCustomAlert("Éxito", `La orden ha sido marcada como ${estadoFinal.toLowerCase()}.`, true);
-            cerrarModal();
+            await db.collection("tickets_mantenimiento").doc(folio).update(updateData);
+
+            const index = ticketsGlobales.findIndex(t => (t.id_ticket || t.doc_id) === folio);
+            if (index !== -1) {
+                ticketsGlobales[index] = { ...ticketsGlobales[index], ...updateData };
+            }
+            
+            if(window.ticketsPendientes[folio]) {
+                window.ticketsPendientes[folio] = { ...window.ticketsPendientes[folio], ...updateData };
+            }
+
             actualizarBadges();
             renderTablaConfirmacion();
-        } catch(error) {
+            cerrarModal();
+            showCustomAlert("¡Evaluación Guardada!", "La orden ha sido evaluada correctamente.", true);
+
+        } catch (error) {
             console.error("Error al guardar evaluación:", error);
-            showCustomAlert("Error", "No se pudo guardar la confirmación en Firebase.", false);
+            showCustomAlert("Error", "No se pudo guardar la evaluación en Firebase.", false);
         } finally {
             btnEnviar.disabled = false;
             btnEnviar.innerHTML = '<i data-lucide="check-circle" style="color: currentColor; width: 18px; height: 18px;"></i> Confirmar Orden';
@@ -857,6 +868,5 @@
         }
     }
 </script>
-
 </body>
 </html>
