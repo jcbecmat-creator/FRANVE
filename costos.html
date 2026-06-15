@@ -353,14 +353,16 @@
     </div>
 
 <script>
-    // ⚠️ NOTA: Verifica que este sea el proyecto correcto. En confirmacion.html usabas frave-4fbbf
+    // ==========================================
+    // 1. CONFIGURACIÓN DE FIREBASE (CORREGIDA PARA COINCIDIR CON CONFIRMACIÓN Y INDEX)
+    // ==========================================
     const firebaseConfig = {
-        apiKey: "AIzaSyDUM2w0L-3GNm0unSgKHZCrrW9xKQY0_is",
-        authDomain: "franve-1b62e.firebaseapp.com",
-        projectId: "franve-1b62e",
-        storageBucket: "franve-1b62e.firebasestorage.app",
-        messagingSenderId: "118420640551",
-        appId: "1:118420640551:web:9b79daa79a2d46eefe4f02"
+        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
+        authDomain: "frave-4fbbf.firebaseapp.com",
+        projectId: "frave-4fbbf",
+        storageBucket: "frave-4fbbf.firebasestorage.app",
+        messagingSenderId: "687825589857",
+        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
     };
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
@@ -369,6 +371,7 @@
     let tabActual = 'pendientes';
     let contadorFilas = 0;
 
+    // === FUNCIÓN DE ALERTA PERSONALIZADA ===
     function showCustomAlert(title, message, isSuccess = true) {
         const alertBox = document.getElementById('custom-alert');
         const alertTitle = document.getElementById('alert-title');
@@ -417,6 +420,7 @@
         cargarTodosLosTickets();
     });
 
+    // === CARGA Y CLASIFICACIÓN DE TICKETS ===
     function cargarTodosLosTickets() {
         db.collection("tickets_mantenimiento")
           .where("estado_confirmacion", "in", ["Confirmado", "Pendiente de Aprobación", "Costos Aprobados", "Costos Rechazados"])
@@ -457,6 +461,7 @@
         renderTablaActual();
     }
 
+    // === DIBUJAR TABLA ===
     function renderTablaActual() {
         const tbody = document.getElementById('tabla-costos-body');
         tbody.innerHTML = '';
@@ -544,6 +549,7 @@
         lucide.createIcons();
     }
 
+    // === LÓGICA DEL MODAL INTELIGENTE ===
     function abrirModal(folio, modo) {
         const ticket = ticketsGlobales.find(t => t.id_ticket === folio);
         if(!ticket && modo !== 'nuevo') return;
@@ -722,7 +728,7 @@
         document.getElementById('modal-suma-total').setAttribute('data-total', totalGran);
     }
 
-    // === FUNCIÓN PARA VER PDF (QUE FALTABA) ===
+    // === FUNCIÓN PARA VER PDF ===
     function verPDFDesdeModal() {
         const folio = document.getElementById('modal-folio-hidden').value;
         const ticketData = ticketsGlobales.find(t => t.id_ticket === folio);
@@ -765,7 +771,7 @@
         window.open('index2.html', '_blank');
     }
 
-    // === GUARDAR EN FIREBASE (COMPLETADO) ===
+    // === GUARDAR EN FIREBASE ===
     async function guardarConceptos() {
         const folio = document.getElementById('modal-folio-hidden').value;
         const modo = document.getElementById('modal-modo-actual').value; 
