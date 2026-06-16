@@ -447,7 +447,6 @@
 
         alertTitle.innerText = title;
         alertMsg.innerText = message;
-
         if(isSuccess) {
             alertIcon.innerHTML = '<i data-lucide="check-circle" style="width:48px; height:48px; color: #16a34a;"></i>';
             alertBtn.style.background = '#16a34a';
@@ -527,6 +526,7 @@
 
         inicializarFirmaModal();
         cargarTodosLosTickets(); 
+        configurarPermisosMenu(); // <--- LLAMADA A LA FUNCIÓN CORREGIDA
     });
 
     // ==========================================
@@ -617,9 +617,6 @@
             if (fInicio && fDoc < fInicio) return false;
             if (fFin && fDoc > fFin) return false;
 
-            // ═══════════════════════════════════════════════
-            // CAMBIO 2: Buscar por id_incidencia y sucursal
-            // ═══════════════════════════════════════════════
             if (fBuscar) {
                 const incidencia = (t.id_incidencia || t.incidencia || "").toLowerCase();
                 const suc = (t.sucursal || "").toLowerCase();
@@ -636,9 +633,6 @@
 
         ticketsFiltrados.forEach(t => {
             const folio = t.id_ticket || t.doc_id;
-            // ═══════════════════════════════════════════════
-            // CAMBIO 1: Priorizar id_incidencia
-            // ═══════════════════════════════════════════════
             const incidencia = t.id_incidencia || t.incidencia || "S/I";
             const suc = t.sucursal || "N/A";
             const tec = t.tec_nombre || t.proveedor || "N/A";
@@ -687,9 +681,6 @@
             suc_tel: ticketData.suc_tel || '',
             suc_mail: ticketData.suc_mail || '',
             ticket: ticketData.id_ticket || 'S/N',
-            // ═══════════════════════════════════════════════
-            // CAMBIO 4: Priorizar id_incidencia en PDF
-            // ═══════════════════════════════════════════════
             incidencia: ticketData.id_incidencia || ticketData.incidencia || '',
             area: ticketData.area || '',
             subarea: ticketData.subarea || '',
@@ -765,9 +756,6 @@
         const ticket = window.ticketsPendientes[folio];
         if(!ticket) return;
 
-        // ═══════════════════════════════════════════════
-        // CAMBIO 3: Priorizar id_incidencia en Modal
-        // ═══════════════════════════════════════════════
         document.getElementById('eval-id-ticket').value = folio;
         document.getElementById('eval-folio').value = ticket.id_incidencia || ticket.incidencia || folio;
         
@@ -867,45 +855,46 @@
             lucide.createIcons();
         }
     }
-</script>
+
     function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession');
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr);
-    const privilegio = String(appData.privilegio); // Convertir a string por seguridad
-
-    // Si es Privilegio 1 (Trabajador/Proveedor)
-    if (privilegio === '1') {
-        // Ocultar enlaces específicos que no debe ver
-        const enlacesOcultar = [
-            'orden_de_servicio.html',
-            'confirmacion.html',
-            'aprobacion.html',
-            'facturacion.html'
-        ];
-
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
-            }
-        });
-
-        // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
-        const seccionReportes = document.getElementById('nav-seccion-reportes');
-        if (seccionReportes) {
-            const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
-            if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
-        }
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if (!appDataStr) return;
         
-        // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
-        const seccionAdmin = document.getElementById('nav-seccion-admin');
-        if (seccionAdmin) {
-            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-            if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
+        const appData = JSON.parse(appDataStr);
+        const privilegio = String(appData.privilegio); // Convertir a string por seguridad
+
+        // Si es Privilegio 1 (Trabajador/Proveedor)
+        if (privilegio === '1') {
+            // Ocultar enlaces específicos que no debe ver
+            const enlacesOcultar = [
+                'orden_de_servicio.html',
+                'confirmacion.html',
+                'aprobacion.html',
+                'facturacion.html'
+            ];
+
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (enlacesOcultar.includes(href)) {
+                    link.style.display = 'none'; // Oculta el enlace
+                }
+            });
+
+            // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
+            const seccionReportes = document.getElementById('nav-seccion-reportes');
+            if (seccionReportes) {
+                const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
+                if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
+            }
+            
+            // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
+            const seccionAdmin = document.getElementById('nav-seccion-admin');
+            if (seccionAdmin) {
+                const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
+                if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
+            }
         }
     }
-}
+</script>
 </body>
 </html>
