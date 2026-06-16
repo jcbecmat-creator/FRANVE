@@ -542,16 +542,54 @@
         document.getElementById('confirm-btn-action').addEventListener('click', function() { closeConfirm(); if(confirmCallback) confirmCallback(); });
 
         // ==========================================
-        // LÓGICA DE INCIDENCIAS
+        // LÓGICA DE INCIDENCIAS (MODIFICADA PARA EVITAR DUPLICADOS)
         // ==========================================
-        function cargarIncidenciasPendientes() {
-            if (!window.appData || !window.appData.nombreUsuario) { console.log("No hay usuario para buscar incidencias"); return; }
-            dbIncidencias.collection("incidencias").where("usuario_assigned", "==", window.appData.nombreUsuario).get().then((querySnapshot) => {
+        async function cargarIncidenciasPendientes() {
+            if (!window.appData || !window.appData.nombreUsuario) { 
+                console.log("No hay usuario para buscar incidencias"); 
+                return; 
+            }
+
+            try {
+                // 1. OBTENER LAS INCIDENCIAS ASIGNADAS AL USUARIO
+                const snapInc = await dbIncidencias.collection("incidencias")
+                    .where("usuario_assigned", "==", window.appData.nombreUsuario).get();
+
+                // 2. OBTENER LAS ÓRDENES QUE EL USUARIO YA HA CREADO (BORRADOR O REALIZADO)
+                const snapOrd = await db.collection("tickets_mantenimiento")
+                    .where("proveedor", "==", window.appData.nombreProveedor).get();
+
+                // 3. CREAR UNA LISTA (SET) CON LOS IDs DE LAS INCIDENCIAS YA TRABAJADAS
+                const incidenciasUsadas = new Set();
+                snapOrd.forEach(doc => {
+                    const orden = doc.data();
+                    if (orden.id_incidencia_doc) {
+                        incidenciasUsadas.add(orden.id_incidencia_doc);
+                    }
+                });
+
+                // 4. LLENAR EL DATALIST OMITIENDO LAS QUE YA ESTÁN EN EL SET
                 incidenciasPendientes = [];
                 const listaInc = document.getElementById('incidencias-list');
                 listaInc.innerHTML = '';
-                querySnapshot.forEach((doc) => { const inc = doc.data(); inc.id_documento = doc.id; incidenciasPendientes.push(inc); let opt = document.createElement('option'); opt.value = inc.incidencia || doc.id; listaInc.appendChild(opt); });
-            }).catch(err => console.error("Error al cargar incidencias", err));
+
+                snapInc.forEach((doc) => {
+                    const inc = doc.data();
+                    inc.id_documento = doc.id;
+
+                    if (!incidenciasUsadas.has(inc.id_documento)) {
+                        incidenciasPendientes.push(inc);
+                        let opt = document.createElement('option');
+                        opt.value = inc.incidencia || doc.id;
+                        listaInc.appendChild(opt);
+                    }
+                });
+
+                console.log(`Incidencias cargadas: ${incidenciasPendientes.length} (Filtradas para evitar duplicados)`);
+
+            } catch (err) {
+                console.error("Error al cargar incidencias pendientes", err);
+            }
         }
 
         document.getElementById('incidencia-input').addEventListener('input', function(e) {
@@ -579,7 +617,6 @@
             if (!window.appData) return;
             db.collection("tickets_mantenimiento").where("proveedor", "==", window.appData.nombreProveedor).get().then((querySnapshot) => {
                 misOrdenes = []; querySnapshot.forEach((doc) => { misOrdenes.push({ id_doc: doc.id, ...doc.data() }); });
-                // Ordenar de la más reciente a la más antigua
                 misOrdenes.sort((a, b) => (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""));
                 actualizarBadgesMtto(); if(tabMttoActual !== 'Nueva Orden') renderTablaMisOrdenes();
             }).catch(err => console.error("Error al cargar órdenes", err));
@@ -602,7 +639,6 @@
 
         function renderTablaMisOrdenes() {
             const tbody = document.getElementById('tabla-mis-ordenes'); const thead = document.querySelector('#dashboard-ordenes thead'); tbody.innerHTML = '';
-            // Cambio: Encabezado ahora dice "Incidencia" en vez de "Folio"
             if (tabMttoActual === 'Borrador') { thead.innerHTML = `<tr><th style="padding: 15px; width: 40px;"><input type="checkbox" id="chk-all-drafts" onchange="toggleAllDrafts(this.checked)" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></th><th>Incidencia</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
             else { thead.innerHTML = `<tr><th>Incidencia</th><th>Sucursal</th><th>Fecha</th><th>Acción</th></tr>`; }
             const fInicio = document.getElementById('filtro-inicio-mtto').value; const fFin = document.getElementById('filtro-fin-mtto').value; const fBuscar = document.getElementById('filtro-buscar-mtto').value.toLowerCase();
@@ -611,7 +647,6 @@
             filtrados.forEach(o => { 
                 let btnAccion = o.estado_confirmacion === 'Borrador' ? `<button type="button" onclick="cargarBorrador('${o.id_doc}')" style="background:#14A981; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="edit-2" style="width:14px;"></i> Editar</button>` : `<button type="button" onclick="verPDFOrden('${o.id_doc}')" style="background:#81D0DC; color:#131520; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="file-text" style="width:14px;"></i> PDF</button>`; 
                 const tr = document.createElement('tr'); 
-                // Cambio: Celdas ahora muestran Incidencia
                 if (tabMttoActual === 'Borrador') { tr.innerHTML = `<td><input type="checkbox" class="chk-draft" value="${o.id_doc}" onchange="actualizarBarraBorradores()" style="width:16px; height:16px; cursor:pointer; accent-color:#81D0DC;"></td><td style="padding: 15px; font-weight: bold;">${o.id_incidencia || o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } 
                 else { tr.innerHTML = `<td style="padding: 15px; font-weight: bold;">${o.id_incidencia || o.id_ticket || ''}</td><td style="font-size: 13px;">${o.sucursal || ''}</td><td style="font-size: 13px;">${o.fecha_creacion || ''}</td><td>${btnAccion}</td>`; } 
                 tbody.appendChild(tr); 
@@ -745,7 +780,6 @@
                 await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
                 
                 if (estadoFinal === 'En proceso') { 
-                    // INICIA CONTEO REGRESIVO
                     const overlay = document.getElementById('countdown-overlay');
                     overlay.classList.add('show');
                     
@@ -759,7 +793,6 @@
                         if (timeLeft <= 0) {
                             clearInterval(timerInterval);
                             overlay.classList.remove('show');
-                            // Redirigir al submenu Realizados
                             cargarMisOrdenes();
                             cambiarTabMtto('Realizado');
                             mostrarFormularioNuevaOrden();
@@ -802,7 +835,6 @@
                 document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'block'; lucide.createIcons();
                 inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
                 
-                // LLAMAR A LA FUNCIÓN DE PERMISOS AQUÍ
                 configurarPermisosMenu();
             }
         });
@@ -853,45 +885,40 @@
         // ==========================================
         // FUNCIÓN DE PERMISOS (CORREGIDA Y MOVIDA AQUÍ)
         // ==========================================
-function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession');
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr);
-    const privilegio = String(appData.privilegio); 
+        function configurarPermisosMenu() {
+            const appDataStr = sessionStorage.getItem('loginSession');
+            if (!appDataStr) return;
+            
+            const appData = JSON.parse(appDataStr);
+            const privilegio = String(appData.privilegio); 
 
-    // 1. LIMPIAR: Mostrar todo por defecto (Para Privilegio 2 y Admin)
-    document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = '');
-    document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
+            document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = '');
+            document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
 
-    // 2. APLICAR REGLAS SOLO PARA PRIVILEGIO 1 (Trabajador)
-    if (privilegio === '1') {
-        // Ocultar la sección de Reportes por completo
-        const seccionReportes = document.getElementById('nav-seccion-reportes');
-        if (seccionReportes) seccionReportes.style.display = 'none';
+            if (privilegio === '1') {
+                const seccionReportes = document.getElementById('nav-seccion-reportes');
+                if (seccionReportes) seccionReportes.style.display = 'none';
 
-        // Enlaces específicos que NO debe ver
-        const enlacesOcultar = [
-            'orden_de_servicio.html',
-            'aprobacion.html',
-            'facturacion.html'
-        ];
+                const enlacesOcultar = [
+                    'orden_de_servicio.html',
+                    'aprobacion.html',
+                    'facturacion.html'
+                ];
 
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (enlacesOcultar.includes(href)) {
+                        link.style.display = 'none';
+                    }
+                });
+                
+                const seccionAdmin = document.getElementById('nav-seccion-admin');
+                if (seccionAdmin) {
+                    const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
+                    if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
+                }
             }
-        });
-        
-        // Restaurar el título de Administración por si estaba modificado
-        const seccionAdmin = document.getElementById('nav-seccion-admin');
-        if (seccionAdmin) {
-            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-            if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
         }
-    }
-}
     </script>
 </body>
 </html>
