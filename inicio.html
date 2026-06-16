@@ -383,39 +383,45 @@
     // ==========================================
     // FUNCIÓN CONFIGURAR PERMISOS MENU
     // ==========================================
-    function configurarPermisosMenu() {
-        const appDataStr = sessionStorage.getItem('loginSession');
-        if (!appDataStr) return;
-        
-        const appData = JSON.parse(appDataStr);
-        const privilegio = String(appData.privilegio); // Convertir a string por seguridad
+function configurarPermisosMenu() {
+    const appDataStr = sessionStorage.getItem('loginSession');
+    if (!appDataStr) return;
+    
+    const appData = JSON.parse(appDataStr);
+    const privilegio = String(appData.privilegio); 
 
-        // Si es Nivel 2 (Proveedor) - Ocultar Administración y Reportes
-        if (privilegio === '2') {
-            const seccionAdmin = document.getElementById('nav-seccion-admin');
-            const seccionReportes = document.getElementById('nav-seccion-reportes');
-            
-            if (seccionAdmin) seccionAdmin.style.display = 'none';
-            if (seccionReportes) seccionReportes.style.display = 'none';
-        } 
-        // Si es Nivel 1 (Trabajador) - Ocultar Administración y Reportes también usualmente
-        else if (privilegio === '1') {
-            const seccionAdmin = document.getElementById('nav-seccion-admin');
-            const seccionReportes = document.getElementById('nav-seccion-reportes');
-            
-            if (seccionAdmin) seccionAdmin.style.display = 'none';
-            if (seccionReportes) seccionReportes.style.display = 'none';
-        }
-        // Nivel Admin (default/otros) - Mostrar todo
-        else {
-            const seccionAdmin = document.getElementById('nav-seccion-admin');
-            const seccionReportes = document.getElementById('nav-seccion-reportes');
-            
-            if (seccionAdmin) seccionAdmin.style.display = 'block';
-            if (seccionReportes) seccionReportes.style.display = 'block';
+    // 1. LIMPIAR: Mostrar todo por defecto (Para Privilegio 2 y Admin)
+    document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = '');
+    document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
+
+    // 2. APLICAR REGLAS SOLO PARA PRIVILEGIO 1 (Trabajador)
+    if (privilegio === '1') {
+        // Ocultar la sección de Reportes por completo
+        const seccionReportes = document.getElementById('nav-seccion-reportes');
+        if (seccionReportes) seccionReportes.style.display = 'none';
+
+        // Enlaces específicos que NO debe ver
+        const enlacesOcultar = [
+            'orden_de_servicio.html',
+            'aprobacion.html',
+            'facturacion.html'
+        ];
+
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (enlacesOcultar.includes(href)) {
+                link.style.display = 'none'; // Oculta el enlace
+            }
+        });
+        
+        // Restaurar el título de Administración por si estaba modificado
+        const seccionAdmin = document.getElementById('nav-seccion-admin');
+        if (seccionAdmin) {
+            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
+            if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
         }
     }
-
+}
     async function cargarDatosDashboard() {
         try {
             let query = db.collection("tickets_mantenimiento");
