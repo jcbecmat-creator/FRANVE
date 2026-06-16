@@ -416,29 +416,7 @@
         </div>
     </div>
 
-    <div id="modalLecturaCP">
-        <div class="modal-card-cp">
-            <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; background: #fff;">
-                <div><h2 style="margin: 0; font-size: 18px; color: #111827; font-weight: 800;">Confirmación Operativa</h2></div>
-                <button onclick="cerrarModalCP()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #6b7280;">&times;</button>
-            </div>
-            <div class="modal-body" style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="user"></i>Nombre Evaluador</label><div class="eval-input-wrapper"><input type="text" id="cp-nombre" class="eval-input-control" readonly></div></div>
-                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="id-card"></i>Número Empleado</label><div class="eval-input-wrapper"><input type="text" id="cp-numero" class="eval-input-control" readonly></div></div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="briefcase"></i>Cargo</label><div class="eval-input-wrapper"><input type="text" id="cp-cargo" class="eval-input-control" readonly></div></div>
-                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="star"></i>Nivel de Servicio</label><div class="eval-input-wrapper"><input type="text" id="cp-nivel" class="eval-input-control" readonly></div></div>
-                </div>
-                <div class="eval-field-group"><label class="eval-label"><i data-lucide="message-square"></i>Comentario</label><div class="eval-input-wrapper"><textarea id="cp-comentario" class="eval-input-control" readonly></textarea></div></div>
-            </div>
-            <div class="modal-footer" style="padding: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; background: #f9fafb;">
-                <button onclick="cerrarModalCP()" style="background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; padding: 0 24px; font-weight: 600; border-radius: 8px; cursor: pointer;">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- ELEMENTOS ADICIONALES Y MODALES (Parte 2) -->
     <div class="upload-bottom-bar" id="delete-draft-bar">
         <div class="up-info"><span>SELECCIÓN ACTUAL</span><span style="display: flex; align-items: center; gap: 8px;"><strong id="lbl-draft-count">0 folios</strong></span></div>
         <button class="btn-limpiar" onclick="limpiarSeleccionBorradores()"><i data-lucide="x-circle" style="width: 16px;"></i> Cancelar</button>
@@ -483,6 +461,29 @@
         <div id="countdown-number">13</div>
         <h2 style="margin: 0 0 10px 0; color: white;">Procesando Orden</h2>
         <p id="countdown-text">Estamos preparando tus evidencias fotográficas para el PDF. Por favor, no cierres esta pantalla.</p>
+    </div>
+
+    <div id="modalLecturaCP">
+        <div class="modal-card-cp">
+            <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; background: #fff;">
+                <div><h2 style="margin: 0; font-size: 18px; color: #111827; font-weight: 800;">Confirmación Operativa</h2></div>
+                <button onclick="cerrarModalCP()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #6b7280;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="user"></i>Nombre Evaluador</label><div class="eval-input-wrapper"><input type="text" id="cp-nombre" class="eval-input-control" readonly></div></div>
+                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="id-card"></i>Número Empleado</label><div class="eval-input-wrapper"><input type="text" id="cp-numero" class="eval-input-control" readonly></div></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="briefcase"></i>Cargo</label><div class="eval-input-wrapper"><input type="text" id="cp-cargo" class="eval-input-control" readonly></div></div>
+                    <div class="eval-field-group"><label class="eval-label"><i data-lucide="star"></i>Nivel de Servicio</label><div class="eval-input-wrapper"><input type="text" id="cp-nivel" class="eval-input-control" readonly></div></div>
+                </div>
+                <div class="eval-field-group"><label class="eval-label"><i data-lucide="message-square"></i>Comentario</label><div class="eval-input-wrapper"><textarea id="cp-comentario" class="eval-input-control" readonly></textarea></div></div>
+            </div>
+            <div class="modal-footer" style="padding: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; background: #f9fafb;">
+                <button onclick="cerrarModalCP()" style="background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; height: 44px; padding: 0 24px; font-weight: 600; border-radius: 8px; cursor: pointer;">Cerrar</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -801,6 +802,9 @@
                 document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'block'; lucide.createIcons();
                 if(window.appData.privilegio == 2 || window.appData.privilegio == "2") { document.getElementById('nav-preventivo').style.display = 'none'; document.getElementById('nav-seccion-admin').style.display = 'none'; document.getElementById('nav-seccion-reportes').style.display = 'none'; }
                 inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
+                
+                // LLAMAR A LA FUNCIÓN DE PERMISOS AQUÍ
+                configurarPermisosMenu();
             }
         });
 
@@ -846,45 +850,49 @@
         function limpiarFirma(id) { if(ctxFirma) ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); document.getElementById(id+'_data').value = ''; }
         function dataURItoBlob(dataURI) { if(!dataURI) return null; const byteString = atob(dataURI.split(',')[1]); const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); return new Blob([ab], {type: mimeString}); }
         function cerrarSesionGlobal() { showConfirm("Cerrar Sesión", "¿Seguro que quieres cerrar sesión?", function() { sessionStorage.clear(); window.location.reload(); }); }
-    </script>
 
-    function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession');
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr);
-    const privilegio = String(appData.privilegio); // Convertir a string por seguridad
+        // ==========================================
+        // FUNCIÓN DE PERMISOS (CORREGIDA Y MOVIDA AQUÍ)
+        // ==========================================
+        function configurarPermisosMenu() {
+            const appDataStr = sessionStorage.getItem('loginSession');
+            if (!appDataStr) return;
+            
+            const appData = JSON.parse(appDataStr);
+            const privilegio = String(appData.privilegio); // Convertir a string por seguridad
 
-    // Si es Privilegio 1 (Trabajador/Proveedor)
-    if (privilegio === '1') {
-        // Ocultar enlaces específicos que no debe ver
-        const enlacesOcultar = [
-            'orden_de_servicio.html',
-            'confirmacion.html',
-            'aprobacion.html',
-            'facturacion.html'
-        ];
+            // Si es Privilegio 1 (Trabajador/Proveedor)
+            if (privilegio === '1') {
+                // Ocultar enlaces específicos que no debe ver
+                const enlacesOcultar = [
+                    'orden_de_servicio.html',
+                    'confirmacion.html',
+                    'aprobacion.html',
+                    'facturacion.html'
+                ];
 
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (enlacesOcultar.includes(href)) {
+                        link.style.display = 'none'; // Oculta el enlace
+                    }
+                });
+
+                // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
+                const seccionReportes = document.getElementById('nav-seccion-reportes');
+                if (seccionReportes) {
+                    const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
+                    if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
+                }
+                
+                // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
+                const seccionAdmin = document.getElementById('nav-seccion-admin');
+                if (seccionAdmin) {
+                    const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
+                    if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
+                }
             }
-        });
-
-        // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
-        const seccionReportes = document.getElementById('nav-seccion-reportes');
-        if (seccionReportes) {
-            const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
-            if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
         }
-        
-        // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
-        const seccionAdmin = document.getElementById('nav-seccion-admin');
-        if (seccionAdmin) {
-            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-            if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
-        }
-    }
-}</body>
+    </script>
+</body>
 </html>
