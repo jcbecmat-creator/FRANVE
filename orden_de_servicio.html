@@ -405,6 +405,7 @@
     let historialCompletoCargado = false; 
     let incidenciaSeleccionadaId = null;
 
+    // FUNCIÓN MEJORADA PARA PARSEAR CUALQUIER FORMATO DE FECHA
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
         if (fechaField && typeof fechaField.toDate === 'function') {
@@ -417,6 +418,11 @@
         }
         if (typeof fechaField === 'string') {
             if (fechaField.includes("Timestamp")) return "—";
+            // Intentar parsear strings ISO (ej. 2026-06-10T21:49:51.641Z)
+            const parsedDate = new Date(fechaField);
+            if (!isNaN(parsedDate.getTime())) {
+                return parsedDate.toLocaleDateString('es-MX') + ' ' + parsedDate.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
+            }
             return fechaField.replace(" a las ", " ").replace("a.m. UTC-6", "AM").replace("p.m. UTC-6", "PM");
         }
         return "—";
@@ -426,7 +432,11 @@
         if (!fechaField) return new Date(0); // Época por defecto para fechas vacías
         if (typeof fechaField.toDate === 'function') return fechaField.toDate();
         if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
-        return new Date(fechaField);
+        // Si es string ISO, new Date() lo puede parsear directo
+        const parsed = new Date(fechaField);
+        if (!isNaN(parsed.getTime())) return parsed;
+        
+        return new Date(0);
     }
 
     function toDatetimeLocal(fechaField) {
@@ -633,6 +643,12 @@
                 selectHtml += `<span class="rechazo-motivo-badge" title="${motivoRechazo}">Motivo: ${motivoRechazo}</span>`;
             }
 
+            // LÓGICA PARA MOSTRAR LA FECHA DE ASIGNACIÓN SOLO EN ENVIADOS Y RECHAZADOS
+            let fechaAsignacionHtml = '';
+            if ((tabActual === 'enviados' || tabActual === 'rechazados') && inc.fecha_asignacion) {
+                fechaAsignacionHtml = `<div style="font-size:10px; color:#64748B; margin-top:4px;">Asignado: ${formatearFecha(inc.fecha_asignacion)}</div>`;
+            }
+
             let btnHtml = `
                 <button id="btn-action-${idDoc}" class="btn-action-trigger" type="button" onclick="event.stopPropagation(); manejarAccionFila('${idDoc}')">
                     <i data-lucide="${btnIcon}" style="width:14px; height:14px;"></i>
@@ -656,7 +672,7 @@
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
                     ${selectHtml}
-                    ${inc.fecha_asignacion ? `<div style="font-size:10px; color:#64748B; margin-top:4px;">${formatearFecha(inc.fecha_asignacion)}</div>` : ''}
+                    ${fechaAsignacionHtml}
                 </td>
                 <td>${btnHtml}</td>
             `;
