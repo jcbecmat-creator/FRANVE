@@ -301,25 +301,25 @@
     </div>
 
 <script>
-    // Inicialización de Firebase con los nuevos datos de FRANVE
-        const firebaseConfig2 = {
-            apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
-            authDomain: "frave-4fbbf.firebaseapp.com",
-            projectId: "frave-4fbbf",
-            storageBucket: "frave-4fbbf.firebasestorage.app",
-            messagingSenderId: "687825589857",
-            appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
-        };
+    // Inicialización de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
+        authDomain: "frave-4fbbf.firebaseapp.com",
+        projectId: "frave-4fbbf",
+        storageBucket: "frave-4fbbf.firebasestorage.app",
+        messagingSenderId: "687825589857",
+        appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
+    };
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
 
     Chart.defaults.font.family = "'Inter', sans-serif";
     Chart.defaults.color = '#6b7280';
     
-    // Paleta de colores ajustada
+    // Paleta de colores
     const thColors = ['#81D0DC', '#f59e0b', '#2563eb', '#10b981', '#8b5cf6', '#111827', '#14b8a6', '#f43f5e'];
 
-    // Variables Globales para Interactividad
+    // Variables Globales
     let allTickets = [];
     let chartInstances = {};
     let activeFilters = {
@@ -329,7 +329,7 @@
         capex: null,
         mes: null,
         tipo: null,
-        kpi: null // Filtro para clics en tarjetas
+        kpi: null 
     };
 
     const kpiNames = {
@@ -342,37 +342,8 @@
         'fin_total': 'Total General'
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-        
-        const savedUser = sessionStorage.getItem('loginUser') || 'Usuario';
-        document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
-
-        const appDataStr = sessionStorage.getItem('loginSession');
-        if(appDataStr) {
-            window.appData = JSON.parse(appDataStr);
-            document.getElementById('welcome-username-display').innerText = window.appData.nombreProveedor || savedUser;
-            document.querySelector('.user-name').innerText = window.appData.nombreProveedor || savedUser;
-            
-            if(window.appData.privilegio == 2 || window.appData.privilegio == "2") {
-                document.getElementById('nav-seccion-admin').style.display = 'none';
-                document.getElementById('nav-seccion-reportes').style.display = 'none';
-            } else {
-                document.getElementById('nav-seccion-admin').style.display = 'block';
-                document.getElementById('nav-seccion-reportes').style.display = 'block';
-            }
-        }
-
-        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
-        toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar').classList.toggle('open')));
-        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
-
-        cargarDatosDashboard();
-    });
-
+    // === FUNCIONES AUXILIARES ===
     function formateaMoneda(valor) { return "$" + parseFloat(valor || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-
-    // Helpers de Extracción de Datos
     function getGrupoEstatus(t) {
         const est = t.estado_confirmacion || 'Nuevo';
         if (['Nuevo', 'Borrador', 'En proceso', 'Pendiente de Aprobación', 'Pendiente Gerencia'].includes(est)) return 'En Proceso';
@@ -386,13 +357,76 @@
     function getCapex(t) { return (t.calificacion_capex_opex || 'Sin asignar'); }
     function getTipo(t) { return (t.tipificacion_gasto || 'Sin asignar'); }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        
+        const savedUser = sessionStorage.getItem('loginUser') || 'Usuario';
+        document.getElementById('user-initial-header').innerText = savedUser.charAt(0).toUpperCase();
+
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if(appDataStr) {
+            window.appData = JSON.parse(appDataStr);
+            document.getElementById('welcome-username-display').innerText = window.appData.nombreProveedor || savedUser;
+            document.querySelector('.user-name').innerText = window.appData.nombreProveedor || savedUser;
+            
+            // AQUÍ SE LLAMA A LA FUNCIÓN DE PERMISOS
+            configurarPermisosMenu();
+        }
+
+        const toggles = document.querySelectorAll('[data-sidebar-toggle]');
+        toggles.forEach(t => t.addEventListener('click', () => document.querySelector('.app-sidebar').classList.toggle('open')));
+        document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.querySelector('.app-sidebar').classList.remove('open'));
+
+        cargarDatosDashboard();
+    });
+
+    // ==========================================
+    // FUNCIÓN CONFIGURAR PERMISOS MENU
+    // ==========================================
+    function configurarPermisosMenu() {
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if (!appDataStr) return;
+        
+        const appData = JSON.parse(appDataStr);
+        const privilegio = String(appData.privilegio); // Convertir a string por seguridad
+
+        // Si es Nivel 2 (Proveedor) - Ocultar Administración y Reportes
+        if (privilegio === '2') {
+            const seccionAdmin = document.getElementById('nav-seccion-admin');
+            const seccionReportes = document.getElementById('nav-seccion-reportes');
+            
+            if (seccionAdmin) seccionAdmin.style.display = 'none';
+            if (seccionReportes) seccionReportes.style.display = 'none';
+        } 
+        // Si es Nivel 1 (Trabajador) - Ocultar Administración y Reportes también usualmente
+        else if (privilegio === '1') {
+            const seccionAdmin = document.getElementById('nav-seccion-admin');
+            const seccionReportes = document.getElementById('nav-seccion-reportes');
+            
+            if (seccionAdmin) seccionAdmin.style.display = 'none';
+            if (seccionReportes) seccionReportes.style.display = 'none';
+        }
+        // Nivel Admin (default/otros) - Mostrar todo
+        else {
+            const seccionAdmin = document.getElementById('nav-seccion-admin');
+            const seccionReportes = document.getElementById('nav-seccion-reportes');
+            
+            if (seccionAdmin) seccionAdmin.style.display = 'block';
+            if (seccionReportes) seccionReportes.style.display = 'block';
+        }
+    }
+
     async function cargarDatosDashboard() {
         try {
             let query = db.collection("tickets_mantenimiento");
             
+            // FILTRO POR USUARIO
             if (window.appData && (window.appData.privilegio == 2 || window.appData.privilegio == "2")) {
                 query = query.where("proveedor", "==", window.appData.nombreProveedor);
             }
+            
+            // Ordenar y limitar
+            query = query.orderBy("fecha_creacion", "desc").limit(2000);
 
             const snapshot = await query.get();
             allTickets = [];
@@ -414,7 +448,6 @@
         aplicarFiltrosCruzados();
     }
 
-    // Lógica al dar clic en una tarjeta (KPI)
     function setFiltroKpi(kpiName) {
         document.querySelectorAll('.metric-card').forEach(c => {
             c.style.borderColor = '#e5e7eb';
@@ -445,7 +478,6 @@
 
     function aplicarFiltrosCruzados() {
         let filtrados = allTickets.filter(t => {
-            // Filtros de las gráficas
             if (activeFilters.estatus && getGrupoEstatus(t) !== activeFilters.estatus) return false;
             if (activeFilters.sucursal && getSucursal(t) !== activeFilters.sucursal) return false;
             if (activeFilters.proveedor && getProveedor(t) !== activeFilters.proveedor) return false;
@@ -453,7 +485,6 @@
             if (activeFilters.mes && getMes(t) !== activeFilters.mes) return false;
             if (activeFilters.tipo && getTipo(t) !== activeFilters.tipo) return false;
             
-            // Filtro si dieron clic en una tarjeta (KPI)
             if (activeFilters.kpi) {
                 const estGrupo = getGrupoEstatus(t);
                 const estRaw = t.estado_confirmacion;
@@ -510,7 +541,6 @@
             const estGrupo = getGrupoEstatus(t);
             const estRaw = t.estado_confirmacion;
 
-            // Fila 1
             top_total.c++; top_total.s += costo;
 
             if (estGrupo === 'Rechazados') {
@@ -523,7 +553,6 @@
                 top_pagado.c++; top_pagado.s += costo;
             }
 
-            // Fila 2
             if (estRaw === 'Costos Aprobados') {
                 fin_total.c++; fin_total.s += costo;
 
@@ -634,4 +663,4 @@
     }
 </script>
 </body>
-</html>,document_type:HTML,title:Inicio_Franve.html}
+</html>
