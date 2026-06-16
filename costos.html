@@ -354,7 +354,7 @@
 
 <script>
     // ==========================================
-    // 1. CONFIGURACIÓN DE FIREBASE (CORREGIDA PARA COINCIDIR CON CONFIRMACIÓN Y INDEX)
+    // 1. CONFIGURACIÓN DE FIREBASE
     // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
@@ -418,6 +418,7 @@
         document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
 
         cargarTodosLosTickets();
+        configurarPermisosMenu(); // <--- LLAMADA A LA FUNCIÓN CORREGIDA
     });
 
     // === CARGA Y CLASIFICACIÓN DE TICKETS ===
@@ -862,84 +863,46 @@
             lucide.createIcons();
         }
     }
+
+    function configurarPermisosMenu() {
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if (!appDataStr) return;
+        
+        const appData = JSON.parse(appDataStr);
+        const privilegio = String(appData.privilegio); // Convertir a string por seguridad
+
+        // Si es Privilegio 1 (Trabajador/Proveedor)
+        if (privilegio === '1') {
+            // Ocultar enlaces específicos que no debe ver
+            const enlacesOcultar = [
+                'orden_de_servicio.html',
+                'confirmacion.html',
+                'aprobacion.html',
+                'facturacion.html'
+            ];
+
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (enlacesOcultar.includes(href)) {
+                    link.style.display = 'none'; // Oculta el enlace
+                }
+            });
+
+            // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
+            const seccionReportes = document.getElementById('nav-seccion-reportes');
+            if (seccionReportes) {
+                const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
+                if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
+            }
+            
+            // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
+            const seccionAdmin = document.getElementById('nav-seccion-admin');
+            if (seccionAdmin) {
+                const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
+                if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
+            }
+        }
+    }
 </script>
-    function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession');
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr);
-    const privilegio = String(appData.privilegio); // Convertir a string por seguridad
-
-    // Si es Privilegio 1 (Trabajador/Proveedor)
-    if (privilegio === '1') {
-        // Ocultar enlaces específicos que no debe ver
-        const enlacesOcultar = [
-            'orden_de_servicio.html',
-            'confirmacion.html',
-            'aprobacion.html',
-            'facturacion.html'
-        ];
-
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
-            }
-        });
-
-        // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
-        const seccionReportes = document.getElementById('nav-seccion-reportes');
-        if (seccionReportes) {
-            const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
-            if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
-        }
-        
-        // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
-        const seccionAdmin = document.getElementById('nav-seccion-admin');
-        if (seccionAdmin) {
-            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-            if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
-        }
-    }
-}
-    function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession');
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr);
-    const privilegio = String(appData.privilegio); // Convertir a string por seguridad
-
-    // Si es Privilegio 1 (Trabajador/Proveedor)
-    if (privilegio === '1') {
-        // Ocultar enlaces específicos que no debe ver
-        const enlacesOcultar = [
-            'orden_de_servicio.html',
-            'confirmacion.html',
-            'aprobacion.html',
-            'facturacion.html'
-        ];
-
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
-            }
-        });
-
-        // Si la sección de Reportes solo tiene un enlace y está vacío, ocultar el título
-        const seccionReportes = document.getElementById('nav-seccion-reportes');
-        if (seccionReportes) {
-            const enlacesVisibles = seccionReportes.querySelectorAll('.sidebar-link:not([style*="display: none"])');
-            if (enlacesVisibles.length === 0) seccionReportes.style.display = 'none';
-        }
-        
-        // Si la sección de Administración se quedó vacía (solo queda Costos), podemos renombrar el título o dejarlo
-        const seccionAdmin = document.getElementById('nav-seccion-admin');
-        if (seccionAdmin) {
-            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-            if (tituloAdmin) tituloAdmin.innerText = "MI ADMINISTRACIÓN"; // Opcional: cambiar título
-        }
-    }
-}
 </body>
 </html>
