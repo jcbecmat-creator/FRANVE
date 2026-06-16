@@ -254,7 +254,6 @@
                                     <th>Tienda</th>
                                     <th>Código Equipo</th>
                                     <th>Instalación</th>
-                                    <!-- COLUMNA "Origen / Tipo" ELIMINADA DE AQUÍ -->
                                     <th>Fallo Reportado</th>
                                     <th>Observaciones</th>
                                     <th style="text-align: center;">Asignar Técnico / Usuario</th>
@@ -424,7 +423,7 @@
     }
 
     function parsearFechaFirebase(fechaField) {
-        if (!fechaField) return new Date(0);
+        if (!fechaField) return new Date(0); // Época por defecto para fechas vacías
         if (typeof fechaField.toDate === 'function') return fechaField.toDate();
         if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
         return new Date(fechaField);
@@ -467,7 +466,7 @@
             document.querySelector('[data-sidebar-close]')?.addEventListener('click', () => document.querySelector('.app-sidebar')?.classList.remove('open'));
         } catch (e) { console.warn("Error en eventos de menú"); }
 
-        configurarPermisosMenu(); // <--- LLAMADA A LA FUNCIÓN CORREGIDA
+        configurarPermisosMenu();
 
         cargarListaUsuarios().then(() => {
             cargarIncidenciasFirebase(false); 
@@ -609,10 +608,7 @@
             const idDoc = inc.id_documento;
             const codigoIncidencia = inc.incidencia || "—";
             const fechaRec = formatearFecha(inc.fechaRecepcion);
-            
-            // CAMBIO: Tomar nombre de DATOS DEL RESTAURANTE
             const tienda = inc.restaurante_nombre || inc.tienda || inc.usuario || "—";
-            
             const codigoEq = inc.codigoEquipo || "—";
             const instalacion = inc.instalacion || "—";
             const fallos = inc.fallos || "—";
@@ -656,7 +652,6 @@
                 <td style="text-align: left;">${tienda}</td>
                 <td><span class="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">${codigoEq}</span></td>
                 <td>${instalacion}</td>
-                <!-- COLUMNA ORIGEN/TIPO ELIMINADA DE AQUÍ -->
                 <td style="text-align: left; max-width: 230px;" title="${fallos}">${fallos}</td>
                 <td style="text-align: left; max-width: 250px; color: #64748b;" title="${obs}">${obs}</td>
                 <td>
@@ -754,7 +749,7 @@
     }
 
     // ==========================================
-    // LÓGICA DE FILTRADO
+    // LÓGICA DE FILTRADO Y ORDENAMIENTO
     // ==========================================
     function filtrarIncidencias() {
         ejecutarFiltradoLogico();
@@ -793,6 +788,14 @@
 
             return true;
         });
+
+        // === ORDENAMIENTO DESCENDENTE POR FECHA RECEPCIÓN (MÁS RECIENTE PRIMERO) ===
+        listaFiltrada.sort((a, b) => {
+            const fechaA = parsearFechaFirebase(a.fechaRecepcion);
+            const fechaB = parsearFechaFirebase(b.fechaRecepcion);
+            return fechaB - fechaA; // Descendente
+        });
+        // =======================================================================
 
         renderizarTabla(listaFiltrada);
     }
@@ -933,7 +936,6 @@
             
             await db.collection("incidencias").doc(idDoc).update(updateData);
             
-            // Actualizar arreglo local también
             const index = incidenciasGlobales.findIndex(i => i.id_documento === idDoc);
             if (index !== -1) {
                 Object.assign(incidenciasGlobales[index], updateData);
@@ -967,11 +969,9 @@ function configurarPermisosMenu() {
 
     // 2. APLICAR REGLAS SOLO PARA PRIVILEGIO 1 (Trabajador)
     if (privilegio === '1') {
-        // Ocultar la sección de Reportes por completo
         const seccionReportes = document.getElementById('nav-seccion-reportes');
         if (seccionReportes) seccionReportes.style.display = 'none';
 
-        // Enlaces específicos que NO debe ver
         const enlacesOcultar = [
             'orden_de_servicio.html',
             'aprobacion.html',
@@ -981,11 +981,10 @@ function configurarPermisosMenu() {
         document.querySelectorAll('.sidebar-link').forEach(link => {
             const href = link.getAttribute('href');
             if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
+                link.style.display = 'none';
             }
         });
         
-        // Restaurar el título de Administración por si estaba modificado
         const seccionAdmin = document.getElementById('nav-seccion-admin');
         if (seccionAdmin) {
             const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
