@@ -800,7 +800,6 @@
                 const listaSuc = document.getElementById('sucursales-list'); listaSuc.innerHTML = ''; if(window.appData.sucursales) window.appData.sucursales.forEach(s => { let opt = document.createElement('option'); opt.value = s.nombre; listaSuc.appendChild(opt); });
                 const listaTec = document.getElementById('tecnicos-list'); listaTec.innerHTML = ''; if(window.appData.tecnicos) window.appData.tecnicos.forEach(t => { let opt = document.createElement('option'); opt.value = t; listaTec.appendChild(opt); });
                 document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'block'; lucide.createIcons();
-                if(window.appData.privilegio == 2 || window.appData.privilegio == "2") { document.getElementById('nav-preventivo').style.display = 'none'; document.getElementById('nav-seccion-admin').style.display = 'none'; document.getElementById('nav-seccion-reportes').style.display = 'none'; }
                 inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
                 
                 // LLAMAR A LA FUNCIÓN DE PERMISOS AQUÍ
