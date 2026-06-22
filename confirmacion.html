@@ -145,7 +145,7 @@
         select.eval-input-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
 
         .signature-pad-container { background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 8px; width: 100%; height: 150px; position: relative; cursor: crosshair; touch-action: none; overflow: hidden; }
-        .firma-canvas { width: 100%; height: 100%; }
+        .firma-canvas { width: 100%; height: 100%; display: block; }
 
         #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -344,6 +344,7 @@
                                 <option value="">Selecciona un nombre...</option>
                                 <option value="FRANCISCO VELASCO VALDIVIA">FRANCISCO VELASCO VALDIVIA</option>
                                 <option value="JORGE ALBERTO ANGEL">JORGE ALBERTO ANGEL</option>
+                                <option value="GENSY SOFIA VIVANCO AGUILAR">GENSY SOFIA VIVANCO AGUILAR</option>
                             </select>
                         </div>
                     </div>
@@ -433,7 +434,7 @@
 
     let ticketsGlobales = []; 
     let tabActual = 'En proceso'; 
-    let signaturePadInstance;
+    let signaturePadInstance = null;
 
     // ==========================================
     // 2. ALERTAS PERSONALIZADAS
@@ -457,7 +458,10 @@
         alertBox.style.display = 'flex';
         lucide.createIcons();
     }
-    function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+    
+    function closeCustomAlert() { 
+        document.getElementById('custom-alert').style.display = 'none'; 
+    }
 
     // ==========================================
     // 3. LÓGICA DE NOMBRE Y CARGO
@@ -466,13 +470,13 @@
         const nombreSeleccionado = document.getElementById('eval-nombre').value;
         const cargoInput = document.getElementById('eval-cargo');
         
-        if (nombreSeleccionado === 'FRANCISCO VELASCO VALDIVIA') {
-            cargoInput.value = 'ADMINISTRADOR GENERAL';
-        } else if (nombreSeleccionado === 'JORGE ALBERTO ANGEL') {
-            cargoInput.value = 'LIDER DE PROYECTO';
-        } else {
-            cargoInput.value = '';
-        }
+        const cargos = {
+            'FRANCISCO VELASCO VALDIVIA': 'ADMINISTRADOR GENERAL',
+            'JORGE ALBERTO ANGEL': 'LIDER DE PROYECTO',
+            'GENSY SOFIA VIVANCO AGUILAR': 'ADMINISTRACION CONTABLE'
+        };
+        
+        cargoInput.value = cargos[nombreSeleccionado] || '';
     }
 
     // ==========================================
@@ -503,6 +507,14 @@
 
         if (window.lucide) { lucide.createIcons(); }
 
+        // Evento resize para la firma - solo cuando el modal está abierto
+        window.addEventListener('resize', function() {
+            const modal = document.getElementById('modalEvaluacion');
+            if (modal && modal.classList.contains('active')) {
+                resizeFirmaCanvas();
+            }
+        });
+
         const userMenu = document.querySelector('[data-user-menu]');
         if (userMenu) {
             const trigger = userMenu.querySelector('[data-user-trigger]');
@@ -526,7 +538,7 @@
 
         inicializarFirmaModal();
         cargarTodosLosTickets(); 
-        configurarPermisosMenu(); // <--- LLAMADA A LA FUNCIÓN CORREGIDA
+        configurarPermisosMenu();
     });
 
     // ==========================================
@@ -715,21 +727,47 @@
     }
     
     // ==========================================
-    // 8. LÓGICA DEL MODAL Y FIRMA
+    // 8. LÓGICA DEL MODAL Y FIRMA (CORREGIDA)
     // ==========================================
     function inicializarFirmaModal() {
         const canvas = document.getElementById("eval-firma-canvas");
         if(canvas) {
-            signaturePadInstance = new SignaturePad(canvas, { backgroundColor: "rgb(255,255,255)" });
-            function resizeCanvas() {
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = canvas.offsetWidth * ratio;
-                canvas.height = canvas.offsetHeight * ratio;
-                canvas.getContext("2d").scale(ratio, ratio);
+            signaturePadInstance = new SignaturePad(canvas, { 
+                backgroundColor: "rgb(255,255,255)",
+                penColor: "rgb(0, 0, 0)"
+            });
+        }
+    }
+
+    function resizeFirmaCanvas() {
+        const canvas = document.getElementById("eval-firma-canvas");
+        if (!canvas || !signaturePadInstance) return;
+        
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const container = canvas.parentElement;
+        
+        // Guardar datos actuales de la firma si los hay
+        let savedData = [];
+        try {
+            savedData = signaturePadInstance.toData();
+        } catch(e) {
+            console.log("No hay datos previos de firma");
+        }
+        
+        // Redimensionar el canvas
+        canvas.width = container.offsetWidth * ratio;
+        canvas.height = container.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        
+        // Restaurar datos si los hay
+        if (savedData && savedData.length > 0) {
+            try {
+                signaturePadInstance.fromData(savedData);
+            } catch(e) {
                 signaturePadInstance.clear();
             }
-            window.onresize = resizeCanvas;
-            resizeCanvas();
+        } else {
+            signaturePadInstance.clear();
         }
     }
 
@@ -749,7 +787,8 @@
             maxIcon.style.display = 'block';
             minIcon.style.display = 'none';
         }
-        setTimeout(() => { if(signaturePadInstance) { window.dispatchEvent(new Event('resize')); } }, 300);
+        // Esperar a que la animación termine para redimensionar el canvas
+        setTimeout(resizeFirmaCanvas, 350);
     }
 
     function abrirModalEvaluacion(folio, isReadOnly = false) {
@@ -768,20 +807,33 @@
 
         const inputs = document.querySelectorAll('#modalEvaluacion .eval-input-control');
         inputs.forEach(input => {
-            if (isReadOnly) { input.setAttribute('disabled', 'true'); } 
-            else { input.removeAttribute('disabled'); }
+            if (isReadOnly) { 
+                input.setAttribute('disabled', 'true'); 
+            } else { 
+                input.removeAttribute('disabled'); 
+            }
         });
 
         document.getElementById('btn-enviar-eval').style.display = isReadOnly ? 'none' : 'inline-flex';
         
-        if(signaturePadInstance) {
-            signaturePadInstance.on(); 
-            if(isReadOnly) signaturePadInstance.off();
-            signaturePadInstance.clear();
-        }
-
+        // PRIMERO: Mostrar el modal
         document.getElementById('modalEvaluacion').classList.add('active');
-        lucide.createIcons();
+        
+        // LUEGO: Redimensionar y configurar la firma DESPUÉS de que el modal sea visible
+        setTimeout(() => {
+            resizeFirmaCanvas();
+            
+            if(signaturePadInstance) {
+                signaturePadInstance.clear();
+                if(isReadOnly) {
+                    signaturePadInstance.off();
+                } else {
+                    signaturePadInstance.on();
+                }
+            }
+            
+            lucide.createIcons();
+        }, 150);
     }
 
     function cerrarModal() {
@@ -808,7 +860,13 @@
 
         try {
             const firmaDataUrl = signaturePadInstance.isEmpty() ? null : signaturePadInstance.toDataURL();
-            let urlFirma = ticket.eval_firma_url || null;
+            let urlFirma = null;
+            
+            // Obtener la firma existente del ticket si no hay nueva
+            const ticket = window.ticketsPendientes[folio];
+            if (ticket) {
+                urlFirma = ticket.eval_firma_url || null;
+            }
 
             if (firmaDataUrl) {
                 const storageRef = storage.ref();
@@ -856,45 +914,48 @@
         }
     }
 
-function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession');
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr);
-    const privilegio = String(appData.privilegio); 
-
-    // 1. LIMPIAR: Mostrar todo por defecto (Para Privilegio 2 y Admin)
-    document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = '');
-    document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
-
-    // 2. APLICAR REGLAS SOLO PARA PRIVILEGIO 1 (Trabajador)
-    if (privilegio === '1') {
-        // Ocultar la sección de Reportes por completo
-        const seccionReportes = document.getElementById('nav-seccion-reportes');
-        if (seccionReportes) seccionReportes.style.display = 'none';
-
-        // Enlaces específicos que NO debe ver
-        const enlacesOcultar = [
-            'orden_de_servicio.html',
-            'aprobacion.html',
-            'facturacion.html'
-        ];
-
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (enlacesOcultar.includes(href)) {
-                link.style.display = 'none'; // Oculta el enlace
-            }
-        });
+    // ==========================================
+    // 10. CONFIGURAR PERMISOS DEL MENÚ
+    // ==========================================
+    function configurarPermisosMenu() {
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if (!appDataStr) return;
         
-        // Restaurar el título de Administración por si estaba modificado
-        const seccionAdmin = document.getElementById('nav-seccion-admin');
-        if (seccionAdmin) {
-            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-            if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
+        const appData = JSON.parse(appDataStr);
+        const privilegio = String(appData.privilegio); 
+
+        // 1. LIMPIAR: Mostrar todo por defecto (Para Privilegio 2 y Admin)
+        document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = '');
+        document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
+
+        // 2. APLICAR REGLAS SOLO PARA PRIVILEGIO 1 (Trabajador)
+        if (privilegio === '1') {
+            // Ocultar la sección de Reportes por completo
+            const seccionReportes = document.getElementById('nav-seccion-reportes');
+            if (seccionReportes) seccionReportes.style.display = 'none';
+
+            // Enlaces específicos que NO debe ver
+            const enlacesOcultar = [
+                'orden_de_servicio.html',
+                'aprobacion.html',
+                'facturacion.html'
+            ];
+
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (enlacesOcultar.includes(href)) {
+                    link.style.display = 'none'; // Oculta el enlace
+                }
+            });
+            
+            // Restaurar el título de Administración por si estaba modificado
+            const seccionAdmin = document.getElementById('nav-seccion-admin');
+            if (seccionAdmin) {
+                const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
+                if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
+            }
         }
     }
-}
 </script>
 </body>
 </html>
