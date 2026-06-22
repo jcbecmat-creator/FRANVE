@@ -320,15 +320,27 @@
                             <div class="form-card">
                                 <h3 class="section-title"><i data-lucide="alert-triangle"></i> Descripción de la falla</h3>
                                 <div class="form-group" style="margin-bottom: 15px;"><textarea class="form-input" id="desc_falla" rows="3" placeholder="Describe detalladamente la falla reportada..."></textarea></div>
-                                <label style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; display: block;">Evidencia Fotográfica (Falla - Máx 3)</label>
+                                <label style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; display: block;">Evidencia Fotográfica (Falla - Máx 1)</label>
                                 <div class="photo-controls">
                                     <button type="button" class="btn-photo" onclick="triggerCamera('falla')"><i data-lucide="camera"></i> Toma Foto</button>
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('falla')"><i data-lucide="upload"></i> Subir Archivo</button>
                                 </div>
-                                <div id="photoGridFalla" class="photo-grid-slots">
+                                <div id="photoGridFalla" class="photo-grid-slots" style="grid-template-columns: repeat(1, 1fr); max-width: 200px;">
                                     <div class="photo-slot" id="slot-falla-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
-                                    <div class="photo-slot" id="slot-falla-1"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
-                                    <div class="photo-slot" id="slot-falla-2"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                </div>
+                            </div>
+
+                            <div class="form-card">
+                                <h3 class="section-title"><i data-lucide="settings"></i> Proceso</h3>
+                                <div class="form-group" style="margin-bottom: 15px;"><textarea class="form-input" id="desc_proceso" rows="3" placeholder="Describe el proceso realizado..."></textarea></div>
+                                <label style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; display: block;">Evidencia Fotográfica (Proceso - Máx 2)</label>
+                                <div class="photo-controls">
+                                    <button type="button" class="btn-photo" onclick="triggerCamera('proceso')"><i data-lucide="camera"></i> Toma Foto</button>
+                                    <button type="button" class="btn-photo-secondary" onclick="triggerFile('proceso')"><i data-lucide="upload"></i> Subir Archivo</button>
+                                </div>
+                                <div id="photoGridProceso" class="photo-grid-slots" style="grid-template-columns: repeat(2, 1fr); max-width: 400px;">
+                                    <div class="photo-slot" id="slot-proceso-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-proceso-1"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
                                 </div>
                             </div>
 
@@ -401,6 +413,26 @@
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('soporte')"><i data-lucide="upload"></i> Subir Archivo</button>
                                 </div>
                                 <div style="display: flex; justify-content: center; margin-top: 15px;"><div class="photo-slot" id="slot-soporte-0" style="width: 150px; height: 150px;"><i data-lucide="image" class="slot-placeholder-icon"></i></div></div>
+                            </div>
+
+                            <div class="form-card">
+                                <h3 class="section-title"><i data-lucide="images"></i> Evidencia fotográfica</h3>
+                                <label style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; display: block;">Evidencia Adicional (Máx 9)</label>
+                                <div class="photo-controls">
+                                    <button type="button" class="btn-photo" onclick="triggerCamera('evidencia')"><i data-lucide="camera"></i> Toma Foto</button>
+                                    <button type="button" class="btn-photo-secondary" onclick="triggerFile('evidencia')"><i data-lucide="upload"></i> Subir Archivo</button>
+                                </div>
+                                <div id="photoGridEvidencia" class="photo-grid-slots">
+                                    <div class="photo-slot" id="slot-evidencia-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-1"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-2"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-3"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-4"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-5"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-6"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-7"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                    <div class="photo-slot" id="slot-evidencia-8"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                </div>
                             </div>
 
                             <div style="height: 12px; background-color: #81D0DC; width: 100%; border-radius: 6px; margin-top: 35px; margin-bottom: 25px;"></div>
@@ -665,11 +697,26 @@
         // ==========================================
         // FORMULARIO
         // ==========================================
-        let fotos = { falla: [null, null, null], solucion: [null, null, null], soporte: [null], selfie: [null] };
+        let fotos = { 
+            falla: [null], 
+            proceso: [null, null], 
+            solucion: [null, null, null], 
+            soporte: [null], 
+            selfie: [null], 
+            evidencia: [null, null, null, null, null, null, null, null, null] 
+        };
 
         function mostrarFormularioNuevaOrden() {
             document.getElementById('ordenMttoForm').reset(); document.getElementById('doc_id_actual').value = ''; document.getElementById('folio_mc').value = ''; document.getElementById('incidencia_doc_id').value = ''; document.getElementById('sucursal-details').style.display = 'none';
-            fotos = { falla: [null, null, null], solucion: [null, null, null], soporte: [null], selfie: [null] }; renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie'); limpiarFirma('firma_tecnico');
+            fotos = { 
+                falla: [null], 
+                proceso: [null, null], 
+                solucion: [null, null, null], 
+                soporte: [null], 
+                selfie: [null], 
+                evidencia: [null, null, null, null, null, null, null, null, null] 
+            }; 
+            renderSlots('falla'); renderSlots('proceso'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie'); renderSlots('evidencia'); limpiarFirma('firma_tecnico');
             if(window.appData) { document.getElementById('nombre_tecnico').value = window.appData.nombreUsuario || ''; document.getElementById('celular_tecnico').value = window.appData.telefonoUsuario || ''; }
         }
 
@@ -680,9 +727,19 @@
             document.getElementById('sucursal-input').value = o.sucursal || ''; document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
             document.getElementById('area-input').value = o.area || ''; document.getElementById('subarea-select').value = o.subarea || ''; document.getElementById('desc_falla').value = o.desc_falla || '';
             document.getElementById('desc_solucion').value = o.desc_solucion || ''; document.getElementById('nombre_tecnico').value = o.tec_nombre || ''; document.getElementById('celular_tecnico').value = o.tec_celular || ''; document.getElementById('comentario_salida').value = o.comentario || '';
-            fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null, null, null]; fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
-            while(fotos.falla.length < 3) fotos.falla.push(null); while(fotos.solucion.length < 3) fotos.solucion.push(null);
-            renderSlots('falla'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie');
+            
+            fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null]; 
+            fotos.proceso = o.urls_proceso && o.urls_proceso.length ? [...o.urls_proceso] : [null, null]; 
+            fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; 
+            fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; 
+            fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
+            fotos.evidencia = o.urls_evidencia && o.urls_evidencia.length ? [...o.urls_evidencia] : [null, null, null, null, null, null, null, null, null];
+            
+            while(fotos.proceso.length < 2) fotos.proceso.push(null); 
+            while(fotos.solucion.length < 3) fotos.solucion.push(null);
+            while(fotos.evidencia.length < 9) fotos.evidencia.push(null);
+            
+            renderSlots('falla'); renderSlots('proceso'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie'); renderSlots('evidencia');
             if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
         }
 
@@ -722,7 +779,7 @@
             try {
                 if (!folioActual) { folioActual = await obtenerFolioGlobal(); document.getElementById('folio_mc').value = folioActual; }
                 
-                let urlsFalla = [], urlsSolucion = []; 
+                let urlsFalla = [], urlsProceso = [], urlsSolucion = [], urlsEvidencia = []; 
                 let urlSoporte = null, urlSelfie = null, urlFirma = null;
                 
                 const checkAndUpload = async (fileData, path) => { 
@@ -735,7 +792,9 @@
                 };
                 
                 for(let i=0; i<fotos.falla.length; i++) { if(fotos.falla[i]) urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`)); }
+                for(let i=0; i<fotos.proceso.length; i++) { if(fotos.proceso[i]) urlsProceso.push(await checkAndUpload(fotos.proceso[i], `ordenes/${folioActual}/proceso_${i}_${Date.now()}.jpg`)); }
                 for(let i=0; i<fotos.solucion.length; i++) { if(fotos.solucion[i]) urlsSolucion.push(await checkAndUpload(fotos.solucion[i], `ordenes/${folioActual}/solucion_${i}_${Date.now()}.jpg`)); }
+                for(let i=0; i<fotos.evidencia.length; i++) { if(fotos.evidencia[i]) urlsEvidencia.push(await checkAndUpload(fotos.evidencia[i], `ordenes/${folioActual}/evidencia_${i}_${Date.now()}.jpg`)); }
                 urlSoporte = await checkAndUpload(fotos.soporte[0], `ordenes/${folioActual}/soporte_${Date.now()}.jpg`); 
                 urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`); 
                 urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
@@ -771,7 +830,9 @@
                     fecha_hora_completa: new Date().toISOString(), 
                     estado_confirmacion: estadoFinal, 
                     urls_falla: urlsFalla, 
+                    urls_proceso: urlsProceso, 
                     urls_solucion: urlsSolucion, 
+                    urls_evidencia: urlsEvidencia,
                     url_soporte: urlSoporte, 
                     url_selfie: urlSelfie, 
                     url_firma: urlFirma 
@@ -813,7 +874,18 @@
             }
         }
 
-        function verPDFOrden(id_doc) { const t = misOrdenes.find(x => x.id_doc === id_doc); if(!t) return; const datosParaPDF = { sucursal: t.sucursal, suc_dir: t.suc_dir, suc_col: t.suc_col, suc_city: t.suc_city, suc_cp: t.suc_cp, suc_tel: t.suc_tel, suc_mail: t.suc_mail, ticket: t.id_ticket, incidencia: t.id_incidencia, area: t.area, subarea: t.subarea, desc_falla: t.desc_falla, fotos_falla: t.urls_falla, desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, prov_nombre: t.prov_nombre, prov_rfc: t.prov_rfc, prov_dir: t.prov_dir, prov_cont: t.prov_cont, prov_tel: t.prov_tel, prov_mail: t.prov_mail, tec_nombre: t.tec_nombre, tec_celular: t.tec_celular, comentario: t.comentario, firma: t.url_firma, foto_soporte: t.url_soporte, foto_selfie: t.url_selfie, fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '') }; sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF)); window.open('index2.html', '_blank'); }
+        function verPDFOrden(id_doc) { 
+            const t = misOrdenes.find(x => x.id_doc === id_doc); if(!t) return; 
+            const datosParaPDF = { 
+                sucursal: t.sucursal, suc_dir: t.suc_dir, suc_col: t.suc_col, suc_city: t.suc_city, suc_cp: t.suc_cp, suc_tel: t.suc_tel, suc_mail: t.suc_mail, 
+                ticket: t.id_ticket, incidencia: t.id_incidencia, area: t.area, subarea: t.subarea, desc_falla: t.desc_falla, fotos_falla: t.urls_falla, 
+                desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, 
+                prov_nombre: t.prov_nombre, prov_rfc: t.prov_rfc, prov_dir: t.prov_dir, prov_cont: t.prov_cont, prov_tel: t.prov_tel, prov_mail: t.prov_mail, 
+                tec_nombre: t.tec_nombre, tec_celular: t.tec_celular, comentario: t.comentario, firma: t.url_firma, foto_soporte: t.url_soporte, foto_selfie: t.url_selfie, 
+                fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '')
+            }; 
+            sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF)); window.open('index2.html', '_blank'); 
+        }
 
         function abrirModalLecturaCP(id_doc) { const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; document.getElementById('cp-nombre').value = o.evaluacion_nombre || 'N/A'; document.getElementById('cp-numero').value = o.evaluacion_numero || 'N/A'; document.getElementById('cp-cargo').value = o.evaluacion_cargo || 'N/A'; document.getElementById('cp-nivel').value = o.evaluacion_nivel || 'N/A'; document.getElementById('cp-comentario').value = o.evaluacion_comentario || 'N/A'; document.getElementById('modalLecturaCP').classList.add('show-modal'); lucide.createIcons(); }
         function cerrarModalCP() { document.getElementById('modalLecturaCP').classList.remove('show-modal'); }
