@@ -331,7 +331,6 @@
 
                             <div class="form-card">
                                 <h3 class="section-title"><i data-lucide="settings"></i> Proceso</h3>
-                                <div class="form-group" style="margin-bottom: 15px;"><textarea class="form-input" id="desc_proceso" rows="3" placeholder="Describe el proceso realizado..."></textarea></div>
                                 <label style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; margin-bottom: 10px; display: block;">Evidencia Fotográfica (Proceso - Máx 2)</label>
                                 <div class="photo-controls">
                                     <button type="button" class="btn-photo" onclick="triggerCamera('proceso')"><i data-lucide="camera"></i> Toma Foto</button>
@@ -490,7 +489,6 @@
         </div>
     </div>
 
-    <!-- OVERLAY DE CONTEO REGRESIVO -->
     <div id="countdown-overlay">
         <div class="spinner-loader"></div>
         <div id="countdown-number">13</div>
@@ -828,6 +826,7 @@
             const datosParaPDF = { 
                 sucursal: t.sucursal, suc_dir: t.suc_dir, suc_col: t.suc_col, suc_city: t.suc_city, suc_cp: t.suc_cp, suc_tel: t.suc_tel, suc_mail: t.suc_mail, 
                 ticket: t.id_ticket, incidencia: t.id_incidencia, area: t.area, subarea: t.subarea, desc_falla: t.desc_falla, fotos_falla: t.urls_falla, 
+                fotos_proceso: t.urls_proceso, 
                 desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, 
                 prov_nombre: t.prov_nombre, prov_rfc: t.prov_rfc, prov_dir: t.prov_dir, prov_cont: t.prov_cont, prov_tel: t.prov_tel, prov_mail: t.prov_mail, 
                 tec_nombre: t.tec_nombre, tec_celular: t.tec_celular, comentario: t.comentario, firma: t.url_firma, foto_soporte: t.url_soporte, foto_selfie: t.url_selfie, 
