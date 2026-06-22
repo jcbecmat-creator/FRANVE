@@ -142,7 +142,6 @@
         textarea.eval-input-control { height: auto; min-height: 80px; padding: 0.75rem 1rem; line-height: 1.5; resize: none; }
         .eval-input-control[readonly] { background-color: #e5e5e5; color: #4b5563; cursor: not-allowed; }
 
-        /* PANTALLA DE ESPERA PDF (CONTEO REGRESIVO) */
         #countdown-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(19, 21, 32, 0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; box-sizing: border-box; }
         #countdown-overlay.show { display: flex !important; }
         #countdown-number { font-size: 80px; font-weight: 900; color: #81D0DC; margin: 20px 0; line-height: 1; }
@@ -325,7 +324,7 @@
                                     <button type="button" class="btn-photo" onclick="triggerCamera('falla')"><i data-lucide="camera"></i> Toma Foto</button>
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('falla')"><i data-lucide="upload"></i> Subir Archivo</button>
                                 </div>
-                                <div id="photoGridFalla" class="photo-grid-slots" style="grid-template-columns: repeat(1, 1fr); max-width: 200px;">
+                                <div id="photoGridFalla" class="photo-grid-slots">
                                     <div class="photo-slot" id="slot-falla-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
                                 </div>
                             </div>
@@ -338,7 +337,7 @@
                                     <button type="button" class="btn-photo" onclick="triggerCamera('proceso')"><i data-lucide="camera"></i> Toma Foto</button>
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('proceso')"><i data-lucide="upload"></i> Subir Archivo</button>
                                 </div>
-                                <div id="photoGridProceso" class="photo-grid-slots" style="grid-template-columns: repeat(2, 1fr); max-width: 400px;">
+                                <div id="photoGridProceso" class="photo-grid-slots">
                                     <div class="photo-slot" id="slot-proceso-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
                                     <div class="photo-slot" id="slot-proceso-1"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
                                 </div>
@@ -391,7 +390,9 @@
                                     <button type="button" class="btn-photo" onclick="triggerCamera('selfie')"><i data-lucide="camera"></i> Toma Foto</button>
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('selfie')"><i data-lucide="upload"></i> Subir Archivo</button>
                                 </div>
-                                <div style="display: flex; justify-content: center; margin-top: 15px;"><div class="photo-slot" id="slot-selfie-0" style="width: 150px; height: 150px;"><i data-lucide="image" class="slot-placeholder-icon"></i></div></div>
+                                <div class="photo-grid-slots">
+                                    <div class="photo-slot" id="slot-selfie-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                </div>
                             </div>
 
                             <div class="form-card">
@@ -412,7 +413,9 @@
                                     <button type="button" class="btn-photo" onclick="triggerCamera('soporte')"><i data-lucide="camera"></i> Toma Foto</button>
                                     <button type="button" class="btn-photo-secondary" onclick="triggerFile('soporte')"><i data-lucide="upload"></i> Subir Archivo</button>
                                 </div>
-                                <div style="display: flex; justify-content: center; margin-top: 15px;"><div class="photo-slot" id="slot-soporte-0" style="width: 150px; height: 150px;"><i data-lucide="image" class="slot-placeholder-icon"></i></div></div>
+                                <div class="photo-grid-slots">
+                                    <div class="photo-slot" id="slot-soporte-0"><i data-lucide="image" class="slot-placeholder-icon"></i></div>
+                                </div>
                             </div>
 
                             <div class="form-card">
@@ -519,9 +522,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // 1. CONFIGURACIÓN - TODO EN FRAVE
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyBxvPZ9G5P8Xo9nYDamz1_EhP_R0hGxXuI",
             authDomain: "frave-4fbbf.firebaseapp.com",
@@ -539,11 +539,6 @@
         const storage = firebase.storage();
         const dbIncidencias = firebase.firestore();
 
-        console.log("=== VERIFICACIÓN - TODO EN FRAVE ===");
-        console.log("Firestore project:", db.app.options.projectId);
-        console.log("Storage bucket:", storage.ref().bucket);
-        console.log("=====================================");
-
         lucide.createIcons();
 
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGWGCHKQZFzMAZvaPjd7MXuW0n9hWLzg1-m7oXRzACeUGEzMl1s2ALDuvhIqcajQ/exec';
@@ -551,9 +546,6 @@
 
         let incidenciasPendientes = [];
 
-        // ==========================================
-        // ALERTAS Y CONFIRMACIONES
-        // ==========================================
         function showCustomAlert(title, message, isSuccess = true) {
             const alertBox = document.getElementById('custom-alert');
             document.getElementById('alert-title').innerText = title;
@@ -573,55 +565,18 @@
         function closeConfirm() { document.getElementById('custom-confirm').style.display = 'none'; }
         document.getElementById('confirm-btn-action').addEventListener('click', function() { closeConfirm(); if(confirmCallback) confirmCallback(); });
 
-        // ==========================================
-        // LÓGICA DE INCIDENCIAS (MODIFICADA PARA EVITAR DUPLICADOS)
-        // ==========================================
         async function cargarIncidenciasPendientes() {
-            if (!window.appData || !window.appData.nombreUsuario) { 
-                console.log("No hay usuario para buscar incidencias"); 
-                return; 
-            }
-
+            if (!window.appData || !window.appData.nombreUsuario) { return; }
             try {
-                // 1. OBTENER LAS INCIDENCIAS ASIGNADAS AL USUARIO
-                const snapInc = await dbIncidencias.collection("incidencias")
-                    .where("usuario_assigned", "==", window.appData.nombreUsuario).get();
-
-                // 2. OBTENER LAS ÓRDENES QUE EL USUARIO YA HA CREADO (BORRADOR O REALIZADO)
-                const snapOrd = await db.collection("tickets_mantenimiento")
-                    .where("proveedor", "==", window.appData.nombreProveedor).get();
-
-                // 3. CREAR UNA LISTA (SET) CON LOS IDs DE LAS INCIDENCIAS YA TRABAJADAS
+                const snapInc = await dbIncidencias.collection("incidencias").where("usuario_assigned", "==", window.appData.nombreUsuario).get();
+                const snapOrd = await db.collection("tickets_mantenimiento").where("proveedor", "==", window.appData.nombreProveedor).get();
                 const incidenciasUsadas = new Set();
-                snapOrd.forEach(doc => {
-                    const orden = doc.data();
-                    if (orden.id_incidencia_doc) {
-                        incidenciasUsadas.add(orden.id_incidencia_doc);
-                    }
-                });
-
-                // 4. LLENAR EL DATALIST OMITIENDO LAS QUE YA ESTÁN EN EL SET
+                snapOrd.forEach(doc => { const orden = doc.data(); if (orden.id_incidencia_doc) { incidenciasUsadas.add(orden.id_incidencia_doc); } });
                 incidenciasPendientes = [];
                 const listaInc = document.getElementById('incidencias-list');
                 listaInc.innerHTML = '';
-
-                snapInc.forEach((doc) => {
-                    const inc = doc.data();
-                    inc.id_documento = doc.id;
-
-                    if (!incidenciasUsadas.has(inc.id_documento)) {
-                        incidenciasPendientes.push(inc);
-                        let opt = document.createElement('option');
-                        opt.value = inc.incidencia || doc.id;
-                        listaInc.appendChild(opt);
-                    }
-                });
-
-                console.log(`Incidencias cargadas: ${incidenciasPendientes.length} (Filtradas para evitar duplicados)`);
-
-            } catch (err) {
-                console.error("Error al cargar incidencias pendientes", err);
-            }
+                snapInc.forEach((doc) => { const inc = doc.data(); inc.id_documento = doc.id; if (!incidenciasUsadas.has(inc.id_documento)) { incidenciasPendientes.push(inc); let opt = document.createElement('option'); opt.value = inc.incidencia || doc.id; listaInc.appendChild(opt); } });
+            } catch (err) { console.error("Error al cargar incidencias pendientes", err); }
         }
 
         document.getElementById('incidencia-input').addEventListener('input', function(e) {
@@ -639,9 +594,6 @@
             } else { document.getElementById('incidencia_doc_id').value = ''; }
         });
 
-        // ==========================================
-        // DASHBOARD Y TABS
-        // ==========================================
         let misOrdenes = [];
         let tabMttoActual = 'Nueva Orden';
 
@@ -694,9 +646,6 @@
 
         async function obtenerFolioGlobal() { const contadorRef = db.collection('metadata').doc('contadores'); return await db.runTransaction(async (transaction) => { const doc = await transaction.get(contadorRef); let nuevoNumero = (doc.exists && doc.data().mc_folio) ? doc.data().mc_folio + 1 : 1; transaction.set(contadorRef, { mc_folio: nuevoNumero }, { merge: true }); return `MC-${nuevoNumero.toString().padStart(4, '0')}`; }); }
 
-        // ==========================================
-        // FORMULARIO
-        // ==========================================
         let fotos = { 
             falla: [null], 
             proceso: [null, null], 
@@ -890,9 +839,6 @@
         function abrirModalLecturaCP(id_doc) { const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; document.getElementById('cp-nombre').value = o.evaluacion_nombre || 'N/A'; document.getElementById('cp-numero').value = o.evaluacion_numero || 'N/A'; document.getElementById('cp-cargo').value = o.evaluacion_cargo || 'N/A'; document.getElementById('cp-nivel').value = o.evaluacion_nivel || 'N/A'; document.getElementById('cp-comentario').value = o.evaluacion_comentario || 'N/A'; document.getElementById('modalLecturaCP').classList.add('show-modal'); lucide.createIcons(); }
         function cerrarModalCP() { document.getElementById('modalLecturaCP').classList.remove('show-modal'); }
 
-        // ==========================================
-        // LOGIN Y MENÚ
-        // ==========================================
         function togglePassword() { const p = document.getElementById('password'); const i = document.getElementById('toggleIcon'); if (p.type === 'password') { p.type = 'text'; i.textContent = 'visibility'; } else { p.type = 'password'; i.textContent = 'visibility_off'; } }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -933,8 +879,6 @@
         const userMenu = document.querySelector('[data-user-menu]');
         if (userMenu) { const trigger = userMenu.querySelector('[data-user-trigger]'); const dropdown = userMenu.querySelector('[data-user-dropdown]'); trigger.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('show'); }); document.addEventListener('click', (event) => { if (!userMenu.contains(event.target)) dropdown.classList.remove('show'); }); }
 
-        // ==========================================
-        // CÁMARA, FOTOS Y FIRMA
         let activeTarget = 'falla'; let currentFacingMode = 'environment';
         function triggerFile(target) { activeTarget = target; if(fotos[target].filter(f => f !== null).length < fotos[target].length) document.getElementById('fileInputGlobal').click(); else window.alert("Límite alcanzado."); }
         function processFile(input) { if (!input.files || input.files.length === 0) return; const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; const maxDim = 800; if(w > maxDim || h > maxDim) { if(w > h) { h = (h/w)*maxDim; w = maxDim; } else { w = (w/h)*maxDim; h = maxDim; } } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); const fotoComprimida = canvas.toDataURL('image/jpeg', 0.7); const slotVacio = fotos[activeTarget].findIndex(f => f === null); if(slotVacio > -1) { fotos[activeTarget][slotVacio] = fotoComprimida; renderSlots(activeTarget); } input.value = ''; }; img.src = e.target.result; }; reader.readAsDataURL(input.files[0]); }
@@ -954,13 +898,9 @@
         function dataURItoBlob(dataURI) { if(!dataURI) return null; const byteString = atob(dataURI.split(',')[1]); const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); return new Blob([ab], {type: mimeString}); }
         function cerrarSesionGlobal() { showConfirm("Cerrar Sesión", "¿Seguro que quieres cerrar sesión?", function() { sessionStorage.clear(); window.location.reload(); }); }
 
-        // ==========================================
-        // FUNCIÓN DE PERMISOS (CORREGIDA Y MOVIDA AQUÍ)
-        // ==========================================
         function configurarPermisosMenu() {
             const appDataStr = sessionStorage.getItem('loginSession');
             if (!appDataStr) return;
-            
             const appData = JSON.parse(appDataStr);
             const privilegio = String(appData.privilegio); 
 
@@ -970,25 +910,10 @@
             if (privilegio === '1') {
                 const seccionReportes = document.getElementById('nav-seccion-reportes');
                 if (seccionReportes) seccionReportes.style.display = 'none';
-
-                const enlacesOcultar = [
-                    'orden_de_servicio.html',
-                    'aprobacion.html',
-                    'facturacion.html'
-                ];
-
-                document.querySelectorAll('.sidebar-link').forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (enlacesOcultar.includes(href)) {
-                        link.style.display = 'none';
-                    }
-                });
-                
+                const enlacesOcultar = ['orden_de_servicio.html', 'aprobacion.html', 'facturacion.html'];
+                document.querySelectorAll('.sidebar-link').forEach(link => { const href = link.getAttribute('href'); if (enlacesOcultar.includes(href)) { link.style.display = 'none'; } });
                 const seccionAdmin = document.getElementById('nav-seccion-admin');
-                if (seccionAdmin) {
-                    const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title');
-                    if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
-                }
+                if (seccionAdmin) { const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title'); if (tituloAdmin) tituloAdmin.innerText = "Administración"; }
             }
         }
     </script>
