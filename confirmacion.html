@@ -146,6 +146,7 @@
 
         .signature-pad-container { background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 8px; width: 100%; height: 150px; position: relative; cursor: crosshair; touch-action: none; overflow: hidden; }
         .firma-canvas { width: 100%; height: 100%; display: block; }
+        .firma-imagen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 10px; background: #f3f4f6; border-radius: 6px; }
 
         #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -379,9 +380,10 @@
                 </div>
 
                 <div class="eval-field-group">
-                    <label class="eval-label"><i data-lucide="pen-tool"></i>Firma Táctil</label>
+                    <label class="eval-label"><i data-lucide="pen-tool"></i>Firma</label>
                     <div class="signature-pad-container">
                         <canvas id="eval-firma-canvas" class="firma-canvas"></canvas>
+                        <img id="eval-firma-imagen" class="firma-imagen" src="" alt="Firma guardada">
                     </div>
                     <div style="text-align: right; margin-top: 8px;">
                         <button type="button" id="btn-clear-firma" onclick="limpiarFirmaModal()" style="padding: 6px 12px; font-size: 13px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #d1d5db; background: white; color: #4b5563; cursor:pointer;">
@@ -511,7 +513,10 @@
         window.addEventListener('resize', function() {
             const modal = document.getElementById('modalEvaluacion');
             if (modal && modal.classList.contains('active')) {
-                resizeFirmaCanvas();
+                const canvas = document.getElementById("eval-firma-canvas");
+                if (canvas && canvas.style.display !== 'none') {
+                    resizeFirmaCanvas();
+                }
             }
         });
 
@@ -787,8 +792,14 @@
             maxIcon.style.display = 'block';
             minIcon.style.display = 'none';
         }
-        // Esperar a que la animación termine para redimensionar el canvas
-        setTimeout(resizeFirmaCanvas, 350);
+        // Esperar a que la animación termine
+        setTimeout(() => {
+            // Solo redimensionar si el canvas está visible (modo edición)
+            const canvas = document.getElementById("eval-firma-canvas");
+            if (canvas && canvas.style.display !== 'none') {
+                resizeFirmaCanvas();
+            }
+        }, 350);
     }
 
     function abrirModalEvaluacion(folio, isReadOnly = false) {
@@ -819,15 +830,52 @@
         // PRIMERO: Mostrar el modal
         document.getElementById('modalEvaluacion').classList.add('active');
         
-        // LUEGO: Redimensionar y configurar la firma DESPUÉS de que el modal sea visible
+        // LUEGO: Configurar la firma DESPUÉS de que el modal sea visible
         setTimeout(() => {
-            resizeFirmaCanvas();
+            const canvas = document.getElementById("eval-firma-canvas");
+            const imagenFirma = document.getElementById("eval-firma-imagen");
+            const btnLimpiar = document.getElementById("btn-clear-firma");
             
-            if(signaturePadInstance) {
-                signaturePadInstance.clear();
-                if(isReadOnly) {
-                    signaturePadInstance.off();
+            if (isReadOnly) {
+                // ============================================
+                // MODO LECTURA: Mostrar imagen de la firma guardada
+                // ============================================
+                
+                // Ocultar canvas y botón limpiar
+                canvas.style.display = 'none';
+                btnLimpiar.style.display = 'none';
+                
+                // Si hay firma guardada, mostrar la imagen
+                if (ticket.eval_firma_url) {
+                    imagenFirma.src = ticket.eval_firma_url;
+                    imagenFirma.style.display = 'block';
                 } else {
+                    // Si no hay firma, mostrar canvas vacío
+                    imagenFirma.style.display = 'none';
+                    canvas.style.display = 'block';
+                }
+                
+                // Desactivar la capacidad de firmar
+                if(signaturePadInstance) {
+                    signaturePadInstance.off();
+                }
+                
+            } else {
+                // ============================================
+                // MODO EDICIÓN: Mostrar canvas para firmar
+                // ============================================
+                
+                // Mostrar canvas y botón limpiar, ocultar imagen
+                canvas.style.display = 'block';
+                imagenFirma.style.display = 'none';
+                imagenFirma.src = '';
+                btnLimpiar.style.display = 'inline-flex';
+                
+                // Redimensionar y activar el canvas
+                resizeFirmaCanvas();
+                
+                if(signaturePadInstance) {
+                    signaturePadInstance.clear();
                     signaturePadInstance.on();
                 }
             }
@@ -837,6 +885,20 @@
     }
 
     function cerrarModal() {
+        // Restaurar los elementos de firma al estado original
+        const canvas = document.getElementById("eval-firma-canvas");
+        const imagenFirma = document.getElementById("eval-firma-imagen");
+        const btnLimpiar = document.getElementById("btn-clear-firma");
+        
+        // Asegurar que al cerrar, todo vuelva al estado de edición
+        if (canvas) canvas.style.display = 'block';
+        if (imagenFirma) {
+            imagenFirma.style.display = 'none';
+            imagenFirma.src = '';
+        }
+        if (btnLimpiar) btnLimpiar.style.display = 'inline-flex';
+        
+        // Cerrar el modal
         document.getElementById('modalEvaluacion').classList.remove('active');
         document.getElementById('modal-card-eval').classList.remove('maximized');
     }
