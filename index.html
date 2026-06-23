@@ -450,7 +450,6 @@
         </div>
     </div>
 
-    <!-- ELEMENTOS ADICIONALES Y MODALES (Parte 2) -->
     <div class="upload-bottom-bar" id="delete-draft-bar">
         <div class="up-info"><span>SELECCIÓN ACTUAL</span><span style="display: flex; align-items: center; gap: 8px;"><strong id="lbl-draft-count">0 folios</strong></span></div>
         <button class="btn-limpiar" onclick="limpiarSeleccionBorradores()"><i data-lucide="x-circle" style="width: 16px;"></i> Cancelar</button>
@@ -601,6 +600,18 @@
                 misOrdenes = []; querySnapshot.forEach((doc) => { misOrdenes.push({ id_doc: doc.id, ...doc.data() }); });
                 misOrdenes.sort((a, b) => (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""));
                 actualizarBadgesMtto(); if(tabMttoActual !== 'Nueva Orden') renderTablaMisOrdenes();
+                
+                // ══════════════════════════════════════════════════════════════
+                // NUEVO: Verificar si se viene de "Editar PDF" desde index2.html
+                // ══════════════════════════════════════════════════════════════
+                const editarId = sessionStorage.getItem('editarPDFId');
+                if (editarId) {
+                    sessionStorage.removeItem('editarPDFId');
+                    const orden = misOrdenes.find(o => o.id_ticket === editarId || o.id_incidencia === editarId || o.id_doc === editarId);
+                    if (orden) {
+                        setTimeout(() => { cargarBorrador(orden.id_doc); }, 500);
+                    }
+                }
             }).catch(err => console.error("Error al cargar órdenes", err));
         }
 
@@ -853,6 +864,19 @@
                 inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
                 
                 configurarPermisosMenu();
+
+                // ══════════════════════════════════════════════════════════════
+                // NUEVO: Escuchar mensaje desde index2.html (ventana emergente)
+                // ══════════════════════════════════════════════════════════════
+                window.addEventListener('message', function(event) {
+                    if (event.data && event.data.accion === 'editarOrden') {
+                        const ticketId = event.data.ticketId;
+                        const orden = misOrdenes.find(o => o.id_ticket === ticketId || o.id_incidencia === ticketId || o.id_doc === ticketId);
+                        if (orden) {
+                            cargarBorrador(orden.id_doc);
+                        }
+                    }
+                });
             }
         });
 
