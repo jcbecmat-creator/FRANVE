@@ -28,9 +28,6 @@
         .btn-cerrar { background-color: #4b5563 !important; color: white !important; }
         .btn-cerrar:hover { background-color: #374151 !important; }
 
-        /* ══════════════════════════════════════════════════════════════ */
-        /* NUEVO: Botón flotante rojo "Editar PDF"                       */
-        /* ══════════════════════════════════════════════════════════════ */
         .btn-editar-pdf {
             position: fixed;
             bottom: 25px;
@@ -46,7 +43,7 @@
             box-shadow: 0 6px 24px rgba(220, 38, 38, 0.45);
             z-index: 1001;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
+            display: none;
             align-items: center;
             gap: 10px;
             letter-spacing: 0.3px;
@@ -154,7 +151,7 @@
             body { background-color: white; padding: 0; margin: 0; }
             #contenido-pdf { transform: none; width: 210mm; margin: 0; }
             .page { box-shadow: none; margin: 0; padding: 10mm 15mm; border: none; height: 297mm; overflow: hidden; }
-            .btn-descargar, .btn-regresar, .btn-editar-pdf { display: none; }
+            .btn-descargar, .btn-regresar, .btn-editar-pdf { display: none !important; }
         }
     </style>
 </head>
@@ -163,9 +160,6 @@
     <button class="btn-regresar" id="btn-regresar" onclick="manejarRegreso()">Volver a la App</button>
     <button class="btn-descargar" id="btn-descargar" onclick="generarPDF()">Descargar PDF</button>
 
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <!-- NUEVO: Botón flotante rojo "Editar PDF"                       -->
-    <!-- ══════════════════════════════════════════════════════════════ -->
     <button class="btn-editar-pdf" id="btn-editar-pdf" onclick="editarPDF()">
         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
@@ -175,9 +169,7 @@
 
     <div id="contenido-pdf">
         
-        <!-- ═══════════════════════════════════════ -->
         <!-- HOJA 1 -->
-        <!-- ═══════════════════════════════════════ -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -206,12 +198,8 @@
                     <div class="title-primary-centered">ATENCIÓN CORRECTIVA</div>
                     <div class="title-primary-centered">REPORTE DE RECEPCIÓN DE TRABAJOS</div>
                     <div class="title-primary-centered" style="font-weight: normal;">MANTENIMIENTO</div>
-                    
                     <div class="ticket-left">INCIDENCIA: <span id="pdf-ticket"></span></div>
-                    
-                    <div class="ticket-right">
-                        FECHA: <span id="pdf-fecha"></span>
-                    </div>
+                    <div class="ticket-right">FECHA: <span id="pdf-fecha"></span></div>
                 </div>
 
                 <div class="primary-divider-bottom"></div>
@@ -280,9 +268,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════ -->
         <!-- HOJA 2 -->
-        <!-- ═══════════════════════════════════════ -->
         <div class="page">
             <div class="content-wrapper">
                 <div class="header-container">
@@ -311,12 +297,8 @@
                     <div class="title-primary-centered">ATENCIÓN CORRECTIVA</div>
                     <div class="title-primary-centered">REPORTE DE RECEPCIÓN DE TRABAJOS</div>
                     <div class="title-primary-centered" style="font-weight: normal;">MANTENIMIENTO</div>
-                    
                     <div class="ticket-left">INCIDENCIA: <span id="pdf-ticket-2"></span></div>
-                    
-                    <div class="ticket-right">
-                        FECHA: <span id="pdf-fecha-2"></span>
-                    </div>
+                    <div class="ticket-right">FECHA: <span id="pdf-fecha-2"></span></div>
                 </div>
 
                 <div class="primary-divider-bottom-sheet2"></div>
@@ -337,7 +319,6 @@
                 </div>
 
                 <div class="primary-bar-full"><span class="bullet-dark"></span> SOPORTE FÍSICO / ORDEN DE SERVICIO FIRMADA</div>
-                
                 <div class="soporte-fisico-box" id="pdf-soporte-fisico"></div>
             </div>
 
@@ -350,9 +331,6 @@
     </div>
 
     <script>
-        // ══════════════════════════════════════════════════════════════
-        // Variable global para almacenar el ticket ID a editar
-        // ══════════════════════════════════════════════════════════════
         let ticketIdParaEditar = null;
 
         function manejarRegreso() {
@@ -363,24 +341,18 @@
             }
         }
 
-        // ══════════════════════════════════════════════════════════════
-        // NUEVA FUNCIÓN: Editar PDF - Regresar al formulario precargado
-        // ══════════════════════════════════════════════════════════════
         function editarPDF() {
             if (!ticketIdParaEditar) {
                 alert('No se pudo identificar la orden para editar.');
                 return;
             }
             
-            // Guardar el ID del ticket en sessionStorage para que index.html lo lea
             sessionStorage.setItem('editarPDFId', ticketIdParaEditar);
             
-            // Si fue abierto como ventana emergente, enviar mensaje al opener
             if (window.opener && !window.opener.closed) {
-                window.opener.postMessage({ accion: 'editarOrden', ticketId: ticketIdParaEditar }, '*');
+                window.opener.location.href = 'index.html';
                 window.close();
             } else {
-                // Navegar a index.html
                 window.location.href = 'index.html';
             }
         }
@@ -391,24 +363,15 @@
                 let cargadas = 0;
                 const total = imagenes.length;
                 
-                if (total === 0) {
-                    resolve();
-                    return;
-                }
+                if (total === 0) { resolve(); return; }
 
                 imagenes.forEach((img) => {
                     if (img.complete && img.naturalHeight !== 0) {
                         cargadas++;
                         if (cargadas === total) resolve();
                     } else {
-                        img.onload = () => {
-                            cargadas++;
-                            if (cargadas === total) resolve();
-                        };
-                        img.onerror = () => {
-                            cargadas++;
-                            if (cargadas === total) resolve();
-                        };
+                        img.onload = () => { cargadas++; if (cargadas === total) resolve(); };
+                        img.onerror = () => { cargadas++; if (cargadas === total) resolve(); };
                     }
                 });
             });
@@ -429,11 +392,17 @@
                 
                 const incidenciaMostrar = data.incidencia || data.ticket || data.id_ticket || '';
                 
-                // ══════════════════════════════════════════════════════════════
-                // NUEVO: Guardar el ticket ID para la función de editar
-                // Priorizar id_ticket (MC-XXXX) que es el folio en Firebase
-                // ══════════════════════════════════════════════════════════════
                 ticketIdParaEditar = data.ticket || data.id_ticket || null;
+                
+                // ══════════════════════════════════════════════════════════════
+                // Solo mostrar "Editar PDF" si se abrió desde Confirmación
+                // ══════════════════════════════════════════════════════════════
+                const btnEditar = document.getElementById('btn-editar-pdf');
+                if (data.permitir_edicion === true) {
+                    btnEditar.style.display = 'flex';
+                } else {
+                    btnEditar.style.display = 'none';
+                }
                 
                 // Llenar encabezado - Hoja 1
                 document.getElementById('pdf-sucursal').innerText = data.sucursal || '';
@@ -499,11 +468,6 @@
                 if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}">`; }
                 if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}">`; }
 
-                // ══════════════════════════════════════════════════════════════
-                // NUEVO: Escuchar mensaje desde la ventana padre (si existe)
-                // Esto permite editar desde confirmacion.html directamente
-                // ══════════════════════════════════════════════════════════════
-
             } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
         });
 
@@ -554,7 +518,16 @@
             html2pdf().set(opciones).from(elemento).save().then(() => {
                 btn.style.display = 'block';
                 btnR.style.display = 'block';
-                btnE.style.display = 'flex';
+                
+                // Restaurar botón editar solo si tenía permiso
+                const dataStr = sessionStorage.getItem('DatosOrdenPDF');
+                if(dataStr) {
+                    const data = JSON.parse(dataStr);
+                    if (data.permitir_edicion === true) {
+                        btnE.style.display = 'flex';
+                    }
+                }
+                
                 btn.innerText = 'Descargar PDF';
                 btn.disabled = false;
                 
