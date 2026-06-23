@@ -687,40 +687,43 @@
     // ==========================================
     // 7. FUNCIONES PARA VER EL PDF
     // ==========================================
-    function prepararDatosParaPDF(ticketData) {
-        return {
-            sucursal: ticketData.sucursal || '',
-            suc_dir: ticketData.suc_dir || '',
-            suc_col: ticketData.suc_col || '',
-            suc_city: ticketData.suc_city || '',
-            suc_cp: ticketData.suc_cp || '',
-            suc_hor: ticketData.suc_hor || '',
-            suc_tel: ticketData.suc_tel || '',
-            suc_mail: ticketData.suc_mail || '',
-            ticket: ticketData.id_ticket || 'S/N',
-            incidencia: ticketData.id_incidencia || ticketData.incidencia || '',
-            area: ticketData.area || '',
-            subarea: ticketData.subarea || '',
-            desc_falla: ticketData.desc_falla || '',
-            fotos_falla: ticketData.urls_falla || [null, null, null],
-            desc_solucion: ticketData.desc_solucion || '',
-            fotos_solucion: ticketData.urls_solucion || [null, null, null],
-            prov_nombre: ticketData.prov_nombre || ticketData.proveedor || '',
-            prov_rfc: ticketData.prov_rfc || '',
-            prov_dir: ticketData.prov_dir || '',
-            prov_cont: ticketData.prov_cont || '',
-            prov_tel: ticketData.prov_tel || '',
-            prov_mail: ticketData.prov_mail || '',
-            tec_nombre: ticketData.tec_nombre || '',
-            tec_celular: ticketData.tec_celular || '',
-            comentario: ticketData.comentario || '',
-            firma: ticketData.url_firma || '',
-            foto_soporte: ticketData.url_soporte || null,
-            fecha_hora: ticketData.fecha_hora_completa 
-                ? new Date(ticketData.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
-                : (ticketData.fecha_creacion || '')
-        };
-    }
+function prepararDatosParaPDF(ticketData) {
+    return {
+        sucursal: ticketData.sucursal || '',
+        suc_dir: ticketData.suc_dir || '',
+        suc_col: ticketData.suc_col || '',
+        suc_city: ticketData.suc_city || '',
+        suc_cp: ticketData.suc_cp || '',
+        suc_hor: ticketData.suc_hor || '',
+        suc_tel: ticketData.suc_tel || '',
+        suc_mail: ticketData.suc_mail || '',
+        ticket: ticketData.id_ticket || 'S/N',
+        incidencia: ticketData.id_incidencia || ticketData.incidencia || '',
+        area: ticketData.area || '',
+        subarea: ticketData.subarea || '',
+        desc_falla: ticketData.desc_falla || '',
+        fotos_falla: ticketData.urls_falla || [null],
+        fotos_proceso: ticketData.urls_proceso || [null, null],
+        desc_solucion: ticketData.desc_solucion || '',
+        fotos_solucion: ticketData.urls_solucion || [null, null, null],
+        prov_nombre: ticketData.prov_nombre || ticketData.proveedor || '',
+        prov_rfc: ticketData.prov_rfc || '',
+        prov_dir: ticketData.prov_dir || '',
+        prov_cont: ticketData.prov_cont || '',
+        prov_tel: ticketData.prov_tel || '',
+        prov_mail: ticketData.prov_mail || '',
+        tec_nombre: ticketData.tec_nombre || '',
+        tec_celular: ticketData.tec_celular || '',
+        comentario: ticketData.comentario || '',
+        firma: ticketData.url_firma || '',
+        foto_soporte: ticketData.url_soporte || null,
+        foto_selfie: ticketData.url_selfie || null,
+        fecha_hora: ticketData.fecha_hora_completa 
+            ? new Date(ticketData.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) 
+            : (ticketData.fecha_creacion || ''),
+        permitir_edicion: true
+    };
+}
 
     function verPDF() {
         const folio = document.getElementById('eval-id-ticket').value;
