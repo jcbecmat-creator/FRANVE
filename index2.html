@@ -43,7 +43,7 @@
             box-shadow: 0 6px 24px rgba(220, 38, 38, 0.45);
             z-index: 1001;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: none;
+            display: flex;
             align-items: center;
             gap: 10px;
             letter-spacing: 0.3px;
@@ -160,6 +160,7 @@
     <button class="btn-regresar" id="btn-regresar" onclick="manejarRegreso()">Volver a la App</button>
     <button class="btn-descargar" id="btn-descargar" onclick="generarPDF()">Descargar PDF</button>
 
+    <!-- Botón visible por defecto, se oculta solo si permitir_edicion === false -->
     <button class="btn-editar-pdf" id="btn-editar-pdf" onclick="editarPDF()">
         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
@@ -386,6 +387,7 @@
             }
 
             const dataStr = sessionStorage.getItem('DatosOrdenPDF');
+            const btnEditar = document.getElementById('btn-editar-pdf');
             
             if(dataStr) {
                 const data = JSON.parse(dataStr);
@@ -395,14 +397,14 @@
                 ticketIdParaEditar = data.ticket || data.id_ticket || null;
                 
                 // ══════════════════════════════════════════════════════════════
-                // Solo mostrar "Editar PDF" si se abrió desde Confirmación
+                // LÓGICA: Botón visible por defecto (display: flex en CSS)
+                // Solo se OCULTA si permitir_edicion es explícitamente false
+                // Esto garantiza que funcione desde confirmacion.html
                 // ══════════════════════════════════════════════════════════════
-                const btnEditar = document.getElementById('btn-editar-pdf');
-                if (data.permitir_edicion === true) {
-                    btnEditar.style.display = 'flex';
-                } else {
+                if (data.permitir_edicion === false) {
                     btnEditar.style.display = 'none';
                 }
+                // En cualquier otro caso (true, undefined, etc.) el botón permanece visible
                 
                 // Llenar encabezado - Hoja 1
                 document.getElementById('pdf-sucursal').innerText = data.sucursal || '';
@@ -446,29 +448,32 @@
 
                 // Foto de FALLA (máx 1)
                 if(data.fotos_falla && data.fotos_falla[0]) {
-                    document.getElementById('pdf-falla-0').innerHTML = `<img src="${data.fotos_falla[0]}">`;
+                    document.getElementById('pdf-falla-0').innerHTML = '<img src="' + data.fotos_falla[0] + '">';
                 }
 
                 // Fotos de PROCESO (máx 2)
                 if(data.fotos_proceso && data.fotos_proceso[0]) {
-                    document.getElementById('pdf-proceso-0').innerHTML = `<img src="${data.fotos_proceso[0]}">`;
+                    document.getElementById('pdf-proceso-0').innerHTML = '<img src="' + data.fotos_proceso[0] + '">';
                 }
                 if(data.fotos_proceso && data.fotos_proceso[1]) {
-                    document.getElementById('pdf-proceso-1').innerHTML = `<img src="${data.fotos_proceso[1]}">`;
+                    document.getElementById('pdf-proceso-1').innerHTML = '<img src="' + data.fotos_proceso[1] + '">';
                 }
 
                 // Fotos de SOLUCIÓN / TRABAJO REALIZADO (máx 3)
                 if(data.fotos_solucion) {
                     data.fotos_solucion.forEach((fotoBase64, index) => {
-                        if(fotoBase64) { document.getElementById(`pdf-sol-${index}`).innerHTML = `<img src="${fotoBase64}">`; }
+                        if(fotoBase64) { document.getElementById('pdf-sol-' + index).innerHTML = '<img src="' + fotoBase64 + '">'; }
                     });
                 }
 
-                if(data.firma) { document.getElementById('pdf-firma').innerHTML = `<img src="${data.firma}">`; }
-                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}">`; }
-                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}">`; }
+                if(data.firma) { document.getElementById('pdf-firma').innerHTML = '<img src="' + data.firma + '">'; }
+                if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = '<img src="' + data.foto_selfie + '">'; }
+                if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = '<img src="' + data.foto_soporte + '">'; }
 
-            } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
+            } else { 
+                alert("No se encontraron datos. Por favor regresa a la aplicación."); 
+                btnEditar.style.display = 'none';
+            }
         });
 
         async function generarPDF() {
@@ -477,6 +482,9 @@
             const btn = document.getElementById('btn-descargar');
             const btnR = document.querySelector('.btn-regresar');
             const btnE = document.getElementById('btn-editar-pdf');
+            
+            // Guardar si el botón editar estaba visible antes
+            const editarVisible = btnE.style.display !== 'none';
             
             btn.innerText = 'Cargando fotos...';
             btn.disabled = true;
@@ -505,7 +513,7 @@
             
             const opciones = {
                 margin:       0,
-                filename:     `MTTO_CORR_${incidenciaLimpia}.pdf`,
+                filename:     'MTTO_CORR_' + incidenciaLimpia + '.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
@@ -519,13 +527,9 @@
                 btn.style.display = 'block';
                 btnR.style.display = 'block';
                 
-                // Restaurar botón editar solo si tenía permiso
-                const dataStr = sessionStorage.getItem('DatosOrdenPDF');
-                if(dataStr) {
-                    const data = JSON.parse(dataStr);
-                    if (data.permitir_edicion === true) {
-                        btnE.style.display = 'flex';
-                    }
+                // Restaurar botón editar solo si estaba visible antes
+                if (editarVisible) {
+                    btnE.style.display = 'flex';
                 }
                 
                 btn.innerText = 'Descargar PDF';
