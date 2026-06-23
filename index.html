@@ -34,19 +34,15 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
-        
         #login-screen { background: linear-gradient(135deg, #131520 0%, #1e2336 100%); background-attachment: fixed; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         #login-card { width: 100%; max-width: 420px; background: white; border-radius: 24px; box-sizing: border-box; padding: 32px 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        
         .modulo-vista { display: none; animation: fadeIn 0.3s ease-in-out; }
         .modulo-vista.activa { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .app-content { overflow-y: auto; height: 100vh; padding-bottom: 100px; -webkit-overflow-scrolling: touch; background-color: #F8FAFC; }
-        
         .main-header { background-color: #131520 !important; border-bottom: none !important; }
         .system-title { color: #FFFFFF !important; }
         .header-hamburger .hamburger, .header-hamburger .hamburger::before, .header-hamburger .hamburger::after { background-color: #81D0DC !important; }
-        
         .user-circle-btn { border: 2px solid #81D0DC !important; background-color: transparent !important; border-radius: 50% !important; padding: 2px !important; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .user-circle-initial { background-color: #81D0DC !important; color: #FFFFFF !important; font-weight: bold; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; border: none !important; }
         .user-dropdown { position: absolute; top: 60px; right: 10px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e5e7eb; width: 220px; z-index: 1000; display: none; overflow: hidden; }
@@ -56,20 +52,16 @@
         .user-actions .dropdown-link { display: flex; align-items: center; gap: 8px; padding: 12px 15px; color: #374151; font-size: 14px; text-decoration: none; font-weight: 500; }
         .user-actions .dropdown-link.destructive { color: #DC2626; }
         .user-actions .dropdown-link:hover { background: #f8fafc; }
-
         .sidebar-link.activa { background-color: rgba(129, 208, 220, 0.15) !important; color: #131520 !important; font-weight: 700 !important; border-left: 4px solid #81D0DC !important; border-radius: 0 8px 8px 0 !important; }
         .sidebar-link.activa i, .sidebar-link.activa svg { stroke: #81D0DC !important; color: #81D0DC !important; }
         .sidebar-section { padding: 10px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px; }
         .sidebar-section:last-child { border-bottom: none; }
         .sidebar-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin: 10px 20px; }
-
         .form-input, .form-select, textarea.form-input { width: 100% !important; padding: 14px 16px !important; background-color: #F3F4F6 !important; border: 1px solid transparent !important; border-radius: 12px !important; font-size: 14px !important; color: #1F2937 !important; box-sizing: border-box !important; font-family: inherit !important; outline: none !important; transition: all 0.2s ease !important; }
         .form-input:focus, .form-select:focus, textarea.form-input:focus { background-color: #FFFFFF !important; border: 1px solid #81D0DC !important; box-shadow: 0 0 0 3px rgba(129,208,220,0.1) !important; }
-        
         .form-card, .data-table-container, .filters-bar { background: #FFFFFF; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border: 1px solid #E5E7EB; margin-bottom: 24px; }
         .form-card { padding: 30px; width: 100%; }
         .section-title { display: flex; align-items: center; gap: 12px; font-size: 18px !important; font-weight: 600 !important; color: #111827 !important; margin: 0 0 20px 0 !important; padding-bottom: 12px !important; border-bottom: 1px solid #f3f4f6 !important; }
-        
         .photo-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
         @media (min-width: 640px) { .photo-controls { display: flex; grid-template-columns: none; } }
         .btn-photo, .btn-photo-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; transition: all 0.2s; width: 100%; box-sizing: border-box; }
@@ -77,61 +69,50 @@
         .btn-photo:hover { opacity: 0.85; }
         .btn-photo-secondary { background: white; color: #374151; border: 1px solid #d1d5db; }
         @media (min-width: 640px) { .btn-photo, .btn-photo-secondary { width: auto; } }
-
         .photo-grid-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
         .photo-slot { aspect-ratio: 1; border: 2px dashed #d1d5db; border-radius: 12px; background: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         .photo-slot img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
         .remove-photo { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 22px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 10; }
-        
         .modal-enlarger { display: none; position: fixed !important; z-index: 999999 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.95) !important; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         .modal-enlarger.show { display: flex !important; }
         .modal-content-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; cursor: zoom-out; }
-        
         #camera-overlay { display: none; position: fixed !important; z-index: 999999 !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.95) !important; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         #camera-overlay.show { display: flex !important; }
         #camera-stream { width: 100%; max-width: 600px; aspect-ratio: 4/3; background: black; border-radius: 12px; overflow: hidden; position: relative; }
         #camera-video { width: 100%; height: 100%; object-fit: cover; }
-
         .signature-container { border: 2px dashed #d1d5db; border-radius: 8px; background: #fafafa; position: relative; margin-bottom: 10px; width: 100%; overflow: hidden; }
-        .signature-pad { width: 100%; height: 200px; cursor: crosshair; touch-action: none; display: block; } 
-
+        .signature-pad { width: 100%; height: 200px; cursor: crosshair; touch-action: none; display: block; }
         .info-grid { display: grid; grid-template-columns: 1fr; gap: 12px; background: #F8FAFC; padding: 16px; border-radius: 12px; border: 1px solid #E5E7EB; margin-top: 10px; }
         @media (min-width: 768px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .info-grid { grid-template-columns: repeat(3, 1fr); } }
         .info-item label { display: block; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 2px; }
         .info-item span { display: block; font-size: 13px; color: #111827; font-weight: 500; }
-
         html.is-logged-in #login-screen { display: none !important; }
         html.is-logged-in #app-screen { display: block !important; }
-
         .tabs-container { display: flex; gap: 15px; align-items: center; overflow-x: auto; padding-bottom: 5px; margin-bottom: 20px;}
         .tab-btn { background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #4b5563; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
         .tab-btn:hover { background: #e5e7eb; }
         .tab-btn.active { background: white !important; color: #111827 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb !important; }
         .tab-badge { background: #d1d5db; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
         .tab-btn.active .tab-badge { background: #81D0DC; color: #131520; }
-
         .filters-bar { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
         .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 140px; }
         .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6b7280; }
         .filter-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .btn-filter-secondary { height: 42px; background: #f8fafc; color: #374151; border: 1px solid #cbd5e1; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-filter-green { height: 42px; background: #16a34a; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-
         .upload-bottom-bar { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 16px 24px; display: flex; align-items: center; gap: 24px; z-index: 50; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 90%; max-width: 800px; }
         .upload-bottom-bar.show { bottom: 24px; }
         .up-info { flex-grow: 1; font-size: 14px; color: #6b7280; display: flex; align-items: center; gap: 12px; }
         .up-info strong { color: #111827; font-weight: 800; font-size: 15px; }
         .btn-limpiar { background: white; color: #6b7280; border: 1px solid #e5e7eb; height: 40px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .btn-adjuntar { background: #81D0DC; color: #131520; border: none; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-
         #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700; }
         #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
         #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: #131520; background: #81D0DC; font-weight: 700; font-size: 14px; cursor: pointer; }
-        
         #modalLecturaCP { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.7) !important; z-index: 9999999 !important; justify-content: center !important; align-items: center !important; padding: 20px; box-sizing: border-box; }
         #modalLecturaCP.show-modal { display: flex !important; }
         .modal-card-cp { background: white; width: 100%; max-width: 600px; border-radius: 16px; display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden; }
@@ -141,14 +122,12 @@
         .eval-input-control { width: 100%; padding: 0 1rem; line-height: 40px; font-size: 14px; color: #111827; background-color: #f3f4f6; border-radius: 0.5rem; border: 1px solid #d1d5db; box-sizing: border-box; height: 42px; display: block; }
         textarea.eval-input-control { height: auto; min-height: 80px; padding: 0.75rem 1rem; line-height: 1.5; resize: none; }
         .eval-input-control[readonly] { background-color: #e5e5e5; color: #4b5563; cursor: not-allowed; }
-
         #countdown-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(19, 21, 32, 0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; box-sizing: border-box; }
         #countdown-overlay.show { display: flex !important; }
         #countdown-number { font-size: 80px; font-weight: 900; color: #81D0DC; margin: 20px 0; line-height: 1; }
         #countdown-text { font-size: 18px; font-weight: 500; color: #cbd5e1; max-width: 400px; }
         .spinner-loader { border: 6px solid rgba(129, 208, 220, 0.2); border-top: 6px solid #81D0DC; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         @media (max-width: 900px) {
             .upload-bottom-bar { flex-direction: column; gap: 12px; padding: 16px; bottom: -200px;}
             .up-info { flex-direction: column; text-align: center; gap: 4px; }
@@ -283,6 +262,7 @@
                                     <input type="hidden" id="incidencia_doc_id">
                                     <input type="hidden" id="doc_id_actual">
                                     <input type="hidden" id="folio_mc" value="">
+                                    <input type="hidden" id="estado_original" value="">
                                 </div>
                             </div>
 
@@ -297,7 +277,7 @@
                                         <div class="info-item"><label>Colonia</label><span id="suc-col"></span></div>
                                         <div class="info-item"><label>Ciudad</label><span id="suc-city"></span></div>
                                         <div class="info-item"><label>C.P.</label><span id="suc-cp"></span></div>
-                                        <div class="info-item"><label>Cliente</label><span id="suc-client"></span></div> 
+                                        <div class="info-item"><label>Cliente</label><span id="suc-client"></span></div>
                                         <div class="info-item"><label>Teléfono</label><span id="suc-tel"></span></div>
                                         <div class="info-item"><label>Correo</label><span id="suc-mail"></span></div>
                                     </div>
@@ -370,7 +350,7 @@
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="form-label required" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Nombre del técnico en sitio</label>
                                     <input type="text" class="form-input" id="nombre_tecnico" list="tecnicos-list" placeholder="Escribe para buscar técnico..." autocomplete="off">
-                                    <datalist id="tecnicos-list"></datalist> 
+                                    <datalist id="tecnicos-list"></datalist>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="form-label required" style="font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase;">Celular del técnico</label>
@@ -442,6 +422,7 @@
                             <div class="submit-section" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px; align-items: stretch; max-width: 400px; margin-left: auto; margin-right: auto; padding-bottom: 40px;">
                                 <button type="button" id="btn-guardar-borrador" onclick="procesarOrden('Borrador')" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #14A981; color: white; border: none; width: 100%;"><i data-lucide="save"></i> Guardar Orden</button>
                                 <button type="button" id="btn-enviar-orden" onclick="procesarOrden('En proceso')" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #81D0DC; color: #131520; border: none; box-shadow: 0 4px 14px rgba(129, 208, 220, 0.3); width: 100%;"><i data-lucide="send"></i> Enviar Orden</button>
+                                <button type="button" id="btn-guardar-cambios" onclick="guardarCambios()" style="display: none; align-items: center; justify-content: center; gap: 10px; padding: 15px 20px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; background: #F59E0B; color: #131520; border: none; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); width: 100%;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a.2.2 0 0 1 .2.2V7a1 1 0 0 0 1 1h3.8a.2.2 0 0 1 .2.2v12.8a.2.2 0 0 1-.2.2H4.2a.2.2 0 0 1-.2-.2V4.2a.2.2 0 0 1 .2-.2h11Z"/><path d="M14 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8Z"/><path d="M8 12h8"/><path d="M8 16h8"/></svg> Guardar cambios</button>
                             </div>
                         </form>
                     </div>
@@ -528,9 +509,7 @@
             appId: "1:687825589857:web:f2c072bc2fda40894b7c20"
         };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 
         const db = firebase.firestore();
         const storage = firebase.storage();
@@ -540,7 +519,6 @@
 
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGWGCHKQZFzMAZvaPjd7MXuW0n9hWLzg1-m7oXRzACeUGEzMl1s2ALDuvhIqcajQ/exec';
         window.appData = null;
-
         let incidenciasPendientes = [];
 
         function showCustomAlert(title, message, isSuccess = true) {
@@ -585,8 +563,7 @@
                 document.getElementById('area-input').value = inc.instalacion || '';
                 document.getElementById('subarea-select').value = inc.fallos || '';
                 document.getElementById('desc_falla').value = inc.observaciones || inc.fallos || '';
-                const sucursalName = inc.usuario || '';
-                document.getElementById('sucursal-input').value = sucursalName;
+                document.getElementById('sucursal-input').value = inc.usuario || '';
                 document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
             } else { document.getElementById('incidencia_doc_id').value = ''; }
         });
@@ -601,16 +578,11 @@
                 misOrdenes.sort((a, b) => (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""));
                 actualizarBadgesMtto(); if(tabMttoActual !== 'Nueva Orden') renderTablaMisOrdenes();
                 
-                // ══════════════════════════════════════════════════════════════
-                // NUEVO: Verificar si se viene de "Editar PDF" desde index2.html
-                // ══════════════════════════════════════════════════════════════
                 const editarId = sessionStorage.getItem('editarPDFId');
                 if (editarId) {
                     sessionStorage.removeItem('editarPDFId');
                     const orden = misOrdenes.find(o => o.id_ticket === editarId || o.id_incidencia === editarId || o.id_doc === editarId);
-                    if (orden) {
-                        setTimeout(() => { cargarBorrador(orden.id_doc); }, 500);
-                    }
+                    if (orden) { setTimeout(() => { cargarBorrador(orden.id_doc); }, 500); }
                 }
             }).catch(err => console.error("Error al cargar órdenes", err));
         }
@@ -655,26 +627,26 @@
 
         async function obtenerFolioGlobal() { const contadorRef = db.collection('metadata').doc('contadores'); return await db.runTransaction(async (transaction) => { const doc = await transaction.get(contadorRef); let nuevoNumero = (doc.exists && doc.data().mc_folio) ? doc.data().mc_folio + 1 : 1; transaction.set(contadorRef, { mc_folio: nuevoNumero }, { merge: true }); return `MC-${nuevoNumero.toString().padStart(4, '0')}`; }); }
 
-        let fotos = { 
-            falla: [null], 
-            proceso: [null, null], 
-            solucion: [null, null, null], 
-            soporte: [null], 
-            selfie: [null], 
-            evidencia: [null, null, null, null, null, null, null, null, null] 
-        };
+        let fotos = { falla: [null], proceso: [null, null], solucion: [null, null, null], soporte: [null], selfie: [null], evidencia: [null, null, null, null, null, null, null, null, null] };
+
+        function configurarBotonesModoEdicion(yaProcesada) {
+            if (yaProcesada) {
+                document.getElementById('btn-guardar-borrador').style.display = 'none';
+                document.getElementById('btn-enviar-orden').style.display = 'none';
+                document.getElementById('btn-guardar-cambios').style.display = 'inline-flex';
+            } else {
+                document.getElementById('btn-guardar-borrador').style.display = 'inline-flex';
+                document.getElementById('btn-enviar-orden').style.display = 'inline-flex';
+                document.getElementById('btn-guardar-cambios').style.display = 'none';
+            }
+            lucide.createIcons();
+        }
 
         function mostrarFormularioNuevaOrden() {
-            document.getElementById('ordenMttoForm').reset(); document.getElementById('doc_id_actual').value = ''; document.getElementById('folio_mc').value = ''; document.getElementById('incidencia_doc_id').value = ''; document.getElementById('sucursal-details').style.display = 'none';
-            fotos = { 
-                falla: [null], 
-                proceso: [null, null], 
-                solucion: [null, null, null], 
-                soporte: [null], 
-                selfie: [null], 
-                evidencia: [null, null, null, null, null, null, null, null, null] 
-            }; 
+            document.getElementById('ordenMttoForm').reset(); document.getElementById('doc_id_actual').value = ''; document.getElementById('folio_mc').value = ''; document.getElementById('incidencia_doc_id').value = ''; document.getElementById('sucursal-details').style.display = 'none'; document.getElementById('estado_original').value = '';
+            fotos = { falla: [null], proceso: [null, null], solucion: [null, null, null], soporte: [null], selfie: [null], evidencia: [null, null, null, null, null, null, null, null, null] }; 
             renderSlots('falla'); renderSlots('proceso'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie'); renderSlots('evidencia'); limpiarFirma('firma_tecnico');
+            configurarBotonesModoEdicion(false);
             if(window.appData) { document.getElementById('nombre_tecnico').value = window.appData.nombreUsuario || ''; document.getElementById('celular_tecnico').value = window.appData.telefonoUsuario || ''; }
         }
 
@@ -686,19 +658,21 @@
             document.getElementById('area-input').value = o.area || ''; document.getElementById('subarea-select').value = o.subarea || ''; document.getElementById('desc_falla').value = o.desc_falla || '';
             document.getElementById('desc_solucion').value = o.desc_solucion || ''; document.getElementById('nombre_tecnico').value = o.tec_nombre || ''; document.getElementById('celular_tecnico').value = o.tec_celular || ''; document.getElementById('comentario_salida').value = o.comentario || '';
             
+            const yaProcesada = o.estado_confirmacion !== 'Borrador';
+            document.getElementById('estado_original').value = o.estado_confirmacion || 'Borrador';
+            configurarBotonesModoEdicion(yaProcesada);
+            
             fotos.falla = o.urls_falla && o.urls_falla.length ? [...o.urls_falla] : [null]; 
             fotos.proceso = o.urls_proceso && o.urls_proceso.length ? [...o.urls_proceso] : [null, null]; 
             fotos.solucion = o.urls_solucion && o.urls_solucion.length ? [...o.urls_solucion] : [null, null, null]; 
             fotos.soporte = o.url_soporte ? [o.url_soporte] : [null]; 
             fotos.selfie = o.url_selfie ? [o.url_selfie] : [null];
             fotos.evidencia = o.urls_evidencia && o.urls_evidencia.length ? [...o.urls_evidencia] : [null, null, null, null, null, null, null, null, null];
-            
             while(fotos.proceso.length < 2) fotos.proceso.push(null); 
             while(fotos.solucion.length < 3) fotos.solucion.push(null);
             while(fotos.evidencia.length < 9) fotos.evidencia.push(null);
-            
             renderSlots('falla'); renderSlots('proceso'); renderSlots('solucion'); renderSlots('soporte'); renderSlots('selfie'); renderSlots('evidencia');
-            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma desde URL"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
+            if(o.url_firma) { document.getElementById('firma_tecnico_data').value = o.url_firma; const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { if(ctxFirma) { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); ctxFirma.drawImage(img, 0, 0, canvasFirma.width, canvasFirma.height); } }; img.onerror = () => { console.warn("No se pudo cargar firma"); }; img.src = o.url_firma; } else { limpiarFirma('firma_tecnico'); }
         }
 
         async function procesarOrden(estadoFinal) {
@@ -707,48 +681,21 @@
             let folioActual = document.getElementById('folio_mc').value;
             const canvasFirmaReal = document.getElementById('firma_tecnico'); 
             const firmaVacia = document.createElement('canvas'); 
-            firmaVacia.width = canvasFirmaReal.width; 
-            firmaVacia.height = canvasFirmaReal.height;
-            
+            firmaVacia.width = canvasFirmaReal.width; firmaVacia.height = canvasFirmaReal.height;
             if (estadoFinal === 'En proceso') { 
-                const suc = document.getElementById('sucursal-input').value; 
-                const area = document.getElementById('area-input').value; 
-                const descF = document.getElementById('desc_falla').value; 
-                const tecNom = document.getElementById('nombre_tecnico').value; 
-                const inc = document.getElementById('incidencia-input').value; 
+                const suc = document.getElementById('sucursal-input').value; const area = document.getElementById('area-input').value; const descF = document.getElementById('desc_falla').value; const tecNom = document.getElementById('nombre_tecnico').value; const inc = document.getElementById('incidencia-input').value; 
                 if(!inc || !suc || !area || !descF || !tecNom) { showCustomAlert("Atención", "Completa Incidencia, Ubicación, Instalación, Falla y Técnico.", false); return; }
-                const firmaData = document.getElementById('firma_tecnico_data').value;
-                let canvasTieneFirma = false;
+                const firmaData = document.getElementById('firma_tecnico_data').value; let canvasTieneFirma = false;
                 try { canvasTieneFirma = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma = false; }
                 if(!canvasTieneFirma && !firmaData) { showCustomAlert("Atención", "Firma obligatoria.", false); return; } 
             }
-            
-            try { 
-                let canvasTieneFirma2 = false;
-                try { canvasTieneFirma2 = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma2 = false; }
-                if (canvasTieneFirma2) { 
-                    try { document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); } catch(e) { console.warn("Canvas tainted, usando URL guardada"); }
-                } 
-            } catch(e) { console.error("Error en firma:", e); }
-            
-            btnGuardar.disabled = true; btnEnviar.disabled = true; 
-            btnGuardar.innerHTML = 'Procesando...'; btnEnviar.innerHTML = 'Procesando...';
-            
+            try { let canvasTieneFirma2 = false; try { canvasTieneFirma2 = canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL(); } catch(e) { canvasTieneFirma2 = false; }
+                if (canvasTieneFirma2) { try { document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); } catch(e) {} } } catch(e) { console.error("Error en firma:", e); }
+            btnGuardar.disabled = true; btnEnviar.disabled = true; btnGuardar.innerHTML = 'Procesando...'; btnEnviar.innerHTML = 'Procesando...';
             try {
                 if (!folioActual) { folioActual = await obtenerFolioGlobal(); document.getElementById('folio_mc').value = folioActual; }
-                
-                let urlsFalla = [], urlsProceso = [], urlsSolucion = [], urlsEvidencia = []; 
-                let urlSoporte = null, urlSelfie = null, urlFirma = null;
-                
-                const checkAndUpload = async (fileData, path) => { 
-                    if (fileData && fileData.startsWith('data:image')) { 
-                        const ref = storage.ref(path); 
-                        await ref.put(dataURItoBlob(fileData)); 
-                        return await ref.getDownloadURL(); 
-                    } 
-                    return fileData; 
-                };
-                
+                let urlsFalla = [], urlsProceso = [], urlsSolucion = [], urlsEvidencia = []; let urlSoporte = null, urlSelfie = null, urlFirma = null;
+                const checkAndUpload = async (fileData, path) => { if (fileData && fileData.startsWith('data:image')) { const ref = storage.ref(path); await ref.put(dataURItoBlob(fileData)); return await ref.getDownloadURL(); } return fileData; };
                 for(let i=0; i<fotos.falla.length; i++) { if(fotos.falla[i]) urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`)); }
                 for(let i=0; i<fotos.proceso.length; i++) { if(fotos.proceso[i]) urlsProceso.push(await checkAndUpload(fotos.proceso[i], `ordenes/${folioActual}/proceso_${i}_${Date.now()}.jpg`)); }
                 for(let i=0; i<fotos.solucion.length; i++) { if(fotos.solucion[i]) urlsSolucion.push(await checkAndUpload(fotos.solucion[i], `ordenes/${folioActual}/solucion_${i}_${Date.now()}.jpg`)); }
@@ -756,79 +703,77 @@
                 urlSoporte = await checkAndUpload(fotos.soporte[0], `ordenes/${folioActual}/soporte_${Date.now()}.jpg`); 
                 urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`); 
                 urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
-                
                 const docId = document.getElementById('doc_id_actual').value || folioActual;
                 const ordenData = { 
-                    id_ticket: folioActual, 
-                    id_incidencia: document.getElementById('incidencia-input').value || '', 
-                    id_incidencia_doc: document.getElementById('incidencia_doc_id').value || '', 
-                    sucursal: document.getElementById('sucursal-input').value || '', 
-                    suc_dir: document.getElementById('suc-dir').innerText || '', 
-                    suc_col: document.getElementById('suc-col').innerText || '', 
-                    suc_city: document.getElementById('suc-city').innerText || '', 
-                    suc_cp: document.getElementById('suc-cp').innerText || '', 
-                    suc_tel: document.getElementById('suc-tel').innerText || '', 
-                    suc_mail: document.getElementById('suc-mail').innerText || '', 
-                    proveedor: window.appData.nombreProveedor, 
-                    prov_nombre: document.getElementById('prov-info-nombre').innerText || '', 
-                    prov_rfc: document.getElementById('prov-info-rfc').innerText || '', 
-                    prov_dir: document.getElementById('prov-info-dir').innerText || '', 
-                    prov_cont: document.getElementById('prov-info-cont').innerText || '', 
-                    prov_tel: document.getElementById('prov-info-tel').innerText || '', 
-                    prov_mail: document.getElementById('prov-info-mail').innerText || '', 
-                    tipo: "Correctivo", 
-                    area: document.getElementById('area-input').value || '', 
-                    subarea: document.getElementById('subarea-select').value || '', 
+                    id_ticket: folioActual, id_incidencia: document.getElementById('incidencia-input').value || '', id_incidencia_doc: document.getElementById('incidencia_doc_id').value || '', 
+                    sucursal: document.getElementById('sucursal-input').value || '', suc_dir: document.getElementById('suc-dir').innerText || '', suc_col: document.getElementById('suc-col').innerText || '', suc_city: document.getElementById('suc-city').innerText || '', suc_cp: document.getElementById('suc-cp').innerText || '', suc_tel: document.getElementById('suc-tel').innerText || '', suc_mail: document.getElementById('suc-mail').innerText || '', 
+                    proveedor: window.appData.nombreProveedor, prov_nombre: document.getElementById('prov-info-nombre').innerText || '', prov_rfc: document.getElementById('prov-info-rfc').innerText || '', prov_dir: document.getElementById('prov-info-dir').innerText || '', prov_cont: document.getElementById('prov-info-cont').innerText || '', prov_tel: document.getElementById('prov-info-tel').innerText || '', prov_mail: document.getElementById('prov-info-mail').innerText || '', 
+                    tipo: "Correctivo", area: document.getElementById('area-input').value || '', subarea: document.getElementById('subarea-select').value || '', 
+                    desc_falla: document.getElementById('desc_falla').value || '', desc_solucion: document.getElementById('desc_solucion').value || '', 
+                    tec_nombre: document.getElementById('nombre_tecnico').value || '', tec_celular: document.getElementById('celular_tecnico').value || '', comentario: document.getElementById('comentario_salida').value || '', 
+                    fecha_creacion: new Date().toISOString().split('T')[0], fecha_hora_completa: new Date().toISOString(), estado_confirmacion: estadoFinal, 
+                    urls_falla: urlsFalla, urls_proceso: urlsProceso, urls_solucion: urlsSolucion, urls_evidencia: urlsEvidencia,
+                    url_soporte: urlSoporte, url_selfie: urlSelfie, url_firma: urlFirma 
+                };
+                await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
+                if (estadoFinal === 'En proceso') { 
+                    const overlay = document.getElementById('countdown-overlay'); overlay.classList.add('show'); let timeLeft = 13; const countdownElement = document.getElementById('countdown-number');
+                    const timerInterval = setInterval(() => { timeLeft--; countdownElement.innerText = timeLeft; if (timeLeft <= 0) { clearInterval(timerInterval); overlay.classList.remove('show'); cargarMisOrdenes(); cambiarTabMtto('Realizado'); mostrarFormularioNuevaOrden(); } }, 1000);
+                } else { showCustomAlert("Éxito", "Orden Guardada Correctamente.", true); document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); }
+            } catch (err) { console.error("Error:", err); showCustomAlert("Error", err.message || "Ocurrió un error.", false); } 
+            finally { btnGuardar.disabled = false; btnEnviar.disabled = false; btnGuardar.innerHTML = '<i data-lucide="save"></i> Guardar Orden'; btnEnviar.innerHTML = '<i data-lucide="send"></i> Enviar Orden'; lucide.createIcons(); }
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // NUEVA FUNCIÓN: Guardar cambios en orden ya procesada
+        // ══════════════════════════════════════════════════════════════
+        async function guardarCambios() {
+            const btnCambios = document.getElementById('btn-guardar-cambios');
+            let folioActual = document.getElementById('folio_mc').value;
+            const docId = document.getElementById('doc_id_actual').value;
+            const estadoOriginal = document.getElementById('estado_original').value;
+            
+            if (!docId || !folioActual) { showCustomAlert("Error", "No se pudo identificar la orden.", false); return; }
+            
+            btnCambios.disabled = true; btnCambios.innerHTML = 'Guardando...';
+            
+            try {
+                let urlsFalla = [], urlsProceso = [], urlsSolucion = [], urlsEvidencia = []; let urlSoporte = null, urlSelfie = null, urlFirma = null;
+                const checkAndUpload = async (fileData, path) => { if (fileData && fileData.startsWith('data:image')) { const ref = storage.ref(path); await ref.put(dataURItoBlob(fileData)); return await ref.getDownloadURL(); } return fileData; };
+                for(let i=0; i<fotos.falla.length; i++) { if(fotos.falla[i]) urlsFalla.push(await checkAndUpload(fotos.falla[i], `ordenes/${folioActual}/falla_${i}_${Date.now()}.jpg`)); }
+                for(let i=0; i<fotos.proceso.length; i++) { if(fotos.proceso[i]) urlsProceso.push(await checkAndUpload(fotos.proceso[i], `ordenes/${folioActual}/proceso_${i}_${Date.now()}.jpg`)); }
+                for(let i=0; i<fotos.solucion.length; i++) { if(fotos.solucion[i]) urlsSolucion.push(await checkAndUpload(fotos.solucion[i], `ordenes/${folioActual}/solucion_${i}_${Date.now()}.jpg`)); }
+                for(let i=0; i<fotos.evidencia.length; i++) { if(fotos.evidencia[i]) urlsEvidencia.push(await checkAndUpload(fotos.evidencia[i], `ordenes/${folioActual}/evidencia_${i}_${Date.now()}.jpg`)); }
+                urlSoporte = await checkAndUpload(fotos.soporte[0], `ordenes/${folioActual}/soporte_${Date.now()}.jpg`);
+                urlSelfie = await checkAndUpload(fotos.selfie[0], `ordenes/${folioActual}/selfie_${Date.now()}.jpg`);
+                
+                const canvasFirmaReal = document.getElementById('firma_tecnico');
+                try {
+                    const firmaVacia = document.createElement('canvas'); firmaVacia.width = canvasFirmaReal.width; firmaVacia.height = canvasFirmaReal.height;
+                    if (canvasFirmaReal.toDataURL() !== firmaVacia.toDataURL()) { document.getElementById('firma_tecnico_data').value = canvasFirmaReal.toDataURL(); }
+                } catch(e) {}
+                urlFirma = await checkAndUpload(document.getElementById('firma_tecnico_data').value, `ordenes/${folioActual}/firma_${Date.now()}.png`);
+                
+                const updateData = { 
                     desc_falla: document.getElementById('desc_falla').value || '', 
                     desc_solucion: document.getElementById('desc_solucion').value || '', 
                     tec_nombre: document.getElementById('nombre_tecnico').value || '', 
                     tec_celular: document.getElementById('celular_tecnico').value || '', 
-                    comentario: document.getElementById('comentario_salida').value || '', 
-                    fecha_creacion: new Date().toISOString().split('T')[0], 
-                    fecha_hora_completa: new Date().toISOString(), 
-                    estado_confirmacion: estadoFinal, 
-                    urls_falla: urlsFalla, 
-                    urls_proceso: urlsProceso, 
-                    urls_solucion: urlsSolucion, 
-                    urls_evidencia: urlsEvidencia,
-                    url_soporte: urlSoporte, 
-                    url_selfie: urlSelfie, 
-                    url_firma: urlFirma 
+                    comentario: document.getElementById('comentario_salida').value || '',
+                    urls_falla: urlsFalla, urls_proceso: urlsProceso, urls_solucion: urlsSolucion, urls_evidencia: urlsEvidencia,
+                    url_soporte: urlSoporte, url_selfie: urlSelfie, url_firma: urlFirma,
+                    fecha_ultima_edicion: new Date().toISOString()
                 };
                 
-                await db.collection("tickets_mantenimiento").doc(docId).set(ordenData, { merge: true });
-                
-                if (estadoFinal === 'En proceso') { 
-                    const overlay = document.getElementById('countdown-overlay');
-                    overlay.classList.add('show');
-                    
-                    let timeLeft = 13;
-                    const countdownElement = document.getElementById('countdown-number');
-                    
-                    const timerInterval = setInterval(() => {
-                        timeLeft--;
-                        countdownElement.innerText = timeLeft;
-                        
-                        if (timeLeft <= 0) {
-                            clearInterval(timerInterval);
-                            overlay.classList.remove('show');
-                            cargarMisOrdenes();
-                            cambiarTabMtto('Realizado');
-                            mostrarFormularioNuevaOrden();
-                        }
-                    }, 1000);
-                } else { 
-                    showCustomAlert("Éxito", "Orden Guardada Correctamente.", true);
-                    document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="plus-circle" style="width: 16px;"></i> Nueva Orden`; lucide.createIcons(); cargarMisOrdenes(); cambiarTabMtto('Borrador'); 
-                }
+                await db.collection("tickets_mantenimiento").doc(docId).update(updateData);
+                showCustomAlert("Cambios Guardados", "La orden ha sido actualizada correctamente.", true);
+                cargarMisOrdenes();
+                cambiarTabMtto('Realizado');
+                mostrarFormularioNuevaOrden();
             } catch (err) { 
-                console.error("Error:", err);
-                showCustomAlert("Error", err.message || "Ocurrió un error.", false); 
+                console.error("Error:", err); showCustomAlert("Error", err.message || "Ocurrió un error al guardar.", false); 
             } finally { 
-                btnGuardar.disabled = false; btnEnviar.disabled = false; 
-                btnGuardar.innerHTML = '<i data-lucide="save"></i> Guardar Orden'; 
-                btnEnviar.innerHTML = '<i data-lucide="send"></i> Enviar Orden'; 
-                lucide.createIcons(); 
+                btnCambios.disabled = false; btnCambios.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a.2.2 0 0 1 .2.2V7a1 1 0 0 0 1 1h3.8a.2.2 0 0 1 .2.2v12.8a.2.2 0 0 1-.2.2H4.2a.2.2 0 0 1-.2-.2V4.2a.2.2 0 0 1 .2-.2h11Z"/><path d="M14 2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8Z"/><path d="M8 12h8"/><path d="M8 16h8"/></svg> Guardar cambios';
             }
         }
 
@@ -837,18 +782,17 @@
             const datosParaPDF = { 
                 sucursal: t.sucursal, suc_dir: t.suc_dir, suc_col: t.suc_col, suc_city: t.suc_city, suc_cp: t.suc_cp, suc_tel: t.suc_tel, suc_mail: t.suc_mail, 
                 ticket: t.id_ticket, incidencia: t.id_incidencia, area: t.area, subarea: t.subarea, desc_falla: t.desc_falla, fotos_falla: t.urls_falla, 
-                fotos_proceso: t.urls_proceso, 
-                desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, 
+                fotos_proceso: t.urls_proceso, desc_solucion: t.desc_solucion, fotos_solucion: t.urls_solucion, 
                 prov_nombre: t.prov_nombre, prov_rfc: t.prov_rfc, prov_dir: t.prov_dir, prov_cont: t.prov_cont, prov_tel: t.prov_tel, prov_mail: t.prov_mail, 
                 tec_nombre: t.tec_nombre, tec_celular: t.tec_celular, comentario: t.comentario, firma: t.url_firma, foto_soporte: t.url_soporte, foto_selfie: t.url_selfie, 
-                fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || '')
+                fecha_hora: t.fecha_hora_completa ? new Date(t.fecha_hora_completa).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : (t.fecha_creacion || ''),
+                permitir_edicion: false
             }; 
             sessionStorage.setItem('DatosOrdenPDF', JSON.stringify(datosParaPDF)); window.open('index2.html', '_blank'); 
         }
 
         function abrirModalLecturaCP(id_doc) { const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; document.getElementById('cp-nombre').value = o.evaluacion_nombre || 'N/A'; document.getElementById('cp-numero').value = o.evaluacion_numero || 'N/A'; document.getElementById('cp-cargo').value = o.evaluacion_cargo || 'N/A'; document.getElementById('cp-nivel').value = o.evaluacion_nivel || 'N/A'; document.getElementById('cp-comentario').value = o.evaluacion_comentario || 'N/A'; document.getElementById('modalLecturaCP').classList.add('show-modal'); lucide.createIcons(); }
         function cerrarModalCP() { document.getElementById('modalLecturaCP').classList.remove('show-modal'); }
-
         function togglePassword() { const p = document.getElementById('password'); const i = document.getElementById('toggleIcon'); if (p.type === 'password') { p.type = 'text'; i.textContent = 'visibility'; } else { p.type = 'password'; i.textContent = 'visibility_off'; } }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -862,19 +806,12 @@
                 const listaTec = document.getElementById('tecnicos-list'); listaTec.innerHTML = ''; if(window.appData.tecnicos) window.appData.tecnicos.forEach(t => { let opt = document.createElement('option'); opt.value = t; listaTec.appendChild(opt); });
                 document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'block'; lucide.createIcons();
                 inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
-                
                 configurarPermisosMenu();
-
-                // ══════════════════════════════════════════════════════════════
-                // NUEVO: Escuchar mensaje desde index2.html (ventana emergente)
-                // ══════════════════════════════════════════════════════════════
                 window.addEventListener('message', function(event) {
                     if (event.data && event.data.accion === 'editarOrden') {
                         const ticketId = event.data.ticketId;
                         const orden = misOrdenes.find(o => o.id_ticket === ticketId || o.id_incidencia === ticketId || o.id_doc === ticketId);
-                        if (orden) {
-                            cargarBorrador(orden.id_doc);
-                        }
+                        if (orden) { cargarBorrador(orden.id_doc); }
                     }
                 });
             }
@@ -885,20 +822,11 @@
         document.getElementById('sucursal-input').addEventListener('input', function(e) { const val = e.target.value; const container = document.getElementById('sucursal-details'); if(!window.appData || !window.appData.sucursales) return; const suc = window.appData.sucursales.find(s => s.nombre === val); if(suc) { document.getElementById('suc-dir').innerText = suc.direccion || ''; document.getElementById('suc-col').innerText = suc.colonia || ''; document.getElementById('suc-city').innerText = suc.ciudad || ''; document.getElementById('suc-cp').innerText = suc.cp || ''; document.getElementById('suc-client').innerText = suc.cliente || ''; document.getElementById('suc-tel').innerText = suc.telefono || ''; document.getElementById('suc-mail').innerText = suc.correo || ''; container.style.display = 'grid'; } else { container.style.display = 'none'; } });
         document.getElementById('celular_tecnico').addEventListener('input', function(e) { e.target.value = e.target.value.replace(/[^0-9]/g, ''); if (e.target.value.length > 10) e.target.value = e.target.value.slice(0, 10); });
 
-        function cambiarVista(event, idVista) {
-            if(event) event.preventDefault();
-            document.querySelectorAll('.modulo-vista').forEach(v => v.classList.remove('activa'));
-            if(event) { document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('activa')); event.currentTarget.classList.add('activa'); }
-            document.getElementById(idVista).classList.add('activa');
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth <= 1024 && sidebar && sidebar.classList.contains('open')) sidebar.classList.remove('open');
-        }
-        
+        function cambiarVista(event, idVista) { if(event) event.preventDefault(); document.querySelectorAll('.modulo-vista').forEach(v => v.classList.remove('activa')); if(event) { document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('activa')); event.currentTarget.classList.add('activa'); } document.getElementById(idVista).classList.add('activa'); const sidebar = document.getElementById('sidebar'); if (window.innerWidth <= 1024 && sidebar && sidebar.classList.contains('open')) sidebar.classList.remove('open'); }
         const togglesSidebar = document.querySelectorAll('[data-sidebar-toggle]');
         togglesSidebar.forEach(t => t.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open')));
         document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
         document.getElementById('sidebar-backdrop').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
-        
         const userMenu = document.querySelector('[data-user-menu]');
         if (userMenu) { const trigger = userMenu.querySelector('[data-user-trigger]'); const dropdown = userMenu.querySelector('[data-user-dropdown]'); trigger.addEventListener('click', (event) => { event.stopPropagation(); dropdown.classList.toggle('show'); }); document.addEventListener('click', (event) => { if (!userMenu.contains(event.target)) dropdown.classList.remove('show'); }); }
 
@@ -922,21 +850,14 @@
         function cerrarSesionGlobal() { showConfirm("Cerrar Sesión", "¿Seguro que quieres cerrar sesión?", function() { sessionStorage.clear(); window.location.reload(); }); }
 
         function configurarPermisosMenu() {
-            const appDataStr = sessionStorage.getItem('loginSession');
-            if (!appDataStr) return;
-            const appData = JSON.parse(appDataStr);
-            const privilegio = String(appData.privilegio); 
-
-            document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = '');
-            document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
-
+            const appDataStr = sessionStorage.getItem('loginSession'); if (!appDataStr) return;
+            const appData = JSON.parse(appDataStr); const privilegio = String(appData.privilegio);
+            document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
             if (privilegio === '1') {
-                const seccionReportes = document.getElementById('nav-seccion-reportes');
-                if (seccionReportes) seccionReportes.style.display = 'none';
+                const seccionReportes = document.getElementById('nav-seccion-reportes'); if (seccionReportes) seccionReportes.style.display = 'none';
                 const enlacesOcultar = ['orden_de_servicio.html', 'aprobacion.html', 'facturacion.html'];
                 document.querySelectorAll('.sidebar-link').forEach(link => { const href = link.getAttribute('href'); if (enlacesOcultar.includes(href)) { link.style.display = 'none'; } });
-                const seccionAdmin = document.getElementById('nav-seccion-admin');
-                if (seccionAdmin) { const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title'); if (tituloAdmin) tituloAdmin.innerText = "Administración"; }
+                const seccionAdmin = document.getElementById('nav-seccion-admin'); if (seccionAdmin) { const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title'); if (tituloAdmin) tituloAdmin.innerText = "Administración"; }
             }
         }
     </script>
