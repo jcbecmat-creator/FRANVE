@@ -578,11 +578,22 @@
                 misOrdenes.sort((a, b) => (b.fecha_creacion || "").localeCompare(a.fecha_creacion || ""));
                 actualizarBadgesMtto(); if(tabMttoActual !== 'Nueva Orden') renderTablaMisOrdenes();
                 
-                const editarId = sessionStorage.getItem('editarPDFId');
+                // ═══════════════════════════════════════════════════════
+                // CORRECCIÓN PRINCIPAL: Usar localStorage en vez de sessionStorage
+                // localStorage SÍ se comparte entre ventanas/pestañas del mismo origen
+                // ═══════════════════════════════════════════════════════
+                const editarId = localStorage.getItem('editarPDFId');
                 if (editarId) {
-                    sessionStorage.removeItem('editarPDFId');
+                    localStorage.removeItem('editarPDFId');
+                    console.log('[EDITAR PDF] Se detectó editarPDFId desde localStorage:', editarId);
                     const orden = misOrdenes.find(o => o.id_ticket === editarId || o.id_incidencia === editarId || o.id_doc === editarId);
-                    if (orden) { setTimeout(() => { cargarBorrador(orden.id_doc); }, 500); }
+                    if (orden) { 
+                        console.log('[EDITAR PDF] Orden encontrada, cargando borrador:', orden.id_doc);
+                        setTimeout(() => { cargarBorrador(orden.id_doc); }, 800); 
+                    } else {
+                        console.warn('[EDITAR PDF] No se encontró la orden con ID:', editarId);
+                        console.log('[EDITAR PDF] Órdenes disponibles:', misOrdenes.map(o => ({id_ticket: o.id_ticket, id_doc: o.id_doc})));
+                    }
                 }
             }).catch(err => console.error("Error al cargar órdenes", err));
         }
@@ -651,7 +662,9 @@
         }
 
         function cargarBorrador(id_doc) {
-            const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; cambiarTabMtto('Nueva Orden', true); 
+            const o = misOrdenes.find(x => x.id_doc === id_doc); if(!o) return; 
+            console.log('[CARGAR BORRADOR] Cargando orden:', id_doc, 'Estado:', o.estado_confirmacion);
+            cambiarTabMtto('Nueva Orden', true); 
             document.getElementById('tab-Nueva Orden').innerHTML = `<i data-lucide="edit-2" style="width: 16px;"></i> Editando`; lucide.createIcons();
             document.getElementById('doc_id_actual').value = o.id_doc; document.getElementById('folio_mc').value = o.id_ticket || ''; document.getElementById('incidencia-input').value = o.id_incidencia || ''; document.getElementById('incidencia_doc_id').value = o.id_incidencia_doc || '';
             document.getElementById('sucursal-input').value = o.sucursal || ''; document.getElementById('sucursal-input').dispatchEvent(new Event('input'));
@@ -725,7 +738,7 @@
         }
 
         // ══════════════════════════════════════════════════════════════
-        // NUEVA FUNCIÓN: Guardar cambios en orden ya procesada
+        // FUNCIÓN: Guardar cambios en orden ya procesada
         // ══════════════════════════════════════════════════════════════
         async function guardarCambios() {
             const btnCambios = document.getElementById('btn-guardar-cambios');
@@ -807,11 +820,34 @@
                 document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'block'; lucide.createIcons();
                 inicializarFirma(); mostrarFormularioNuevaOrden(); cargarMisOrdenes(); cargarIncidenciasPendientes(); 
                 configurarPermisosMenu();
+
+                // ═══════════════════════════════════════════════════════
+                // Escuchar mensajes de index2.html vía postMessage (método alternativo)
+                // ═══════════════════════════════════════════════════════
                 window.addEventListener('message', function(event) {
                     if (event.data && event.data.accion === 'editarOrden') {
                         const ticketId = event.data.ticketId;
+                        console.log('[POSTMESSAGE] Recibida solicitud de edición para:', ticketId);
                         const orden = misOrdenes.find(o => o.id_ticket === ticketId || o.id_incidencia === ticketId || o.id_doc === ticketId);
-                        if (orden) { cargarBorrador(orden.id_doc); }
+                        if (orden) { 
+                            cargarBorrador(orden.id_doc); 
+                        }
+                    }
+                });
+
+                // ═══════════════════════════════════════════════════════
+                // Escuchar cambios en localStorage por si index2.html lo actualiza
+                // después de que esta página ya cargó
+                // ═══════════════════════════════════════════════════════
+                window.addEventListener('storage', function(event) {
+                    if (event.key === 'editarPDFId' && event.newValue) {
+                        const editarId = event.newValue;
+                        localStorage.removeItem('editarPDFId');
+                        console.log('[STORAGE EVENT] Detectado editarPDFId:', editarId);
+                        const orden = misOrdenes.find(o => o.id_ticket === editarId || o.id_incidencia === editarId || o.id_doc === editarId);
+                        if (orden) { 
+                            cargarBorrador(orden.id_doc); 
+                        }
                     }
                 });
             }
