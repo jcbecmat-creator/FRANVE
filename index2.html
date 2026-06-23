@@ -28,10 +28,52 @@
         .btn-cerrar { background-color: #4b5563 !important; color: white !important; }
         .btn-cerrar:hover { background-color: #374151 !important; }
 
+        /* ══════════════════════════════════════════════════════════════ */
+        /* NUEVO: Botón flotante rojo "Editar PDF"                       */
+        /* ══════════════════════════════════════════════════════════════ */
+        .btn-editar-pdf {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(220, 38, 38, 0.45);
+            z-index: 1001;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+        .btn-editar-pdf:hover {
+            background: linear-gradient(135deg, #B91C1C, #991B1B);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.55);
+        }
+        .btn-editar-pdf:active {
+            transform: translateY(0px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+        .btn-editar-pdf svg {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            stroke-width: 2.5;
+            fill: none;
+        }
+
         @media (max-width: 767px) {
             body:not(.pdf-generating) { padding: 60px 0 0 0; } 
             body:not(.pdf-generating) #contenido-pdf { transform: scale(0.48); transform-origin: top center; margin-top: 10px; width: 210mm; } 
             body:not(.pdf-generating) .page { box-shadow: none; margin: 0 0 10px 0; padding: 8mm 15mm; border: none; height: auto; } 
+            .btn-editar-pdf { bottom: 15px; right: 15px; padding: 12px 20px; font-size: 13px; }
         }
 
         .page { width: 210mm; height: 297mm; background: white; margin: 0 auto 20px auto; padding: 6mm 15mm; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.5); position: relative; display: flex; flex-direction: column; overflow: hidden; }
@@ -112,7 +154,7 @@
             body { background-color: white; padding: 0; margin: 0; }
             #contenido-pdf { transform: none; width: 210mm; margin: 0; }
             .page { box-shadow: none; margin: 0; padding: 10mm 15mm; border: none; height: 297mm; overflow: hidden; }
-            .btn-descargar, .btn-regresar { display: none; }
+            .btn-descargar, .btn-regresar, .btn-editar-pdf { display: none; }
         }
     </style>
 </head>
@@ -120,6 +162,16 @@
 
     <button class="btn-regresar" id="btn-regresar" onclick="manejarRegreso()">Volver a la App</button>
     <button class="btn-descargar" id="btn-descargar" onclick="generarPDF()">Descargar PDF</button>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- NUEVO: Botón flotante rojo "Editar PDF"                       -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <button class="btn-editar-pdf" id="btn-editar-pdf" onclick="editarPDF()">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+        </svg>
+        Editar PDF
+    </button>
 
     <div id="contenido-pdf">
         
@@ -298,11 +350,38 @@
     </div>
 
     <script>
+        // ══════════════════════════════════════════════════════════════
+        // Variable global para almacenar el ticket ID a editar
+        // ══════════════════════════════════════════════════════════════
+        let ticketIdParaEditar = null;
+
         function manejarRegreso() {
             if (window.opener) {
                 window.close(); 
             } else {
                 window.location.href = 'index.html'; 
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // NUEVA FUNCIÓN: Editar PDF - Regresar al formulario precargado
+        // ══════════════════════════════════════════════════════════════
+        function editarPDF() {
+            if (!ticketIdParaEditar) {
+                alert('No se pudo identificar la orden para editar.');
+                return;
+            }
+            
+            // Guardar el ID del ticket en sessionStorage para que index.html lo lea
+            sessionStorage.setItem('editarPDFId', ticketIdParaEditar);
+            
+            // Si fue abierto como ventana emergente, enviar mensaje al opener
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ accion: 'editarOrden', ticketId: ticketIdParaEditar }, '*');
+                window.close();
+            } else {
+                // Navegar a index.html
+                window.location.href = 'index.html';
             }
         }
 
@@ -349,6 +428,12 @@
                 const data = JSON.parse(dataStr);
                 
                 const incidenciaMostrar = data.incidencia || data.ticket || data.id_ticket || '';
+                
+                // ══════════════════════════════════════════════════════════════
+                // NUEVO: Guardar el ticket ID para la función de editar
+                // Priorizar id_ticket (MC-XXXX) que es el folio en Firebase
+                // ══════════════════════════════════════════════════════════════
+                ticketIdParaEditar = data.ticket || data.id_ticket || null;
                 
                 // Llenar encabezado - Hoja 1
                 document.getElementById('pdf-sucursal').innerText = data.sucursal || '';
@@ -414,6 +499,11 @@
                 if(data.foto_selfie) { document.getElementById('pdf-foto-tecnico').innerHTML = `<img src="${data.foto_selfie}">`; }
                 if(data.foto_soporte) { document.getElementById('pdf-soporte-fisico').innerHTML = `<img src="${data.foto_soporte}">`; }
 
+                // ══════════════════════════════════════════════════════════════
+                // NUEVO: Escuchar mensaje desde la ventana padre (si existe)
+                // Esto permite editar desde confirmacion.html directamente
+                // ══════════════════════════════════════════════════════════════
+
             } else { alert("No se encontraron datos. Por favor regresa a la aplicación."); }
         });
 
@@ -422,10 +512,12 @@
 
             const btn = document.getElementById('btn-descargar');
             const btnR = document.querySelector('.btn-regresar');
+            const btnE = document.getElementById('btn-editar-pdf');
             
             btn.innerText = 'Cargando fotos...';
             btn.disabled = true;
             btnR.style.display = 'none';
+            btnE.style.display = 'none';
 
             window.scrollTo(0, 0);
 
@@ -462,6 +554,7 @@
             html2pdf().set(opciones).from(elemento).save().then(() => {
                 btn.style.display = 'block';
                 btnR.style.display = 'block';
+                btnE.style.display = 'flex';
                 btn.innerText = 'Descargar PDF';
                 btn.disabled = false;
                 
