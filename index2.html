@@ -160,7 +160,6 @@
     <button class="btn-regresar" id="btn-regresar" onclick="manejarRegreso()">Volver a la App</button>
     <button class="btn-descargar" id="btn-descargar" onclick="generarPDF()">Descargar PDF</button>
 
-    <!-- Botón visible por defecto, se oculta solo si permitir_edicion === false -->
     <button class="btn-editar-pdf" id="btn-editar-pdf" onclick="editarPDF()">
         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
@@ -342,20 +341,46 @@
             }
         }
 
+        // ══════════════════════════════════════════════════════════════
+        // FUNCIÓN CLAVE: editarPDF
+        // Cambio principal: sessionStorage → localStorage para editarPDFId
+        // Pausa de 300ms antes de redirigir para garantizar que el write
+        // se complete antes de que la navegación destruya el contexto
+        // ══════════════════════════════════════════════════════════════
         function editarPDF() {
             if (!ticketIdParaEditar) {
                 alert('No se pudo identificar la orden para editar.');
                 return;
             }
             
-            sessionStorage.setItem('editarPDFId', ticketIdParaEditar);
+            // 1. Escribir en localStorage (SÍ se comparte entre ventanas/pestañas)
+            localStorage.setItem('editarPDFId', ticketIdParaEditar);
             
+            // 2. También enviar por postMessage como respaldo inmediato
+            //    (funciona si la ventana opener ya está cargada y escuchando)
             if (window.opener && !window.opener.closed) {
-                window.opener.location.href = 'index.html';
-                window.close();
-            } else {
-                window.location.href = 'index.html';
+                try {
+                    window.opener.postMessage({
+                        accion: 'editarOrden',
+                        ticketId: ticketIdParaEditar
+                    }, '*');
+                } catch(e) {
+                    console.warn('No se pudo enviar postMessage:', e);
+                }
             }
+            
+            // 3. Esperar 300ms para asegurar que localStorage.setItem se confirmó
+            //    antes de que la redirección destruya este contexto
+            setTimeout(() => {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.location.href = 'index.html';
+                    window.close();
+                } else {
+                    // Si no hay ventana opener (ej. abierta en nueva pestaña directamente),
+                    // navegar esta misma pestaña a index.html
+                    window.location.href = 'index.html';
+                }
+            }, 300);
         }
 
         function esperarImagenes() {
@@ -386,6 +411,8 @@
                 btnRegresar.classList.add('btn-cerrar'); 
             }
 
+            // DatosOrdenPDF sigue en sessionStorage porque se escribe y lee
+            // en el mismo flujo de ventana (index.html la escribe → index2.html la lee)
             const dataStr = sessionStorage.getItem('DatosOrdenPDF');
             const btnEditar = document.getElementById('btn-editar-pdf');
             
@@ -396,15 +423,11 @@
                 
                 ticketIdParaEditar = data.ticket || data.id_ticket || null;
                 
-                // ══════════════════════════════════════════════════════════════
-                // LÓGICA: Botón visible por defecto (display: flex en CSS)
+                // Botón visible por defecto (display: flex en CSS)
                 // Solo se OCULTA si permitir_edicion es explícitamente false
-                // Esto garantiza que funcione desde confirmacion.html
-                // ══════════════════════════════════════════════════════════════
                 if (data.permitir_edicion === false) {
                     btnEditar.style.display = 'none';
                 }
-                // En cualquier otro caso (true, undefined, etc.) el botón permanece visible
                 
                 // Llenar encabezado - Hoja 1
                 document.getElementById('pdf-sucursal').innerText = data.sucursal || '';
@@ -483,7 +506,6 @@
             const btnR = document.querySelector('.btn-regresar');
             const btnE = document.getElementById('btn-editar-pdf');
             
-            // Guardar si el botón editar estaba visible antes
             const editarVisible = btnE.style.display !== 'none';
             
             btn.innerText = 'Cargando fotos...';
@@ -527,7 +549,6 @@
                 btn.style.display = 'block';
                 btnR.style.display = 'block';
                 
-                // Restaurar botón editar solo si estaba visible antes
                 if (editarVisible) {
                     btnE.style.display = 'flex';
                 }
