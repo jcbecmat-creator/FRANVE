@@ -113,7 +113,11 @@
         .section-agregar { width: 100%; padding-bottom: 20px; margin-bottom: 20px; text-align: right; border-bottom: 1px solid #e5e7eb;}
         .btn-add-concepto { background: #81D0DC; color: #131520; border: none; height: 42px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 220px; transition: opacity 0.2s; }
         .btn-add-concepto:hover { opacity: 0.85; }
-        .botones-accion-group { display: flex; gap: 12px; justify-content: flex-end; width: 100%; }
+        
+        .modal-footer-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .capturado-label { font-size: 14px; color: #4b5563; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+
+        .botones-accion-group { display: flex; gap: 12px; justify-content: flex-end; }
         .btn-cancelar { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; height: 44px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 220px; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
         .btn-confirmar { background: #81D0DC; color: #131520; border: none; height: 44px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 220px; transition: opacity 0.2s; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
         .btn-confirmar:hover { opacity: 0.85; }
@@ -133,8 +137,10 @@
             .header-left-group { flex-direction: column; align-items: flex-start; gap: 10px; }
             .header-folio-group { border-left: none; padding-left: 0; }
             .header-totals-group { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 15px; }
-            .botones-accion-group { flex-direction: column; }
+            .modal-footer-row { flex-direction: column-reverse; gap: 15px; align-items: stretch; }
+            .botones-accion-group { flex-direction: column; width: 100%; }
             .btn-cancelar, .btn-confirmar, .btn-add-concepto { width: 100%; }
+            .capturado-label { justify-content: center; }
         }
     </style>
 </head>
@@ -331,13 +337,19 @@
                         <i data-lucide="plus" style="width:18px;"></i> Agregar concepto
                     </button>
                 </div>
-                <div class="botones-accion-group">
-                    <button type="button" class="btn-cancelar" id="btn-cancelar-gral" onclick="cerrarModal()">
-                        Cancelar
-                    </button>
-                    <button type="button" class="btn-confirmar" id="btn-guardar-gral" onclick="guardarConceptos()">
-                        <i data-lucide="dollar-sign" style="width:18px;"></i> Confirmar
-                    </button>
+                <div class="modal-footer-row">
+                    <div class="capturado-label" id="capturado-por-container">
+                        <i data-lucide="user-check" style="width: 18px; height: 18px; color: #81D0DC;"></i>
+                        <span id="capturado-por-nombre">Cargando...</span>
+                    </div>
+                    <div class="botones-accion-group">
+                        <button type="button" class="btn-cancelar" id="btn-cancelar-gral" onclick="cerrarModal()">
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn-confirmar" id="btn-guardar-gral" onclick="guardarConceptos()">
+                            <i data-lucide="dollar-sign" style="width:18px;"></i> Confirmir
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -402,6 +414,12 @@
             if(welcomeTitle) welcomeTitle.innerText = appData.nombreProveedor || savedUser;
             const dropdownName = document.getElementById('dropdown-username');
             if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
+            
+            // Etiqueta de quién captura los costos en el modal
+            const capturadoPorNombre = document.getElementById('capturado-por-nombre');
+            if(capturadoPorNombre) {
+                capturadoPorNombre.innerText = `Capturado por: ${appData.nombreProveedor || savedUser}`;
+            }
         }
 
         const userMenu = document.querySelector('[data-user-menu]');
@@ -418,7 +436,7 @@
         document.querySelector('[data-sidebar-close]').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
 
         cargarTodosLosTickets();
-        configurarPermisosMenu(); // <--- LLAMADA A LA FUNCIÓN CORREGIDA
+        configurarPermisosMenu(); 
     });
 
     // === CARGA Y CLASIFICACIÓN DE TICKETS ===
@@ -787,122 +805,100 @@
             const tipo = fila.querySelector('.inp-tipo').value;
             const concepto = fila.querySelector('.inp-concepto').value.trim();
             const unidad = fila.querySelector('.inp-unidad').value;
-            const cant = parseFloat(fila.querySelector('.inp-cant').value) || 0;
+            const cantidad = parseFloat(fila.querySelector('.inp-cant').value) || 0;
             const precio = parseFloat(fila.querySelector('.inp-precio').value) || 0;
-            const importe = cant * precio;
-            const obs = fila.querySelector('.inp-obs').value.trim();
+            const importe = cantidad * precio;
+            const observacion = fila.querySelector('.inp-obs').value.trim();
 
-            if(concepto !== '' || cant > 0 || precio > 0) {
-                if(concepto === '' || cant <= 0 || precio <= 0) {
-                    errorFaltanDatos = true;
-                }
-                
-                let estadoEval = 'pendiente';
-                if (modo === 'corregir') {
-                    const existingTicket = ticketsGlobales.find(t => t.id_ticket === folio);
-                    if (existingTicket && existingTicket.conceptos_costos) {
-                        const existingConcepto = existingTicket.conceptos_costos.find(c => c.concepto === concepto);
-                        if (existingConcepto && existingConcepto.estado_evaluacion === 'rechazado') {
-                            estadoEval = 'pendiente'; 
-                        } else if (existingConcepto && existingConcepto.estado_evaluacion === 'aprobado') {
-                            estadoEval = 'aprobado'; 
-                        }
+            // Si es modo corregir y la fila está deshabilitada (aprobada), mantener su estado_evaluacion
+            let estadoEvaluacion = 'pendiente';
+            let motivoRechazo = '';
+
+            if (modo === 'corregir') {
+                const folioData = ticketsGlobales.find(t => t.id_ticket === folio);
+                if(folioData && folioData.conceptos_costos) {
+                    const conceptoOriginal = folioData.conceptos_costos.find(c => 
+                        c.concepto === concepto && c.tipo === tipo && c.unidad === unidad
+                    );
+                    if(conceptoOriginal && conceptoOriginal.estado_evaluacion === 'aprobado') {
+                        estadoEvaluacion = 'aprobado';
                     }
                 }
-                
-                conceptosAguardar.push({
-                    tipo, concepto, unidad, cantidad: cant, precio_unitario: precio, importe, observacion: obs, estado_evaluacion: estadoEval
-                });
             }
+
+            if(concepto === '' || cantidad === 0 || precio === 0) {
+                if(concepto !== '' || cantidad !== 0 || precio !== 0) {
+                    errorFaltanDatos = true;
+                }
+                return; 
+            }
+
+            conceptosAguardar.push({
+                tipo: tipo,
+                concepto: concepto,
+                unidad: unidad,
+                cantidad: cantidad,
+                precio_unitario: precio,
+                importe: importe,
+                observacion: observacion,
+                estado_evaluacion: estadoEvaluacion,
+                motivo_rechazo: motivoRechazo
+            });
         });
 
         if(errorFaltanDatos) {
-            showCustomAlert("Datos incompletos", "Por favor completa Concepto, Cantidad y Precio Unitario en todas las filas.", false);
+            showCustomAlert("Datos incompletos", "Algunos conceptos tienen campos vacíos. Completa todos los datos o elimina las filas vacías.", false);
             return;
         }
 
         if(conceptosAguardar.length === 0) {
-            showCustomAlert("Sin conceptos", "Debes agregar al menos un concepto para guardar.", false);
+            showCustomAlert("Sin conceptos", "Debes agregar al menos un concepto con datos válidos para guardar.", false);
             return;
         }
 
-        const btnGuardar = document.getElementById('btn-guardar-gral');
-        btnGuardar.disabled = true;
-        btnGuardar.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:18px;"></i> Guardando...';
+        const btnConfirmar = document.getElementById('btn-guardar-gral');
+        btnConfirmar.innerHTML = '<i data-lucide="loader" style="width:18px;" class="animate-spin"></i> Guardando...';
+        btnConfirmar.disabled = true;
 
         try {
             let nuevoEstado = 'Pendiente de Aprobación';
-
-            const updateData = {
-                conceptos_costos: conceptosAguardar,
+            
+            await db.collection("tickets_mantenimiento").doc(folio).update({
+                concepto_costos: conceptosAguardar,
                 costo_subtotal: subtotalNum,
                 costo_iva: ivaNum,
                 costo_total: totalNum,
                 cantidad_conceptos: conceptosAguardar.length,
-                estado_confirmacion: nuevoEstado
-            };
+                estado_confirmacion: nuevoEstado,
+                fecha_captura_costos: new Date().toISOString()
+            });
 
-            await db.collection("tickets_mantenimiento").doc(folio).update(updateData);
-
-            const index = ticketsGlobales.findIndex(t => t.id_ticket === folio);
-            if(index !== -1) {
-                ticketsGlobales[index] = { ...ticketsGlobales[index], ...updateData };
-            }
-
-            actualizarBadges();
-            renderTablaActual();
+            showCustomAlert("Guardado exitoso", "Los costos de reparación se han registrado correctamente.", true);
             cerrarModal();
-            showCustomAlert("¡Guardado!", "Los costos se han guardado correctamente.", true);
+            cargarTodosLosTickets();
 
         } catch (error) {
-            console.error("Error al guardar:", error);
-            showCustomAlert("Error", "No se pudieron guardar los costos en Firebase.", false);
+            console.error("Error al guardar: ", error);
+            showCustomAlert("Error", "Ocurrió un problema al guardar los costos. Inténtalo de nuevo.", false);
         } finally {
-            btnGuardar.disabled = false;
-            btnGuardar.innerHTML = '<i data-lucide="dollar-sign" style="width:18px;"></i> Confirmar';
+            btnConfirmar.innerHTML = '<i data-lucide="dollar-sign" style="width:18px;"></i> Confirmir';
+            btnConfirmar.disabled = false;
             lucide.createIcons();
         }
     }
 
-function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession'); 
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr); 
-    const privilegio = String(appData.privilegio);
-    
-    // 1. Mostrar todo por defecto
-    document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); 
-    document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
-    
-    // 2. Aplicar restricciones solo a Privilegio 1
-    if (privilegio === '1') {
-        
-        // Ocultar la sección completa de Reportes
-        const seccionReportes = document.getElementById('nav-seccion-reportes'); 
-        if (seccionReportes) seccionReportes.style.display = 'none';
-        
-        // ✅ NUEVO: Ocultar TODA la sección de Administración (incluye Costos, Confirmación, etc.)
-        const seccionAdmin = document.getElementById('nav-seccion-admin'); 
-        if (seccionAdmin) seccionAdmin.style.display = 'none';
-
-        // Por seguridad, también ocultamos los enlaces individuales por si están fuera de la sección
-        const enlacesOcultar = [
-            'orden_de_servicio.html', 
-            'confirmacion.html',
-            'costos.html',          // ✅ Agregado
-            'aprobacion.html', 
-            'facturacion.html'
-        ];
-        
-        document.querySelectorAll('.sidebar-link').forEach(link => { 
-            const href = link.getAttribute('href'); 
-            if (enlacesOcultar.includes(href)) { 
-                link.style.display = 'none'; 
-            } 
-        });
+    function configurarPermisosMenu() {
+        const appDataStr = sessionStorage.getItem('loginSession');
+        if(appDataStr) {
+            const appData = JSON.parse(appDataStr);
+            if(appData.privilegio == 1 || appData.privilegio == "1") {
+                const seccionAdmin = document.getElementById('nav-seccion-admin');
+                if(seccionAdmin) seccionAdmin.style.display = 'none';
+                const seccionReportes = document.getElementById('nav-seccion-reportes');
+                if(seccionReportes) seccionReportes.style.display = 'none';
+            }
+        }
     }
-}
 </script>
 </body>
 </html>
