@@ -341,12 +341,13 @@
                     <div class="eval-field-group">
                         <label class="eval-label"><i data-lucide="user"></i>Nombre</label>
                         <div class="eval-input-wrapper">
-                            <select id="eval-nombre" class="eval-input-control" onchange="actualizarCargo()">
-                                <option value="">Selecciona un nombre...</option>
-                                <option value="FRANCISCO VELASCO VALDIVIA">FRANCISCO VELASCO VALDIVIA</option>
-                                <option value="JORGE ALBERTO ANGEL">JORGE ALBERTO ANGEL</option>
-                                <option value="GENSY SOFIA VIVANCO AGUILAR">GENSY SOFIA VIVANCO AGUILAR</option>
-                            </select>
+<select id="eval-nombre" class="eval-input-control" onchange="actualizarCargo()">
+    <option value="">Selecciona un nombre...</option>
+    <option value="FRANCISCO VELASCO VALDIVIA">FRANCISCO VELASCO VALDIVIA</option>
+    <option value="JORGE ALBERTO ANGEL">JORGE ALBERTO ANGEL</option>
+    <option value="GENSY SOFIA VIVANCO AGUILAR">GENSY SOFIA VIVANCO AGUILAR</option>
+    <option value="ELÍAS CRUZ MOTA">ELÍAS CRUZ MOTA</option>
+</select>
                         </div>
                     </div>
                     <div class="eval-field-group">
@@ -468,18 +469,19 @@
     // ==========================================
     // 3. LÓGICA DE NOMBRE Y CARGO
     // ==========================================
-    function actualizarCargo() {
-        const nombreSeleccionado = document.getElementById('eval-nombre').value;
-        const cargoInput = document.getElementById('eval-cargo');
-        
-        const cargos = {
-            'FRANCISCO VELASCO VALDIVIA': 'ADMINISTRADOR GENERAL',
-            'JORGE ALBERTO ANGEL': 'LIDER DE PROYECTO',
-            'GENSY SOFIA VIVANCO AGUILAR': 'ADMINISTRACION CONTABLE'
-        };
-        
-        cargoInput.value = cargos[nombreSeleccionado] || '';
-    }
+function actualizarCargo() {
+    const nombreSeleccionado = document.getElementById('eval-nombre').value;
+    const cargoInput = document.getElementById('eval-cargo');
+    
+    const cargos = {
+        'FRANCISCO VELASCO VALDIVIA': 'ADMINISTRADOR GENERAL',
+        'JORGE ALBERTO ANGEL': 'LIDER DE PROYECTO',
+        'GENSY SOFIA VIVANCO AGUILAR': 'ADMINISTRACION CONTABLE',
+        'ELÍAS CRUZ MOTA': 'SUPERVISOR'
+    };
+    
+    cargoInput.value = cargos[nombreSeleccionado] || '';
+}
 
     // ==========================================
     // 4. INICIALIZACIÓN DE LA PÁGINA
