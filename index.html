@@ -885,17 +885,42 @@
         function dataURItoBlob(dataURI) { if(!dataURI) return null; const byteString = atob(dataURI.split(',')[1]); const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]; const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); return new Blob([ab], {type: mimeString}); }
         function cerrarSesionGlobal() { showConfirm("Cerrar Sesión", "¿Seguro que quieres cerrar sesión?", function() { sessionStorage.clear(); window.location.reload(); }); }
 
-        function configurarPermisosMenu() {
-            const appDataStr = sessionStorage.getItem('loginSession'); if (!appDataStr) return;
-            const appData = JSON.parse(appDataStr); const privilegio = String(appData.privilegio);
-            document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
-            if (privilegio === '1') {
-                const seccionReportes = document.getElementById('nav-seccion-reportes'); if (seccionReportes) seccionReportes.style.display = 'none';
-                const enlacesOcultar = ['orden_de_servicio.html', 'aprobacion.html', 'facturacion.html'];
-                document.querySelectorAll('.sidebar-link').forEach(link => { const href = link.getAttribute('href'); if (enlacesOcultar.includes(href)) { link.style.display = 'none'; } });
-                const seccionAdmin = document.getElementById('nav-seccion-admin'); if (seccionAdmin) { const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title'); if (tituloAdmin) tituloAdmin.innerText = "Administración"; }
-            }
+function configurarPermisosMenu() {
+    const appDataStr = sessionStorage.getItem('loginSession'); 
+    if (!appDataStr) return;
+    
+    const appData = JSON.parse(appDataStr); 
+    const privilegio = String(appData.privilegio);
+    
+    document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); 
+    document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
+    
+    if (privilegio === '1') {
+        const seccionReportes = document.getElementById('nav-seccion-reportes'); 
+        if (seccionReportes) seccionReportes.style.display = 'none';
+        
+        // ✅ AGREGAR 'confirmacion.html' AQUÍ
+        const enlacesOcultar = [
+            'orden_de_servicio.html', 
+            'confirmacion.html', 
+            'aprobacion.html', 
+            'facturacion.html'
+        ];
+        
+        document.querySelectorAll('.sidebar-link').forEach(link => { 
+            const href = link.getAttribute('href'); 
+            if (enlacesOcultar.includes(href)) { 
+                link.style.display = 'none'; 
+            } 
+        });
+        
+        const seccionAdmin = document.getElementById('nav-seccion-admin'); 
+        if (seccionAdmin) { 
+            const tituloAdmin = seccionAdmin.querySelector('.sidebar-section-title'); 
+            if (tituloAdmin) tituloAdmin.innerText = "Administración"; 
         }
+    }
+}
     </script>
 </body>
 </html>
