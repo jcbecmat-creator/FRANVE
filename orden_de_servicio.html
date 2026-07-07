@@ -116,13 +116,18 @@
         .btn-save-modal:hover { opacity: 0.85; }
         .btn-save-modal:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .fab-edit { position: fixed; bottom: 30px; right: 30px; background: #81D0DC; color: #131520; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700 !important; cursor: pointer; box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: none; align-items: center; gap: 8px; z-index: 100; transition: all 0.3s; }
+        .fab-edit { background: #81D0DC; color: #131520; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 700 !important; cursor: pointer; box-shadow: 0 4px 15px rgba(129, 208, 220, 0.3); display: none; align-items: center; gap: 8px; transition: all 0.3s; }
         .fab-edit:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(129, 208, 220, 0.4); }
+
+        /* CSS para el contenedor y el botón de eliminar */
+        .fab-container { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 15px; z-index: 100; }
+        .fab-delete { background: #DC2626; color: #FFFFFF; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
+        .fab-delete:hover { opacity: 0.85; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4); }
 
         #custom-alert .modal-card-alert { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         #alert-icon-container { margin-bottom: 16px; display: flex; justify-content: center; }
         #alert-title { margin: 0 0 8px 0; font-size: 18px; color: #111827; font-weight: 700 !important; }
-        #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b5563; line-height: 1.5; }
+        #alert-msg { margin: 0 0 24px 0; font-size: 14px; color: #4b636F; line-height: 1.5; }
         #alert-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; color: white; font-weight: 600 !important; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
         #alert-btn:hover { opacity: 0.9; }
     </style>
@@ -371,11 +376,20 @@
         </div>
     </div>
 
-    <!-- BOTÓN FLOTANTE EDICIÓN -->
-    <button id="btn-editar-flotante" class="fab-edit" onclick="abrirModalEdicion()">
-        <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i> 
-        Editar Incidencia
-    </button>
+    <!-- CONTENEDOR DE BOTONES FLOTANTES -->
+    <div class="fab-container">
+        <!-- Botón Editar -->
+        <button id="btn-editar-flotante" class="fab-edit" onclick="abrirModalEdicion()">
+            <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i> 
+            Editar Incidencia
+        </button>
+
+        <!-- Botón Eliminar -->
+        <button id="btn-eliminar-flotante" class="fab-edit fab-delete" onclick="eliminarIncidencia()">
+            <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i> 
+            Eliminar Incidencia
+        </button>
+    </div>
 
     <div id="custom-alert" class="modal-overlay">
         <div class="modal-card-alert">
@@ -596,11 +610,45 @@
     }
 
     function gestionarBotonFlotante() {
-        const fab = document.getElementById('btn-editar-flotante');
+        const fabEdit = document.getElementById('btn-editar-flotante');
+        const fabDel = document.getElementById('btn-eliminar-flotante');
+        
+        // Si hay una incidencia seleccionada y estamos en la pestaña correcta, mostramos ambos
         if(incidenciaSeleccionadaId && tabActual === 'pendientes') {
-            fab.style.display = 'flex';
+            if(fabEdit) fabEdit.style.display = 'flex';
+            if(fabDel) fabDel.style.display = 'flex';
         } else {
-            fab.style.display = 'none';
+            if(fabEdit) fabEdit.style.display = 'none';
+            if(fabDel) fabDel.style.display = 'none';
+        }
+    }
+
+    // Nueva función para eliminar de Firebase
+    async function eliminarIncidencia() {
+        if(!incidenciaSeleccionadaId) return;
+        
+        // Usamos un confirm nativo del navegador para evitar borrados accidentales
+        const confirmar = window.confirm("⚠️ ¿Estás seguro de que deseas ELIMINAR esta incidencia?\nEsta acción no se puede deshacer.");
+        if (!confirmar) return;
+
+        try {
+            // 1. Borramos de Firebase
+            await db.collection("incidencias").doc(incidenciaSeleccionadaId).delete();
+            
+            // 2. Quitamos del arreglo local
+            incidenciasGlobales = incidenciasGlobales.filter(i => i.id_documento !== incidenciaSeleccionadaId);
+            
+            // 3. Actualizamos la interfaz
+            incidenciaSeleccionadaId = null;
+            gestionarBotonFlotante();
+            actualizarBadges();
+            ejecutarFiltradoLogico();
+            
+            // 4. Mensaje de éxito
+            showCustomAlert("Eliminado", "La incidencia se ha eliminado correctamente.", true);
+        } catch (error) {
+            console.error("Error al eliminar:", error);
+            showCustomAlert("Error", "No se pudo eliminar la incidencia de la base de datos.", false);
         }
     }
 
@@ -972,45 +1020,45 @@
         }
     }
 
-function configurarPermisosMenu() {
-    const appDataStr = sessionStorage.getItem('loginSession'); 
-    if (!appDataStr) return;
-    
-    const appData = JSON.parse(appDataStr); 
-    const privilegio = String(appData.privilegio);
-    
-    // 1. Mostrar todo por defecto
-    document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); 
-    document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
-    
-    // 2. Aplicar restricciones solo a Privilegio 1
-    if (privilegio === '1') {
+    function configurarPermisosMenu() {
+        const appDataStr = sessionStorage.getItem('loginSession'); 
+        if (!appDataStr) return;
         
-        // Ocultar la sección completa de Reportes
-        const seccionReportes = document.getElementById('nav-seccion-reportes'); 
-        if (seccionReportes) seccionReportes.style.display = 'none';
+        const appData = JSON.parse(appDataStr); 
+        const privilegio = String(appData.privilegio);
         
-        // ✅ NUEVO: Ocultar TODA la sección de Administración (incluye Costos, Confirmación, etc.)
-        const seccionAdmin = document.getElementById('nav-seccion-admin'); 
-        if (seccionAdmin) seccionAdmin.style.display = 'none';
+        // 1. Mostrar todo por defecto
+        document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); 
+        document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
+        
+        // 2. Aplicar restricciones solo a Privilegio 1
+        if (privilegio === '1') {
+            
+            // Ocultar la sección completa de Reportes
+            const seccionReportes = document.getElementById('nav-seccion-reportes'); 
+            if (seccionReportes) seccionReportes.style.display = 'none';
+            
+            // ✅ NUEVO: Ocultar TODA la sección de Administración (incluye Costos, Confirmación, etc.)
+            const seccionAdmin = document.getElementById('nav-seccion-admin'); 
+            if (seccionAdmin) seccionAdmin.style.display = 'none';
 
-        // Por seguridad, también ocultamos los enlaces individuales por si están fuera de la sección
-        const enlacesOcultar = [
-            'orden_de_servicio.html', 
-            'confirmacion.html',
-            'costos.html',          // ✅ Agregado
-            'aprobacion.html', 
-            'facturacion.html'
-        ];
-        
-        document.querySelectorAll('.sidebar-link').forEach(link => { 
-            const href = link.getAttribute('href'); 
-            if (enlacesOcultar.includes(href)) { 
-                link.style.display = 'none'; 
-            } 
-        });
+            // Por seguridad, también ocultamos los enlaces individuales por si están fuera de la sección
+            const enlacesOcultar = [
+                'orden_de_servicio.html', 
+                'confirmacion.html',
+                'costos.html',          // ✅ Agregado
+                'aprobacion.html', 
+                'facturacion.html'
+            ];
+            
+            document.querySelectorAll('.sidebar-link').forEach(link => { 
+                const href = link.getAttribute('href'); 
+                if (enlacesOcultar.includes(href)) { 
+                    link.style.display = 'none'; 
+                } 
+            });
+        }
     }
-}
 </script>
 </body>
 </html>
