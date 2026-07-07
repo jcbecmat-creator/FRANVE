@@ -659,14 +659,32 @@
     }
 
     // Nueva función para eliminar de Firebase
-    async function eliminarIncidencia() {
+       async function eliminarIncidencia() {
         if(!incidenciaSeleccionadaId) return;
         
-        // Usamos un confirm nativo del navegador para evitar borrados accidentales
-        const confirmar = window.confirm("⚠️ ¿Estás seguro de que deseas ELIMINAR esta incidencia?\nEsta acción no se puede deshacer.");
-        if (!confirmar) return;
-
-        try {
+        // Llamamos a nuestra ventanita elegante personalizada
+        showConfirm("Confirmar Eliminación", "¿Estás seguro de que deseas ELIMINAR esta incidencia?<br>Esta acción no se puede deshacer.", async function() {
+            try {
+                // 1. Borramos de Firebase
+                await db.collection("incidencias").doc(incidenciaSeleccionadaId).delete();
+                
+                // 2. Quitamos del arreglo local
+                incidenciasGlobales = incidenciasGlobales.filter(i => i.id_documento !== incidenciaSeleccionadaId);
+                
+                // 3. Actualizamos la interfaz
+                incidenciaSeleccionadaId = null;
+                gestionarBotonFlotante();
+                actualizarBadges();
+                ejecutarFiltradoLogico();
+                
+                // 4. Mensaje de éxito
+                showCustomAlert("Eliminado", "La incidencia se ha eliminado correctamente.", true);
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                showCustomAlert("Error", "No se pudo eliminar la incidencia de la base de datos.", false);
+            }
+        });
+    }
             // 1. Borramos de Firebase
             await db.collection("incidencias").doc(incidenciaSeleccionadaId).delete();
             
