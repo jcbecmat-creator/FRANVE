@@ -1001,11 +1001,12 @@ function prepararDatosParaPDF(ticketData) {
             if (seccionReportes) seccionReportes.style.display = 'none';
 
             // Enlaces específicos que NO debe ver
-            const enlacesOcultar = [
-                'orden_de_servicio.html',
-                'aprobacion.html',
-                'facturacion.html'
-            ];
+const enlacesOcultar = [
+    'orden_de_servicio.html',
+    'confirmacion.html',   // ← Agregar esta línea
+    'aprobacion.html',
+    'facturacion.html'
+];
 
             document.querySelectorAll('.sidebar-link').forEach(link => {
                 const href = link.getAttribute('href');
