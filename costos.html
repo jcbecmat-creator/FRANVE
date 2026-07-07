@@ -410,15 +410,20 @@
         const appDataStr = sessionStorage.getItem('loginSession');
         if(appDataStr) {
             const appData = JSON.parse(appDataStr);
+            
+            // Obtenemos el nombre del usuario, NO el de la empresa (nombreProveedor)
+            const nombreUsuarioSesion = appData.nombre || appData.nombreProveedor || savedUser;
+            
             const welcomeTitle = document.getElementById('welcome-username-display');
-            if(welcomeTitle) welcomeTitle.innerText = appData.nombreProveedor || savedUser;
+            if(welcomeTitle) welcomeTitle.innerText = nombreUsuarioSesion;
+            
             const dropdownName = document.getElementById('dropdown-username');
-            if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
+            if(dropdownName) dropdownName.innerText = nombreUsuarioSesion;
             
             // Etiqueta de quién captura los costos en el modal
             const capturadoPorNombre = document.getElementById('capturado-por-nombre');
             if(capturadoPorNombre) {
-                capturadoPorNombre.innerText = `Capturado por: ${appData.nombreProveedor || savedUser}`;
+                capturadoPorNombre.innerText = `Capturado por: ${nombreUsuarioSesion}`;
             }
         }
 
