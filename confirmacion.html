@@ -500,9 +500,10 @@
             const dropdownName = document.getElementById('dropdown-username');
             if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
 
-            if(appData.privilegio == 2 || appData.privilegio == "2") {
-                window.location.replace('index.html');
-            }
+if(appData.privilegio == 1 || appData.privilegio == "1") {
+    // Privilegio 1 NO puede ver Confirmación Operativa, redirigir a Mantenimiento Correctivo
+    window.location.replace('index.html');
+}
         } else {
             window.location.replace('index.html');
         }
