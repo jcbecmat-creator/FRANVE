@@ -438,7 +438,6 @@
     let incidenciaSeleccionadaId = null;
     let confirmCallback = null;
 
-    // FUNCIÓN MEJORADA PARA PARSEAR CUALQUIER FORMATO DE FECHA
     function formatearFecha(fechaField) {
         if (!fechaField) return "—";
         if (fechaField && typeof fechaField.toDate === 'function') {
@@ -451,7 +450,6 @@
         }
         if (typeof fechaField === 'string') {
             if (fechaField.includes("Timestamp")) return "—";
-            // Intentar parsear strings ISO (ej. 2026-06-10T21:49:51.641Z)
             const parsedDate = new Date(fechaField);
             if (!isNaN(parsedDate.getTime())) {
                 return parsedDate.toLocaleDateString('es-MX') + ' ' + parsedDate.toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'});
@@ -462,13 +460,11 @@
     }
 
     function parsearFechaFirebase(fechaField) {
-        if (!fechaField) return new Date(0); // Época por defecto para fechas vacías
+        if (!fechaField) return new Date(0);
         if (typeof fechaField.toDate === 'function') return fechaField.toDate();
         if (fechaField.seconds) return new Date(fechaField.seconds * 1000);
-        // Si es string ISO, new Date() lo puede parsear directo
         const parsed = new Date(fechaField);
         if (!isNaN(parsed.getTime())) return parsed;
-        
         return new Date(0);
     }
 
@@ -545,7 +541,6 @@
         document.getElementById('custom-confirm').style.display = 'flex';
         try { if(window.lucide) lucide.createIcons(); } catch(e){}
     }
-    
     function closeConfirm(isAccepted) {
         document.getElementById('custom-confirm').style.display = 'none';
         if(isAccepted && confirmCallback) {
@@ -648,7 +643,6 @@
         const fabEdit = document.getElementById('btn-editar-flotante');
         const fabDel = document.getElementById('btn-eliminar-flotante');
         
-        // Si hay una incidencia seleccionada y estamos en la pestaña correcta, mostramos ambos
         if(incidenciaSeleccionadaId && tabActual === 'pendientes') {
             if(fabEdit) fabEdit.style.display = 'flex';
             if(fabDel) fabDel.style.display = 'flex';
@@ -658,11 +652,10 @@
         }
     }
 
-    // Nueva función para eliminar de Firebase
-       async function eliminarIncidencia() {
+    // Función eliminar completamente corregida usando la interfaz gráfica
+    async function eliminarIncidencia() {
         if(!incidenciaSeleccionadaId) return;
         
-        // Llamamos a nuestra ventanita elegante personalizada
         showConfirm("Confirmar Eliminación", "¿Estás seguro de que deseas ELIMINAR esta incidencia?<br>Esta acción no se puede deshacer.", async function() {
             try {
                 // 1. Borramos de Firebase
@@ -684,25 +677,6 @@
                 showCustomAlert("Error", "No se pudo eliminar la incidencia de la base de datos.", false);
             }
         });
-    }
-            // 1. Borramos de Firebase
-            await db.collection("incidencias").doc(incidenciaSeleccionadaId).delete();
-            
-            // 2. Quitamos del arreglo local
-            incidenciasGlobales = incidenciasGlobales.filter(i => i.id_documento !== incidenciaSeleccionadaId);
-            
-            // 3. Actualizamos la interfaz
-            incidenciaSeleccionadaId = null;
-            gestionarBotonFlotante();
-            actualizarBadges();
-            ejecutarFiltradoLogico();
-            
-            // 4. Mensaje de éxito
-            showCustomAlert("Eliminado", "La incidencia se ha eliminado correctamente.", true);
-        } catch (error) {
-            console.error("Error al eliminar:", error);
-            showCustomAlert("Error", "No se pudo eliminar la incidencia de la base de datos.", false);
-        }
     }
 
     function renderizarTabla(listaIncidencias) {
@@ -744,7 +718,6 @@
                 selectHtml += `<span class="rechazo-motivo-badge" title="${motivoRechazo}">Motivo: ${motivoRechazo}</span>`;
             }
 
-            // LÓGICA PARA MOSTRAR LA FECHA DE ASIGNACIÓN SOLO EN ENVIADOS Y RECHAZADOS
             let fechaAsignacionHtml = '';
             if ((tabActual === 'enviados' || tabActual === 'rechazados') && inc.fecha_asignacion) {
                 fechaAsignacionHtml = `<div style="font-size:10px; color:#64748B; margin-top:4px;">Asignado: ${formatearFecha(inc.fecha_asignacion)}</div>`;
@@ -865,9 +838,6 @@
         }
     }
 
-    // ==========================================
-    // LÓGICA DE FILTRADO Y ORDENAMIENTO
-    // ==========================================
     function filtrarIncidencias() {
         ejecutarFiltradoLogico();
     }
@@ -906,13 +876,11 @@
             return true;
         });
 
-        // === ORDENAMIENTO DESCENDENTE POR FECHA RECEPCIÓN (MÁS RECIENTE PRIMERO) ===
         listaFiltrada.sort((a, b) => {
             const fechaA = parsearFechaFirebase(a.fechaRecepcion);
             const fechaB = parsearFechaFirebase(b.fechaRecepcion);
-            return fechaB - fechaA; // Descendente
+            return fechaB - fechaA;
         });
-        // =======================================================================
 
         renderizarTabla(listaFiltrada);
     }
@@ -924,9 +892,6 @@
         filtrarIncidencias();
     }
 
-    // ==========================================
-    // LÓGICA DEL MODAL AGREGAR
-    // ==========================================
     function abrirModalAgregar() {
         document.getElementById('add-incidencia').value = '';
         document.getElementById('add-fecha').value = toDatetimeLocal(new Date());
@@ -993,11 +958,11 @@
         }
     }
 
-    // ==========================================
-    // LÓGICA DEL MODAL EDITAR
-    // ==========================================
     function abrirModalEdicion() {
-        if(!incidenciaSeleccionadaId) return;
+        if(!incidenciaSeleccionadaId) {
+            showCustomAlert("Atención", "Por favor, selecciona una incidencia de la tabla primero haciendo clic sobre ella.", false);
+            return;
+        }
         const inc = incidenciasGlobales.find(i => i.id_documento === incidenciaSeleccionadaId);
         if(!inc) return;
 
@@ -1080,26 +1045,20 @@
         const appData = JSON.parse(appDataStr); 
         const privilegio = String(appData.privilegio);
         
-        // 1. Mostrar todo por defecto
         document.querySelectorAll('.sidebar-link').forEach(link => link.style.display = ''); 
         document.querySelectorAll('.sidebar-section').forEach(sec => sec.style.display = '');
         
-        // 2. Aplicar restricciones solo a Privilegio 1
         if (privilegio === '1') {
-            
-            // Ocultar la sección completa de Reportes
             const seccionReportes = document.getElementById('nav-seccion-reportes'); 
             if (seccionReportes) seccionReportes.style.display = 'none';
             
-            // ✅ NUEVO: Ocultar TODA la sección de Administración (incluye Costos, Confirmación, etc.)
             const seccionAdmin = document.getElementById('nav-seccion-admin'); 
             if (seccionAdmin) seccionAdmin.style.display = 'none';
 
-            // Por seguridad, también ocultamos los enlaces individuales por si están fuera de la sección
             const enlacesOcultar = [
                 'orden_de_servicio.html', 
                 'confirmacion.html',
-                'costos.html',          // ✅ Agregado
+                'costos.html',
                 'aprobacion.html', 
                 'facturacion.html'
             ];
