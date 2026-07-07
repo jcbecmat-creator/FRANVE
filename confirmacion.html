@@ -484,29 +484,29 @@
     // ==========================================
     // 4. INICIALIZACIÓN DE LA PÁGINA
     // ==========================================
-    document.addEventListener('DOMContentLoaded', function () {
-        const savedSession = sessionStorage.getItem('loginSession');
-        const savedUser = sessionStorage.getItem('loginUser');
+document.addEventListener('DOMContentLoaded', function () {
+    const savedSession = sessionStorage.getItem('loginSession');
+    const savedUser = sessionStorage.getItem('loginUser');
+    
+    if (savedSession && savedUser) {
+        document.getElementById('app-screen').style.display = 'block';
+        const appData = JSON.parse(savedSession);
         
-        if (savedSession && savedUser) {
-            document.getElementById('app-screen').style.display = 'block';
-            const appData = JSON.parse(savedSession);
-            
-            const inicial = savedUser.charAt(0).toUpperCase();
-            document.querySelectorAll('.user-circle-initial').forEach(el => el.innerText = inicial);
+        const inicial = savedUser.charAt(0).toUpperCase();
+        document.querySelectorAll('.user-circle-initial').forEach(el => el.innerText = inicial);
 
-            const welcomeTitle = document.getElementById('welcome-username-display');
-            if(welcomeTitle) welcomeTitle.innerText = appData.nombreProveedor || savedUser;
-            const dropdownName = document.getElementById('dropdown-username');
-            if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
+        const welcomeTitle = document.getElementById('welcome-username-display');
+        if(welcomeTitle) welcomeTitle.innerText = appData.nombreProveedor || savedUser;
+        const dropdownName = document.getElementById('dropdown-username');
+        if(dropdownName) dropdownName.innerText = appData.nombreProveedor || savedUser;
 
-if(appData.privilegio == 1 || appData.privilegio == "1") {
-    // Privilegio 1 NO puede ver Confirmación Operativa, redirigir a Mantenimiento Correctivo
-    window.location.replace('index.html');
-}
-        } else {
+        // ✅ CORREGIDO: Privilegio 1 NO puede ver esta página
+        if(appData.privilegio == 1 || appData.privilegio == "1") {
             window.location.replace('index.html');
         }
+    } else {
+        window.location.replace('index.html');
+    }
 
         if (window.lucide) { lucide.createIcons(); }
 
