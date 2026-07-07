@@ -411,9 +411,9 @@
             </div>
             <h3 id="confirm-title">Confirmar Eliminación</h3>
             <p id="confirm-msg">¿Estás seguro de que deseas ELIMINAR esta incidencia?<br>Esta acción no se puede deshacer.</p>
-            <div class="confirm-actions">
-                <button class="btn-confirm-cancel" onclick="closeConfirm(false)">Cancelar</button>
-                <button class="btn-confirm-accept" onclick="closeConfirm(true)">Aceptar</button>
+            <div class="confirm-actions" style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn-confirm-cancel" onclick="closeConfirm(false)" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; font-weight: 600; cursor: pointer;">Cancelar</button>
+                <button class="btn-confirm-accept" onclick="closeConfirm(true)" style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: #DC2626; color: white; font-weight: 600; cursor: pointer;">Sí, Eliminar</button>
             </div>
         </div>
     </div>
